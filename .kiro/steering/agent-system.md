@@ -114,10 +114,19 @@ Apply protocols from `chit-chat.md` steering document:
 - Use visual formatting (bold, code blocks, lists)
 - Optimize for ADHD-C (minimal cognitive load)
 
-### Step 2: Scan Agents Directory
+### Step 2: Auto-Setup and Scan Agents Directory
 
-List all available agents from `.kiro/agents/` directory:
-- Find all `*.md` files (excluding `*.instructions.md`)
+**First, check if `.kiro/agents/` directory exists:**
+
+If directory doesn't exist OR directory is empty:
+1. Create `.kiro/agents/` directory if missing
+2. Create `kiro-manager.md` agent automatically using the enhanced description from "Available Agents" section
+3. Show diff block indicating setup completion
+4. Continue to Step 3 with kiro-manager as available agent
+
+If directory exists with agents:
+- List all available agents from `.kiro/agents/` directory
+- Find all `*.md` files
 - Extract agent names from filenames
 - Read frontmatter metadata for descriptions
 - Categorize by agent type if metadata available
@@ -318,7 +327,7 @@ When `/agents` is executed:
 Agents are discovered automatically from `.kiro/agents/` directory.
 
 **Current agents:**
-- **kiro-manager** - Interactive Kiro feature management (MCP, hooks, agents, specs, steering)
+- **kiro-manager** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities
 - **refactor-architect** - Code refactoring and architecture enforcement specialist
 - **code-analyzer** - Advanced code quality analysis and review
 - **typescript-pro** - Expert TypeScript development and type system mastery
