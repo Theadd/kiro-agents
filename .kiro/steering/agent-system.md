@@ -328,10 +328,6 @@ Agents are discovered automatically from `.kiro/agents/` directory.
 
 **Current agents:**
 - **kiro-manager** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities
-- **refactor-architect** - Code refactoring and architecture enforcement specialist
-- **code-analyzer** - Advanced code quality analysis and review
-- **typescript-pro** - Expert TypeScript development and type system mastery
-- **package-manager** - Interactive monorepo package management
 
 ## Usage Examples
 
