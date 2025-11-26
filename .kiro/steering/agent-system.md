@@ -53,7 +53,7 @@ When processing instructions, if you encounter an XML structure `<alias>` with v
 
 You are now activating the **{agent_name}** agent.
 
-### Step 1: Load Agent Definition
+### Step 1: Load Agent Definition and Strict Mode
 
 Read `.kiro/agents/{agent_name}.md` into context.
 
@@ -63,6 +63,8 @@ This file contains:
 - Mandatory protocols and rules
 - Examples and best practices
 - Integration requirements
+
+**Also load `strict-mode.md` steering document** to enable `/strict` and `/relax` commands for this agent session. STRICT_MODE defaults to OFF but user can activate it anytime.
 
 ### Step 2: Assume Agent Role
 
@@ -153,8 +155,9 @@ Use this response structure:
 2. **Create new agent** - Start agent creation wizard
 3. **Manage existing agent** - Modify agent configuration
 4. **View agent details** - Show full agent definition
-5. **Agent system help** - Explain how agents work
-6. **Exit** - Return to normal mode
+5. **List all commands** - Show available slash commands
+6. **Agent system help** - Explain how agents work
+7. **Exit** - Return to normal mode
 
 ### Step 4: Handle User Choice
 
@@ -190,14 +193,37 @@ Based on user selection:
 - Show agent protocols and capabilities summary
 - Offer to activate or manage agent
 
-**Option 5 - Agent system help:**
+**Option 5 - List all commands:**
+- Show all available slash commands in the system
+- Display command syntax and brief description
+- Group by category (agents, modes, utilities)
+- Format as table for quick reference:
+
+```
+Available Commands:
+
+AGENT COMMANDS
+  /agent {name}     Activate specific agent
+  /agents           Interactive agent management
+
+MODE COMMANDS  
+  /strict           Activate strict mode (shortcut)
+  /strict on        Activate strict mode
+  /strict off       Deactivate strict mode
+  /relax            Deactivate strict mode (alias)
+
+Note: Commands are defined in steering documents.
+New commands can be added via Instruction Alias pattern.
+```
+
+**Option 6 - Agent system help:**
 - Explain agent system architecture
 - Show command usage examples
 - Describe agent file structure
 - Explain how to create custom agents
 - Document best practices
 
-**Option 6 - Exit:**
+**Option 7 - Exit:**
 - Confirm exit from agent management mode
 - Return to normal Kiro interaction
 - Preserve any changes made
@@ -228,6 +254,7 @@ When `/agent {name}` is executed:
 
 2. **Load agent definition**
    - Read `.kiro/agents/{name}.md` into context
+   - **Load `strict-mode.md`** steering document (enables `/strict` commands)
    - Parse frontmatter metadata
    - Understand agent capabilities and workflows
    - Identify mandatory protocols
@@ -431,7 +458,7 @@ Multiple agents can coordinate through:
 
 **Problem:** `/agent {name}` doesn't work
 **Solutions:**
-- Check agent file exists in `.kiro/agents/`
+- Check agent files exist in `.kiro/agents/`
 - Verify filename matches command (case-sensitive)
 - Ensure `.md` file contains all required sections
 - Try `/agents` to see available agents
