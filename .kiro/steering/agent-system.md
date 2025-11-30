@@ -122,9 +122,9 @@ Apply protocols from `chit-chat.md` steering document:
 
 If directory doesn't exist OR directory is empty:
 1. Create `.kiro/agents/` directory if missing
-2. Create `kiro-manager.md` agent automatically using the enhanced description from "Available Agents" section
+2. Create `kiro-master.md` agent automatically using the enhanced description from "Available Agents" section
 3. Show diff block indicating setup completion
-4. Continue to Step 3 with kiro-manager as available agent
+4. Continue to Step 3 with kiro-master as available agent
 
 If directory exists with agents:
 - List all available agents from `.kiro/agents/` directory
@@ -170,7 +170,7 @@ Based on user selection:
 - Agent activates immediately
 
 **Option 2 - Create new agent:**
-- Start agent creation workflow (similar to kiro-manager)
+- Start agent creation workflow (similar to kiro-master)
 - Ask for agent type (code-focused, documentation, testing, etc.)
 - Collect agent name, description, capabilities
 - Generate `.md` file with all agent definition
@@ -351,7 +351,7 @@ When `/agents` is executed:
 Agents are discovered automatically from `.kiro/agents/` directory.
 
 **Current agents:**
-- **kiro-manager** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities
+- **kiro-master** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities
 
 ## Usage Examples
 
@@ -374,10 +374,10 @@ Agents are discovered automatically from `.kiro/agents/` directory.
 ### Switch Between Agents
 
 ```
-/agent kiro-manager
+/agent kiro-master
 ```
 
-**Result:** Switch from current agent (e.g., refactor-architect) to kiro-manager. Previous agent context is suspended, new agent context is loaded.
+**Result:** Switch from current agent (e.g., refactor-architect) to kiro-master. Previous agent context is suspended, new agent context is loaded.
 
 ### Create New Agent
 
@@ -483,7 +483,7 @@ Multiple agents can coordinate through:
 Potential improvements to agent system:
 
 - **Agent parameters** - `/agent refactor-architect --mode=strict`
-- **Agent chaining** - `/agent kiro-manager then refactor-architect`
+- **Agent chaining** - `/agent kiro-master then refactor-architect`
 - **Agent context preservation** - Maintain context when switching agents
 - **Agent history** - Track agent usage and sessions
 - **Agent templates** - Quick agent creation from templates
