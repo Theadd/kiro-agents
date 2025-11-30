@@ -64,7 +64,7 @@ This file contains:
 - Examples and best practices
 - Integration requirements
 
-**Also load `strict-mode.md` steering document** to enable `/strict` and `/relax` commands for this agent session. STRICT_MODE defaults to OFF but user can activate it anytime.
+**Also load `strict-mode.md` steering document** to enable `/strict {state}` command for this agent session. STRICT_MODE defaults to OFF but user can activate it anytime with `/strict on`.
 
 ### Step 2: Assume Agent Role
 
@@ -207,10 +207,7 @@ AGENT COMMANDS
   /agents           Interactive agent management
 
 MODE COMMANDS  
-  /strict           Activate strict mode (shortcut)
-  /strict on        Activate strict mode
-  /strict off       Deactivate strict mode
-  /relax            Deactivate strict mode (alias)
+  /strict {state}   Control strict mode (on/off)
 
 Note: Commands are defined in steering documents.
 New commands can be added via Instruction Alias pattern.
