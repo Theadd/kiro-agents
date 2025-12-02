@@ -206,8 +206,7 @@ AGENT COMMANDS
   /agent {name}     Activate specific agent
   /agents           Interactive agent management
 
-MODE COMMANDS  
-  /strict {state}   Control strict mode (on/off)
+{{{MODE_COMMANDS}}}
 
 Note: Commands are defined in steering documents.
 New commands can be added via Instruction Alias pattern.
@@ -398,6 +397,7 @@ Agents are discovered automatically from `.kiro/agents/` directory.
 - **Preserves ADHD-C optimizations** - Single focus, visual formatting maintained
 - **Maintains language rules** - Spanish chat, English files
 - **Respects user preferences** - Confirmation before changes, choice-based interaction
+{{{EXTRA_COMPATIBILITY}}}
 
 ### Steering Document Loading
 
@@ -489,6 +489,7 @@ Potential improvements to agent system:
 - **Agent marketplace** - Share agents with community
 - **Agent versioning** - Track agent changes over time
 - **Agent testing** - Automated agent validation
+{{{INTEGRATION_ENHANCEMENTS}}}
 
 ## Notes
 
