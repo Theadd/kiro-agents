@@ -125,10 +125,9 @@ Apply protocols from `chit-chat.md` steering document:
 **First, execute `listDirectory` on `.kiro/agents/`:**
 
 If directory doesn't exist OR directory is empty:
-1. Create `.kiro/agents/` directory if missing
-2. Create `kiro-master.md` agent automatically using the enhanced description from "Available Agents" section
-3. Show diff block indicating setup completion
-4. Continue to Step 3 with kiro-master as available agent
+1. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
+2. Show diff block indicating setup completion
+3. Continue to Step 3 with kiro-master as available agent
 
 If directory exists with agents:
 1. **Execute `listDirectory` tool** to get complete list of `.md` files
@@ -349,12 +348,13 @@ When `/agents` is executed:
 - Error Handling
 - Success Metrics
 
-## Available Agents
+## Initial Agent
 
-Agents are discovered automatically from `.kiro/agents/` directory.
+When auto-setup detects no agents exist, it creates the initial agent:
 
-**Current agents:**
-- **kiro-master** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities
+**kiro-master** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, powers, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities
+
+This description is used when creating `.kiro/agents/kiro-master.md` during auto-setup.
 
 ## Usage Examples
 
