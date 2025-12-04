@@ -1,0 +1,33 @@
+{
+  "name": "kiro-agents",
+  "version": "1.0.0",
+  "description": "AI agent system for Kiro IDE - Intelligent steering documents with dynamic substitutions and cross-IDE compatibility",
+  "type": "module",
+  "bin": {
+    "kiro-agents": "./bin/cli.ts"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun run scripts/build.ts",
+    "watch": "bun run scripts/build.ts --watch",
+    "clean": "bun run scripts/clean.ts"
+  },
+  "keywords": [
+    "kiro",
+    "ai-agents",
+    "steering-documents",
+    "ide-automation",
+    "adhd-assistance"
+  ],
+  "author": "VoltAgent AI ADHD",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
