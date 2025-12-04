@@ -206,7 +206,10 @@ AGENT COMMANDS
   /agent {name}     Activate specific agent
   /agents           Interactive agent management
 
-{{{MODE_COMMANDS}}}
+MODE COMMANDS (see modes-system.md)
+  /mode {name}      Switch Kiro mode (vibe/spec)
+  /modes            Interactive mode management
+  /strict {state}   Control strict mode (on/off)
 
 Note: Commands are defined in steering documents.
 New commands can be added via Instruction Alias pattern.
@@ -397,7 +400,8 @@ Agents are discovered automatically from `.kiro/agents/` directory.
 - **Preserves ADHD-C optimizations** - Single focus, visual formatting maintained
 - **Maintains language rules** - Spanish chat, English files
 - **Respects user preferences** - Confirmation before changes, choice-based interaction
-{{{EXTRA_COMPATIBILITY}}}
+- **Mode system** - Works seamlessly with modes (see `modes-system.md`)
+- **Context preservation** - File changes and conversation history persist across agent switches
 
 ### Steering Document Loading
 
@@ -489,7 +493,11 @@ Potential improvements to agent system:
 - **Agent marketplace** - Share agents with community
 - **Agent versioning** - Track agent changes over time
 - **Agent testing** - Automated agent validation
-{{{INTEGRATION_ENHANCEMENTS}}}
+
+**Integration enhancements:**
+- **Task sessions** - Agents create sub-tasks with own context
+- **Session continuation** - Resume interrupted work with full context
+- **Enhanced mode integration** - Better coordination with modes system
 
 ## Notes
 
