@@ -9,9 +9,9 @@ const FILE_MAPPINGS = [
   { src: "src/core/strict-mode.md", dest: "dist/agent-system/strict-mode.md" },
   { src: "src/kiro/steering/agent-system/kiro-spec-mode.md", dest: "dist/agent-system/kiro-spec-mode.md" },
   { src: "src/kiro/steering/agent-system/kiro-vibe-mode.md", dest: "dist/agent-system/kiro-vibe-mode.md" },
-  { src: "src/core/interactions/chit-chat.md", dest: "dist/interactions/chit-chat.md" },
-  { src: "src/core/interactions/interaction-styles.md", dest: "dist/interactions/interaction-styles.md" },
-  { src: "src/kiro/steering/agent-system/tools/client-tools.md", dest: "dist/tools/client-tools.md" },
+  { src: "src/core/interactions/chit-chat.md", dest: "dist/agent-system/interactions/chit-chat.md" },
+  { src: "src/core/interactions/interaction-styles.md", dest: "dist/agent-system/interactions/interaction-styles.md" },
+  { src: "src/kiro/steering/agent-system/tools/client-tools.md", dest: "dist/agent-system/tools/client-tools.md" },
 ] as const;
 
 type Substitutions = { [key: string]: () => string };
@@ -67,8 +67,30 @@ async function copyToKiroSteering(): Promise<void> {
   }
 }
 
+async function buildCLI(): Promise<void> {
+  console.log("🔧 Building CLI...\n");
+  
+  const result = await Bun.build({
+    entrypoints: ["./bin/cli.ts"],
+    outdir: "./bin",
+    target: "node",
+    format: "esm",
+    naming: "[dir]/[name].js",
+  });
+  
+  if (!result.success) {
+    console.error("❌ CLI build failed:", result.logs);
+    throw new Error("CLI build failed");
+  }
+  
+  console.log("✅ CLI built: bin/cli.js\n");
+}
+
 async function build(): Promise<void> {
   console.log("🔨 Starting build...\n");
+  
+  // Build CLI
+  await buildCLI();
   
   // Load configuration
   const config = await loadConfig();

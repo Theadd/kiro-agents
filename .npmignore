@@ -1,0 +1,10 @@
+src/
+scripts/
+.kiro/
+.git/
+.gitignore
+dev-resources/
+tsconfig.json
+index.ts
+*.log
+bin/cli.ts

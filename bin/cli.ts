@@ -1,7 +1,11 @@
-#!/usr/bin/env bun
-import { join } from "path";
+#!/usr/bin/env node
+import { join, dirname } from "path";
 import { homedir } from "os";
 import { existsSync, chmodSync, constants } from "fs";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const INSTALL_DIR = join(homedir(), ".kiro", "steering");
 
@@ -12,9 +16,9 @@ const FILES_TO_INSTALL = [
   "agent-system/strict-mode.md",
   "agent-system/kiro-spec-mode.md",
   "agent-system/kiro-vibe-mode.md",
-  "interactions/chit-chat.md",
-  "interactions/interaction-styles.md",
-  "tools/client-tools.md",
+  "agent-system/interactions/chit-chat.md",
+  "agent-system/interactions/interaction-styles.md",
+  "agent-system/tools/client-tools.md",
 ] as const;
 
 async function setWritable(filePath: string): Promise<void> {
@@ -42,11 +46,18 @@ async function installFile(relativePath: string): Promise<void> {
   }
   
   // Get source file from package dist/
-  const srcPath = join(import.meta.dir, "..", "dist", relativePath);
-  const srcFile = Bun.file(srcPath);
+  const srcPath = join(__dirname, "..", "dist", relativePath);
+  
+  // Read file using fs for Node.js compatibility
+  const { readFile, writeFile, mkdir } = await import("fs/promises");
+  const content = await readFile(srcPath);
+  
+  // Ensure directory exists
+  const destDir = dirname(destPath);
+  await mkdir(destDir, { recursive: true });
   
   // Write file
-  await Bun.write(destPath, srcFile, { createPath: true });
+  await writeFile(destPath, content);
   
   // Set read-only
   await setReadOnly(destPath);
