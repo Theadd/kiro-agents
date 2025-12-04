@@ -118,7 +118,11 @@ Apply protocols from `chit-chat.md` steering document:
 
 ### Step 2: Auto-Setup and Scan Agents Directory
 
-**First, check if `.kiro/agents/` directory exists:**
+**CRITICAL: You MUST execute `listDirectory` tool on `.kiro/agents/` to get the actual list of agents.**
+
+**DO NOT rely on open editor files or context - always scan the directory explicitly.**
+
+**First, execute `listDirectory` on `.kiro/agents/`:**
 
 If directory doesn't exist OR directory is empty:
 1. Create `.kiro/agents/` directory if missing
@@ -127,11 +131,11 @@ If directory doesn't exist OR directory is empty:
 4. Continue to Step 3 with kiro-master as available agent
 
 If directory exists with agents:
-- List all available agents from `.kiro/agents/` directory
-- Find all `*.md` files
-- Extract agent names from filenames
-- Read frontmatter metadata for descriptions
-- Categorize by agent type if metadata available
+1. **Execute `listDirectory` tool** to get complete list of `.md` files
+2. Extract agent names from filenames (remove `.md` extension)
+3. Read frontmatter metadata for descriptions
+4. Categorize by agent type if metadata available
+5. **List ALL agents found** - do not filter or assume based on context
 
 ### Step 3: Present Agent Selection
 
