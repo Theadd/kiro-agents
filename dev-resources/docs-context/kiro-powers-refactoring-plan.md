@@ -53,11 +53,14 @@ kiro-agents/
 power-kiro-agents/
 ├── POWER.md                      # Metadata + onboarding + steering mappings
 ├── steering/                     # All steering documents
-│   ├── agent-system.md           # Core agent system
-│   ├── modes-system.md           # Mode switching
-│   ├── strict-mode.md            # Strict mode
+│   ├── agent-system.md           # inclusion: always (contains /agents {name} alias)
+│   ├── agents.md                 # inclusion: manual → /agents command
+│   ├── modes-system.md           # inclusion: always (contains /modes {name} alias)
+│   ├── modes.md                  # inclusion: manual → /modes command
+│   ├── strict-mode.md            # inclusion: always (contains /strict {state} alias)
+│   ├── strict.md                 # inclusion: manual → /strict command (interactive)
 │   ├── interactions/
-│   │   ├── chit-chat.md
+│   │   ├── chit-chat.md          # inclusion: manual (optional)
 │   │   ├── conversation-language.md
 │   │   └── interaction-styles.md
 │   └── modes/
@@ -67,6 +70,23 @@ power-kiro-agents/
 │           └── client-tools.md
 └── mcp.json                      # (Optional, if we add MCP servers later)
 ```
+
+### File Organization Strategy
+
+**Always Loaded** (core system):
+- `agent-system.md` - Contains `/agents {name}` alias for direct activation
+- `modes-system.md` - Contains `/modes {name}` alias for direct switching
+- `strict-mode.md` - Contains `/strict {state}` alias for direct state change
+
+**Manual Inclusion** (interactive interfaces):
+- `agents.md` - Interactive agent management → `/agents` (no parameters)
+- `modes.md` - Interactive mode management → `/modes` (no parameters)
+- `strict.md` - Interactive strict mode control → `/strict` (no parameters, uses userInput)
+
+**On-Demand** (specialized guidance):
+- `interactions/chit-chat.md` - Choice-based interaction patterns
+- `modes/kiro-spec-mode.md` - Spec mode protocols
+- `modes/kiro-vibe-mode.md` - Vibe mode protocols
 
 ## POWER.md Structure
 
@@ -130,7 +150,34 @@ To get started:
 
 ## Slash Commands Integration
 
-### Current Approach (Instruction Alias in Steering)
+### The ENTER Key Problem & Solution
+
+**Problem**: Kiro's native slash commands capture input, preventing ENTER from sending the message.
+
+**Solution**: The problem only affects commands WITHOUT parameters!
+
+```
+/agents     ← Kiro captures it, ENTER doesn't work ❌
+/agent kiro-master [ENTER]  ← Space = normal text, ENTER works ✅
+```
+
+### Optimal Strategy
+
+**For Commands WITHOUT Parameters** → Use steering with `inclusion: manual`
+
+```markdown
+---
+inclusion: manual
+---
+
+# Agent Management
+
+Interactive agent management interface...
+```
+
+**Result**: `/agent-management` appears in Kiro's native slash command menu
+
+**For Commands WITH Parameters** → Use instruction aliases
 
 ```markdown
 <alias>
@@ -142,27 +189,27 @@ To get started:
 </alias>
 ```
 
-### Power Approach (Manual Inclusion Steering)
+**Result**: User types `/agent kiro-master` + ENTER and it works perfectly
 
-Each steering file can become a slash command by adding frontmatter:
+### Command Classification
 
-```markdown
----
-inclusion: manual
----
+**Convert to Manual Steering** (no parameters, interactive):
+- `/agents` → `agents.md` with `inclusion: manual` (chit-chat interface)
+- `/modes` → `modes.md` with `inclusion: manual` (chit-chat interface)
+- `/strict` → `strict.md` with `inclusion: manual` (userInput tool with buttons)
 
-# Agent System
+**Keep as Aliases** (with parameters, direct):
+- `/agents {name}` → Alias in `agent-system.md` (space after /agents = normal text)
+- `/modes {name}` → Alias in `modes-system.md` (space after /modes = normal text)
+- `/strict {state}` → Alias in `strict-mode.md` (space after /strict = normal text)
 
-Content here...
-```
+### Benefits of This Approach
 
-**Result**: `/agent-system` command appears in slash command menu
-
-### Hybrid Approach (Recommended)
-
-1. **Core steering files**: `inclusion: always` (agent-system.md, modes-system.md)
-2. **Specialized guidance**: `inclusion: manual` (strict-mode.md, specific workflows)
-3. **Keep instruction aliases**: They work within steering documents for parameterized commands
+1. **No-parameter commands**: Native Kiro UI with visual selection
+2. **Parameterized commands**: ENTER works, fast typing
+3. **Better UX**: Each command type uses the most appropriate mechanism
+4. **Full compatibility**: Works in both npm and Power distributions
+5. **User choice**: Interactive menu OR direct command entry
 
 ## Refactoring Strategy
 
@@ -173,15 +220,28 @@ Content here...
    - Write onboarding instructions
    - Map steering files to workflows
 
-2. **Reorganize Steering Files**
-   - Move all `.md` files to `steering/` directory
-   - Update frontmatter for inclusion modes
-   - Preserve instruction aliases
+2. **Split Commands into Separate Files**
+   - Extract `/agents` (no params) → `agents.md` with `inclusion: manual`
+   - Extract `/modes` (no params) → `modes.md` with `inclusion: manual`
+   - Create `/strict` (no params) → `strict.md` with `inclusion: manual` + userInput
+   - Update aliases to use same command name with parameters:
+     - `/agents {name}` in `agent-system.md`
+     - `/modes {name}` in `modes-system.md`
+     - `/strict {state}` in `strict-mode.md`
 
-3. **Test Locally**
+3. **Reorganize Steering Files**
+   - Move all `.md` files to `steering/` directory
+   - Update frontmatter for inclusion modes:
+     - `always` for core system files (agent-system.md, modes-system.md, strict-mode.md)
+     - `manual` for interactive interfaces (agents.md, modes.md, strict.md)
+   - Ensure consistent command naming (same base, different usage)
+
+4. **Test Locally**
    - Install power from local path
    - Verify keyword activation
-   - Test steering file loading
+   - Test slash commands without parameters (interactive)
+   - Test same commands with parameters (direct, ENTER works)
+   - Verify userInput tool works for `/strict`
 
 ### Phase 2: Maintain npm Distribution
 
@@ -275,11 +335,23 @@ async function build(target: 'npm' | 'power' | 'both') {
 ### Power Creation
 
 - [ ] Create `POWER.md` with metadata and onboarding
+- [ ] Split commands into separate files:
+  - [ ] Create `agents.md` from `/agents` alias (interactive, no params)
+  - [ ] Create `modes.md` from `/modes` alias (interactive, no params)
+  - [ ] Create `strict.md` with userInput tool (interactive, no params)
 - [ ] Organize steering files in `steering/` directory
-- [ ] Update frontmatter for inclusion modes
+- [ ] Update frontmatter for inclusion modes:
+  - [ ] `always` for agent-system.md, modes-system.md, strict-mode.md
+  - [ ] `manual` for agents.md, modes.md, strict.md
+- [ ] Update parameterized aliases to match command names:
+  - [ ] `/agents {name}` in agent-system.md
+  - [ ] `/modes {name}` in modes-system.md
+  - [ ] `/strict {state}` in strict-mode.md
 - [ ] Test keyword activation
-- [ ] Test steering file loading
-- [ ] Verify slash commands work
+- [ ] Test native slash commands without params (/agents, /modes, /strict)
+- [ ] Test parameterized commands with ENTER (/agents {name}, /modes {name}, /strict {state})
+- [ ] Verify userInput tool works for /strict
+- [ ] Verify steering file loading
 
 ### Build System
 
@@ -427,28 +499,51 @@ This power includes comprehensive guidance:
 
 ### Create a Custom Agent
 
+**Option 1: Interactive (native slash command)**
 ```
 /agents
+[Interactive menu with buttons]
 [Select: Create new agent]
 [Follow wizard prompts]
 ```
 
+**Option 2: Direct activation (if agent exists)**
+```
+/agents kiro-master [ENTER]
+```
+
 ### Switch Modes Mid-Workflow
 
+**Option 1: Interactive (native slash command)**
 ```
-/mode vibe
+/modes
+[Interactive menu with buttons]
+[Select mode from options]
+```
+
+**Option 2: Direct switching (fast)**
+```
+/modes vibe [ENTER]
 [Explore and prototype]
 
-/mode spec
+/modes spec [ENTER]
 [Formalize into structured plan]
 ```
 
 ### Use Strict Mode for Critical Code
 
+**Option 1: Interactive (native slash command with userInput)**
 ```
-/strict on
+/strict
+[Interactive buttons appear]
+[Select: Enable Strict Mode / Disable Strict Mode]
+```
+
+**Option 2: Direct state change (fast)**
+```
+/strict on [ENTER]
 [Work on critical implementation]
-/strict off
+/strict off [ENTER]
 ```
 
 ## Best Practices
@@ -508,10 +603,54 @@ For issues or questions:
 5. **Publish to GitHub** for community access
 6. **Iterate based on feedback**
 
+## User Experience Comparison
+
+### Before (Current System)
+
+**Problem**: `/agents` and `/modes` captured by Kiro, ENTER doesn't work
+
+```
+User types: /agents
+Kiro: [Captures it, shows in menu]
+User presses: ENTER
+Result: Nothing happens ❌
+```
+
+### After (Optimized System)
+
+**Interactive Commands** (no parameters):
+```
+User types: /agents
+Kiro: [Shows in native slash command menu]
+User selects: [Click or arrow keys + ENTER]
+Result: Interactive interface loads ✅
+```
+
+**Direct Commands** (with parameters, same command name):
+```
+User types: /agents kiro-master [ENTER]
+Kiro: [Space = treats as normal text]
+Result: Agent activates immediately ✅
+```
+
+**Strict Mode with userInput** (interactive buttons):
+```
+User types: /strict
+Kiro: [Shows in native slash command menu]
+User selects: [Click or arrow keys + ENTER]
+Result: Interactive buttons appear via userInput tool ✅
+  [🟢 Enable Strict Mode]
+  [🔴 Disable Strict Mode]
+```
+
+**Best of both worlds**: Same command name, different usage patterns!
+
 ## Questions to Discuss
 
 1. Should we deprecate npm package or maintain both?
 2. What keywords should trigger power activation?
-3. Which steering files should be `always` vs `manual`?
-4. Do we need MCP servers for additional functionality?
-5. Should we submit to official Power Store immediately?
+3. Do we need MCP servers for additional functionality?
+4. Should we submit to official Power Store immediately?
+5. Should we rename commands to avoid confusion?
+   - Keep `/agents` → `/agent-management`?
+   - Or use shorter names like `/agents-ui`?
