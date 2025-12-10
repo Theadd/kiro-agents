@@ -156,3 +156,6 @@ __*
 
 # Changeset snapshots (temporary session data)
 .changeset/snapshots/
+
+# npm configuration with tokens
+.npmrc
