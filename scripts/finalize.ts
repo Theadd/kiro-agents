@@ -2,7 +2,6 @@
 import { readdirSync, readFileSync, writeFileSync, rmSync } from "fs";
 import { execSync } from "child_process";
 import { join } from "path";
-import * as readline from "readline";
 
 interface SessionSnapshot {
   id: string;
@@ -62,11 +61,12 @@ function getSquashedCommit(): { message: string; diff: string; files: string[] }
   return { message: messages, diff, files };
 }
 
-async function analyzeFinal(snapshots: SessionSnapshot[], finalCommit: ReturnType<typeof getSquashedCommit>): Promise<FinalAnalysis> {
-  console.log("🤖 AI analyzing final changes vs session snapshots...\n");
+function displayAIPrompt(snapshots: SessionSnapshot[], finalCommit: ReturnType<typeof getSquashedCommit>): void {
+  console.log("🤖 AI Agent: Please analyze and provide changeset content\n");
   
   const prompt = `
-Analyze the final changes and determine what from the session snapshots made it to the final commit.
+📋 AI Analysis Required
+${"─".repeat(60)}
 
 **Session Snapshots (${snapshots.length} sessions):**
 ${JSON.stringify(snapshots, null, 2)}
@@ -86,55 +86,37 @@ ${finalCommit.diff.slice(0, 3000)}
    - **minor**: New features, new capabilities, backwards-compatible additions
    - **patch**: Bug fixes, documentation, refactoring, minor improvements
 5. Write user-facing changelog entry (not technical implementation details)
-6. Include relevant findings and decisions from snapshots
+6. Update the changeset file in .changeset/ (replace all TODO placeholders)
+7. Run: bun run finalize:commit
 
-**Output JSON:**
-{
-  "type": "major|minor|patch",
-  "summary": "One-line summary for changelog",
-  "description": "Detailed description (2-3 sentences)",
-  "details": {
-    "added": ["User-facing feature X"],
-    "changed": ["Behavior Y now does Z"],
-    "fixed": ["Bug W no longer occurs"],
-    "removed": ["Deprecated feature V"]
-  },
-  "findings": ["Important discovery A that users should know"],
-  "decisions": ["Chose approach B because C (affects usage)"]
-}
+**Changeset Format:**
+---
+"kiro-agents": major|minor|patch
+---
 
-**Example:**
-{
-  "type": "minor",
-  "summary": "Add AI-powered versioning system",
-  "description": "Implemented hybrid AI + Changesets versioning system with session snapshots for better changelog generation.",
-  "details": {
-    "added": [
-      "Session snapshot system for capturing development context",
-      "/snapshot command for incremental documentation",
-      "/finalize command for consolidating changes"
-    ],
-    "changed": [],
-    "fixed": [],
-    "removed": []
-  },
-  "findings": [
-    "Session context provides more value than git diffs alone"
-  ],
-  "decisions": [
-    "Separated snapshot (incremental) from finalize (consolidation) for better workflow"
-  ]
-}
+# One-line summary
+
+Detailed description (2-3 sentences)
+
+## Added
+- User-facing feature X
+
+## Changed
+- Behavior Y now does Z
+
+## Fixed
+- Bug W no longer occurs
+
+## Removed
+- Deprecated feature V
+
+${"─".repeat(60)}
 `;
 
-  console.log("📋 AI Agent Prompt:");
-  console.log("─".repeat(60));
   console.log(prompt);
-  console.log("─".repeat(60));
-  console.log("\n⚠️  This script requires AI agent interaction.");
-  console.log("💡 The AI agent should analyze snapshots + final commit and provide JSON output.\n");
-  
-  // Placeholder - In real usage, the AI agent will provide this
+}
+
+function createPlaceholderAnalysis(): FinalAnalysis {
   return {
     type: "minor",
     summary: "TODO: AI agent should provide summary",
@@ -215,31 +197,7 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
 
-async function promptUser(question: string, options: string[]): Promise<string> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
 
-  return new Promise((resolve) => {
-    console.log(`\n${question}\n`);
-    options.forEach((opt, i) => {
-      console.log(`  ${i + 1}. ${opt}`);
-    });
-    console.log();
-
-    rl.question("Enter your choice (1-" + options.length + "): ", (answer) => {
-      rl.close();
-      const choice = parseInt(answer.trim());
-      if (choice >= 1 && choice <= options.length) {
-        resolve(options[choice - 1]!);
-      } else {
-        console.log("❌ Invalid choice, defaulting to 'Review first'");
-        resolve(options[1]!); // Default to review
-      }
-    });
-  });
-}
 
 function commitChangeset(changesetFile: string): void {
   try {
@@ -308,8 +266,8 @@ Squashed ${commitCount} commits from feature branch.`;
   }
 }
 
-async function main() {
-  console.log("🎯 Finalize Changes\n");
+async function analyzePhase() {
+  console.log("🎯 Finalize Changes - Phase 1: Analysis\n");
   
   // Load snapshots
   const snapshots = loadSnapshots();
@@ -329,29 +287,75 @@ async function main() {
   const finalCommit = getSquashedCommit();
   console.log(`📦 Final commit affects ${finalCommit.files.length} files\n`);
   
-  // Analyze and create changeset
-  const analysis = await analyzeFinal(snapshots, finalCommit);
+  // Display AI prompt
+  displayAIPrompt(snapshots, finalCommit);
+  
+  // Create changeset with TODOs
+  const analysis = createPlaceholderAnalysis();
   const changesetFile = createChangeset(analysis);
+  
+  console.log("\n✅ Phase 1 complete!");
+  console.log("💡 AI agent should now:");
+  console.log("   1. Analyze the snapshots and diff above");
+  console.log("   2. Update the changeset file with real content");
+  console.log("   3. Execute: bun run finalize:commit");
+}
+
+async function commitPhase() {
+  console.log("🎯 Finalize Changes - Phase 2: Commit\n");
+  
+  // Find the most recent changeset file
+  const changesetFiles = readdirSync(".changeset")
+    .filter(f => f.endsWith(".md") && f !== "README.md")
+    .sort();
+  
+  if (changesetFiles.length === 0) {
+    console.error("❌ No changeset found");
+    console.error("💡 Run 'bun run finalize:analyze' first");
+    process.exit(1);
+  }
+  
+  const changesetFile = `.changeset/${changesetFiles[changesetFiles.length - 1]}`;
+  
+  // Verify changeset was updated
+  const content = readFileSync(changesetFile, "utf-8");
+  if (content.includes("TODO")) {
+    console.error("❌ Changeset still contains TODO placeholders");
+    console.error("💡 Please update the changeset file before committing");
+    console.error(`   File: ${changesetFile}`);
+    process.exit(1);
+  }
+  
+  console.log("✅ Changeset verified (no TODOs)");
   
   // Cleanup snapshots
   cleanupSnapshots();
   
-  // Automatic workflow
-  console.log("\n🚀 Starting automatic finalization workflow...");
-  
-  // 1. Commit changeset
+  // Commit and squash
+  console.log("\n🚀 Starting automatic finalization...");
   commitChangeset(changesetFile);
-  
-  // 2. Auto-squash commits
   autoSquashCommits();
   
-  // 3. Done!
   console.log("\n✨ Finalization complete!");
   console.log("\n💡 Next steps:");
-  console.log("1. Review the squashed commit: git log -1");
-  console.log("2. Push to remote: git push origin <branch> --force-with-lease");
+  console.log("1. Review: git log -1");
+  console.log("2. Push: git push origin <branch> --force-with-lease");
   console.log("\n💡 When ready to release (maintainer):");
   console.log("   bun run release");
+}
+
+async function main() {
+  const command = process.argv[2] || "analyze";
+  
+  if (command === "analyze") {
+    await analyzePhase();
+  } else if (command === "commit") {
+    await commitPhase();
+  } else {
+    console.error("❌ Unknown command:", command);
+    console.error("Usage: bun run finalize [analyze|commit]");
+    process.exit(1);
+  }
 }
 
 main();
