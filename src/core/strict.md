@@ -1,12 +1,12 @@
 ---
 inclusion: manual
-description: "Interactive strict mode control with visual buttons for enabling/disabling precision mode"
+description: "Interactive strict mode control with numbered options for enabling/disabling precision mode"
 keywords: ["strict", "precision", "mode", "control"]
 ---
 
 # Strict Mode Control
 
-Interactive control for STRICT_MODE using userInput tool.
+Interactive control for STRICT_MODE using numbered choice pattern.
 
 ## Current State Check
 
@@ -14,11 +14,10 @@ First, determine the current STRICT_MODE state from context.
 
 ## Present Interactive Options
 
-Use userInput tool to show interactive buttons:
+Display the question with numbered options:
 
-```typescript
-userInput({
-  question: `# Strict Mode Control
+```markdown
+# Strict Mode Control
 
 **Current State**: STRICT_MODE = ${current_state}
 
@@ -29,30 +28,15 @@ Strict mode blocks execution on ambiguous input and requires explicit clarificat
 - New component creation establishing patterns
 - Debugging propagated errors from incorrect assumptions
 
-**What would you like to do?**`,
-  options: [
-    {
-      title: "🟢 Enable Strict Mode",
-      description: "Activate precision mode - blocks execution on ambiguous input, requires explicit clarification",
-      recommended: current_state === "OFF"
-    },
-    {
-      title: "🔴 Disable Strict Mode",
-      description: "Return to normal mode - allows reasonable assumptions, faster iteration",
-      recommended: current_state === "ON"
-    },
-    {
-      title: "ℹ️ Learn More",
-      description: "Understand when and how to use strict mode effectively"
-    },
-    {
-      title: "📊 Check Current State",
-      description: "Show current strict mode configuration and status"
-    }
-  ],
-  reason: "strict-mode-control"
-})
+**What would you like to do?**
+
+1. **🟢 Enable Strict Mode** - Activate precision mode - blocks execution on ambiguous input, requires explicit clarification
+2. **🔴 Disable Strict Mode** - Return to normal mode - allows reasonable assumptions, faster iteration
+3. **ℹ️ Learn More** - Understand when and how to use strict mode effectively
+4. **📊 Check Current State** - Show current strict mode configuration and status
 ```
+
+**Note**: Recommend option 1 when current_state is "OFF", recommend option 2 when current_state is "ON".
 
 ## Handle User Selection
 
