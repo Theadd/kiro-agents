@@ -4,7 +4,7 @@ import { join } from "path";
 import { rmSync } from "fs";
 
 // Build targets configuration
-type BuildTarget = "npm" | "power" | "dev";
+type BuildTarget = "npm" | "npm-no-clean" | "power" | "dev";
 
 // File mappings for npm distribution
 const NPM_FILE_MAPPINGS = [
@@ -183,13 +183,15 @@ async function build(target: BuildTarget): Promise<void> {
   console.log(`📝 Loaded configuration with ${Object.keys(config.substitutions).length} substitutions\n`);
   
   // Build based on target
-  if (target === "npm") {
+  if (target === "npm" || target === "npm-no-clean") {
     await buildNpm(config);
     
-    // Clean build directory after successful build
-    console.log("\n🧹 Cleaning build directory...");
-    rmSync("build/npm", { recursive: true, force: true });
-    console.log("✅ Build directory cleaned");
+    // Clean build directory after successful build (unless npm-no-clean)
+    if (target === "npm") {
+      console.log("\n🧹 Cleaning build directory...");
+      rmSync("build/npm", { recursive: true, force: true });
+      console.log("✅ Build directory cleaned");
+    }
   } else if (target === "power") {
     await buildPower(config);
   } else if (target === "dev") {
@@ -245,9 +247,11 @@ if (command === "dev") {
   devMode();
 } else if (command === "npm") {
   build("npm");
+} else if (command === "npm-no-clean") {
+  build("npm-no-clean");
 } else if (command === "power") {
   build("power");
 } else {
-  console.error("❌ Invalid command. Use: dev, npm, or power");
+  console.error("❌ Invalid command. Use: dev, npm, npm-no-clean, or power");
   process.exit(1);
 }

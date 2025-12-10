@@ -52,10 +52,11 @@ async function main() {
   const newVersion = newPkg.version;
   console.log(`\n✅ Version bumped: ${currentVersion} → ${newVersion}\n`);
   
-  // Step 2: Build
+  // Step 2: Build (without cleanup for npm publish)
   console.log("🔨 Step 2: Building package...");
   try {
-    execSync("bun run build", { stdio: "inherit" });
+    // Build npm package but don't clean (needed for npm publish)
+    execSync("bun run scripts/build.ts npm-no-clean", { stdio: "inherit" });
   } catch (error) {
     console.error("\n❌ Build failed");
     process.exit(1);
