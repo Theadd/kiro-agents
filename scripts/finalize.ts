@@ -199,7 +199,7 @@ function generateId(): string {
 
 
 
-function commitChangeset(changesetFile: string): void {
+function commitChangeset(): void {
   try {
     console.log("\n📝 Committing changeset...");
     execSync("git add .changeset/*.md", { stdio: "inherit" });
@@ -211,7 +211,40 @@ function commitChangeset(changesetFile: string): void {
   }
 }
 
-function autoSquashCommits(): void {
+function parseChangeset(changesetFile: string): { type: string; summary: string; sections: { added: string[]; changed: string[]; fixed: string[]; removed: string[] } } {
+  const content = readFileSync(changesetFile, "utf-8");
+  
+  // Extract type from frontmatter
+  const typeMatch = content.match(/^---\n"[^"]+": (major|minor|patch)\n---/m);
+  const type: string = typeMatch ? typeMatch[1]! : "minor";
+  
+  // Extract summary (first # heading after frontmatter)
+  const summaryMatch = content.match(/^# (.+)$/m);
+  const summary: string = summaryMatch ? summaryMatch[1]! : "Update";
+  
+  // Extract sections
+  const sections = {
+    added: extractSection(content, "## Added"),
+    changed: extractSection(content, "## Changed"),
+    fixed: extractSection(content, "## Fixed"),
+    removed: extractSection(content, "## Removed")
+  };
+  
+  return { type, summary, sections };
+}
+
+function extractSection(content: string, heading: string): string[] {
+  const regex = new RegExp(`${heading}\\n([\\s\\S]*?)(?=\\n## |$)`, "m");
+  const match = content.match(regex);
+  if (!match) return [];
+  
+  return match[1]!
+    .split("\n")
+    .filter(line => line.trim().startsWith("-"))
+    .map(line => line.trim().substring(2));
+}
+
+function autoSquashCommits(changesetFile: string): void {
   try {
     console.log("\n🔄 Auto-squashing commits...");
     
@@ -236,24 +269,33 @@ function autoSquashCommits(): void {
     
     console.log(`🎯 Squashing ${commitCount} commits into 1...`);
     
-    // 3. Get the first commit message for the squashed commit
-    const firstCommitMsg = execSync(`git log --format=%B -n 1 HEAD~${commitCount - 1}`, { encoding: "utf-8" }).trim();
+    // 3. Parse changeset to generate descriptive commit message
+    const { type, summary, sections } = parseChangeset(changesetFile);
     
-    // 4. Soft reset to main
+    // 4. Build commit message
+    const commitType = type === "major" ? "feat!" : type === "minor" ? "feat" : "fix";
+    let commitMsg = `${commitType}: ${summary.toLowerCase()}`;
+    
+    // Add bullet points for each section
+    const bullets: string[] = [];
+    sections.added.forEach(item => bullets.push(`- ${item}`));
+    sections.changed.forEach(item => bullets.push(`- ${item}`));
+    sections.fixed.forEach(item => bullets.push(`- ${item}`));
+    sections.removed.forEach(item => bullets.push(`- ${item}`));
+    
+    if (bullets.length > 0) {
+      commitMsg += "\n\n" + bullets.join("\n");
+    }
+    
+    // 5. Soft reset to main
     execSync("git reset --soft main", { stdio: "inherit" });
     
-    // 5. Create single commit with descriptive message
-    const squashMsg = `feat: implement AI-powered versioning system
-
-${firstCommitMsg}
-
-Squashed ${commitCount} commits from feature branch.`;
-    
-    execSync(`git commit -m "${squashMsg.replace(/"/g, '\\"')}"`, { stdio: "inherit" });
+    // 6. Create single commit with descriptive message
+    execSync(`git commit -m "${commitMsg.replace(/"/g, '\\"')}"`, { stdio: "inherit" });
     
     console.log("✅ Commits squashed successfully!");
     
-    // 6. Restore stashed changes if any
+    // 7. Restore stashed changes if any
     if (hasUnstaged === "has-changes") {
       console.log("📦 Restoring stashed changes...");
       execSync("git stash pop", { stdio: "inherit" });
@@ -333,8 +375,8 @@ async function commitPhase() {
   
   // Commit and squash
   console.log("\n🚀 Starting automatic finalization...");
-  commitChangeset(changesetFile);
-  autoSquashCommits();
+  commitChangeset();
+  autoSquashCommits(changesetFile);
   
   console.log("\n✨ Finalization complete!");
   console.log("\n💡 Next steps:");
