@@ -5,6 +5,5 @@ scripts/
 .gitignore
 dev-resources/
 tsconfig.json
-index.ts
 *.log
 bin/cli.ts

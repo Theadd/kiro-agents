@@ -14,13 +14,29 @@ kiro-agents is a steering document system that extends Kiro IDE with:
 
 ## Installation
 
+### Option 1: Global Installation (npm)
+
 ```bash
 npx kiro-agents
 # or
 bunx kiro-agents
 ```
 
-This installs steering documents to `~/.kiro/steering/` that enhance Kiro's AI capabilities.
+This installs steering documents to `~/.kiro/steering/` (global, available in all workspaces).
+
+### Option 2: Workspace Installation (Kiro Power)
+
+1. Open Kiro IDE
+2. Open Powers panel (Ghosty icon ⚡)
+3. Click "Add power from GitHub"
+4. Enter: `https://github.com/theadd/kiro-agents`
+5. Click Install
+
+This installs to `.kiro/powers/kiro-agents/` (workspace-specific).
+
+**Differences:**
+- **npm**: Global installation, available in all workspaces
+- **Power**: Workspace-specific, auto-updates, better Kiro integration
 
 ## Core Features
 
@@ -34,8 +50,8 @@ Create specialized AI agents for different tasks. Each agent has:
 - Integration with other agents
 
 **Commands:**
-- `/agents` - Interactive agent management (create, activate, manage agents)
-- `/agent {name}` - Activate specific agent directly
+- `/agents` - Interactive agent management (visual menu)
+- `/agents {name}` - Activate specific agent directly
 
 **Example workflow:**
 ```
@@ -68,9 +84,9 @@ Switch between interaction styles based on your needs:
 - Property-based testing focus
 
 **Commands:**
-- `/modes` - Interactive mode management
-- `/mode vibe` - Switch to flexible development
-- `/mode spec` - Switch to structured planning
+- `/modes` - Interactive mode management (visual menu)
+- `/modes vibe` - Switch to flexible development
+- `/modes spec` - Switch to structured planning
 
 ### Strict Mode
 
@@ -82,6 +98,7 @@ Precision mode for experimental or critical development:
 - Ideal for architectural decisions
 
 **Commands:**
+- `/strict` - Interactive control (visual buttons)
 - `/strict on` - Activate precision mode
 - `/strict off` - Return to normal mode
 
@@ -98,33 +115,59 @@ This design reduces decision fatigue and maintains context during long conversat
 
 ## How It Works
 
-kiro-agents installs markdown files to `~/.kiro/steering/` that Kiro loads as steering documents. These documents:
+kiro-agents provides steering documents that Kiro loads to enhance AI capabilities:
 
-1. Define new slash commands (`/agent`, `/mode`, `/strict`, etc.)
-2. Provide protocols for AI behavior
-3. Enable agent and mode systems
-4. Optimize interactions for reduced cognitive load
+**npm installation:**
+- Installs to `~/.kiro/steering/` (global)
+- Available in all workspaces
+- Manual updates via re-running npx/bunx
 
-The system adds minimal overhead to initial context while enabling progressive enhancement through agent creation.
+**Power installation:**
+- Installs to `.kiro/powers/kiro-agents/` (workspace)
+- Auto-updates from GitHub
+- Better integration with Kiro ecosystem
+- Keyword-based activation
+
+Both methods provide:
+1. New slash commands (`/agents`, `/modes`, `/strict`)
+2. Protocols for AI behavior
+3. Agent and mode systems
+4. Optimized interactions for reduced cognitive load
+
+The system adds minimal overhead while enabling progressive enhancement.
 
 ## File Structure After Installation
 
+**npm installation** (`~/.kiro/steering/`):
 ```
 ~/.kiro/steering/
-├── agent-system.md              # Core agent system
-├── modes-system.md              # Mode switching system
+├── agent-system.md
+├── modes-system.md
 └── agent-system/
-    ├── strict-mode.md           # Precision mode
-    ├── kiro-spec-mode.md        # Spec mode protocols
-    ├── kiro-vibe-mode.md        # Vibe mode protocols
+    ├── strict-mode.md
+    ├── kiro-spec-mode.md
+    ├── kiro-vibe-mode.md
     ├── interactions/
-    │   ├── chit-chat.md         # Interactive workflows
-    │   └── interaction-styles.md
     └── tools/
-        └── client-tools.md
 ```
 
-Files are set to read-only after installation to prevent accidental modifications.
+**Power installation** (`.kiro/powers/kiro-agents/`):
+```
+.kiro/powers/kiro-agents/
+├── POWER.md                     # Power metadata
+├── mcp.json                     # MCP server config (empty for now)
+└── steering/
+    ├── agent-system.md          # Core system (always loaded)
+    ├── agents.md                # Interactive menu (manual)
+    ├── modes-system.md          # Core system (always loaded)
+    ├── modes.md                 # Interactive menu (manual)
+    ├── strict-mode.md           # Core system (always loaded)
+    ├── strict.md                # Interactive control (manual)
+    ├── interactions/            # Interaction patterns
+    └── modes/                   # Mode definitions
+```
+
+npm files are read-only after installation. Power files managed by Kiro.
 
 ## Usage Examples
 
