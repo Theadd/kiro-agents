@@ -145,14 +145,14 @@ dist
 .nx
 
 .voltagent
-# dev-resources
+dev-resources/
 __*
 .kilocode*
 .roomodes
 .rooignore
 
 # workspace steering docs
-.kiro/steering/
+# .kiro/steering/
 
 # Changeset snapshots (temporary session data)
 .changeset/snapshots/

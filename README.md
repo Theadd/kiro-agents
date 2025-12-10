@@ -186,7 +186,7 @@ AI: Agent created! Activate now? [Yes/No]
 ### Switching Modes
 
 ```
-User: /mode spec
+User: /modes spec
 AI: [Loads spec mode protocols]
 AI: What feature do you want to work on?
 User: User authentication system
@@ -205,9 +205,9 @@ AI: [Asks clarifying questions about cache strategy, TTL, invalidation, etc.]
 ### Agent Coordination
 
 ```
-User: /mode spec
+User: /modes spec
 [Work on feature planning]
-User: /agent kiro-master
+User: /agents kiro-master
 [Use kiro-master capabilities while in spec mode]
 ```
 

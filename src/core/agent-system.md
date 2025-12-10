@@ -113,7 +113,7 @@ This provides a visual interface for:
 
 ## Agent Activation Protocol
 
-When `/agent {name}` is executed:
+When `/agents {name}` is executed:
 
 1. **Discover agent file**
    - Check `.kiro/agents/{name}.md` exists
@@ -169,7 +169,7 @@ When `/agents` is executed:
    - Allow exit to normal mode
 
 4. **Handle operations**
-   - Agent activation → Execute `/agent {name}`
+   - Agent activation → Execute `/agents {name}`
    - Agent creation → Start creation wizard
    - Agent management → Modify agent files
    - Agent viewing → Display agent details
@@ -229,7 +229,7 @@ This description is used when creating `.kiro/agents/kiro-master.md` during auto
 ### Activate Specific Agent
 
 ```
-/agent refactor-architect
+/agents refactor-architect
 ```
 
 **Result:** AI immediately assumes refactor-architect role, loads agent files, applies protocols, and begins interaction according to agent's style.
@@ -245,7 +245,7 @@ This description is used when creating `.kiro/agents/kiro-master.md` during auto
 ### Switch Between Agents
 
 ```
-/agent kiro-master
+/agents kiro-master
 ```
 
 **Result:** Switch from current agent (e.g., refactor-architect) to kiro-master. Previous agent context is suspended, new agent context is loaded.
@@ -300,7 +300,7 @@ Agents can specify required steering documents in their `.md` definition file:
 ### For Agent Users
 
 1. **Use `/agents` for discovery** - See what agents are available
-2. **Use `/agent {name}` for direct activation** - When you know which agent you need
+2. **Use `/agents {name}` for direct activation** - When you know which agent you need
 3. **Let agents maintain focus** - Don't switch agents mid-task unless necessary
 4. **Provide clear context** - Help agents understand your needs
 5. **Use agent capabilities** - Leverage agent-specific tools and workflows
@@ -325,7 +325,7 @@ Agents can specify required steering documents in their `.md` definition file:
 
 ### Agent Not Activating
 
-**Problem:** `/agent {name}` doesn't work
+**Problem:** `/agents {name}` doesn't work
 **Solutions:**
 - Check agent files exist in `.kiro/agents/`
 - Verify filename matches command (case-sensitive)
@@ -355,8 +355,8 @@ Agents can specify required steering documents in their `.md` definition file:
 Potential improvements to agent system:
 
 **Agent enhancements:**
-- **Agent parameters** - `/agent refactor-architect --mode=strict`
-- **Agent chaining** - `/agent kiro-master then refactor-architect`
+- **Agent parameters** - `/agents refactor-architect --mode=strict`
+- **Agent chaining** - `/agents kiro-master then refactor-architect`
 - **Agent templates** - Quick agent creation from templates
 - **Agent marketplace** - Share agents with community
 - **Agent versioning** - Track agent changes over time
@@ -373,4 +373,4 @@ Potential improvements to agent system:
 
 ---
 
-**Agent system ready. Use `/agents` to begin or `/agent {name}` to activate specific agent.**
+**Agent system ready. Use `/agents` to begin or `/agents {name}` to activate specific agent.**
