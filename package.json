@@ -17,7 +17,9 @@
     "test": "bun run scripts/test.ts",
     "clean": "bun run scripts/clean.ts",
     "snapshot": "bun run scripts/snapshot.ts",
-    "finalize": "bun run scripts/finalize.ts",
+    "finalize": "bun run scripts/finalize.ts analyze",
+    "finalize:analyze": "bun run scripts/finalize.ts analyze",
+    "finalize:commit": "bun run scripts/finalize.ts commit",
     "release": "bun run scripts/release.ts"
   },
   "keywords": [
