@@ -9,6 +9,7 @@ type BuildTarget = "npm" | "npm-no-clean" | "power" | "dev";
 // File mappings for npm distribution
 const NPM_FILE_MAPPINGS = [
   // Core system files (always loaded)
+  { src: "src/core/aliases.md", dest: "build/npm/dist/aliases.md" },
   { src: "src/core/agent-system.md", dest: "build/npm/dist/agent-system.md" },
   { src: "src/kiro/steering/modes-system.md", dest: "build/npm/dist/modes-system.md" },
   { src: "src/core/strict-mode.md", dest: "build/npm/dist/strict-mode.md" },
@@ -34,6 +35,7 @@ const POWER_FILE_MAPPINGS = [
   { src: "src/kiro/mcp.json", dest: "power/mcp.json" },
   
   // Core system files (always loaded)
+  { src: "src/core/aliases.md", dest: "power/steering/aliases.md" },
   { src: "src/core/agent-system.md", dest: "power/steering/agent-system.md" },
   { src: "src/kiro/steering/modes-system.md", dest: "power/steering/modes-system.md" },
   { src: "src/core/strict-mode.md", dest: "power/steering/strict-mode.md" },
