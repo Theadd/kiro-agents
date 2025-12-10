@@ -7,42 +7,9 @@ description: Generic agent activation system with instruction commands for seaml
 
 Generic agent activation and management system for Kiro using instruction commands with parameter support.
 
-## Instruction Alias with Parameters
-
-### Parameter Substitution Protocol
-
-When processing instructions, if you encounter an XML structure `<alias>` with variables in `{curly_braces}`:
-
-```xml
-<alias>
-  <trigger>COMMAND {param1} {param2}</trigger>
-  <definition>
-    Instructions with {param1} and {param2} placeholders
-  </definition>
-</alias>
-```
-
-**Processing steps:**
-1. **Extract parameter names** from `<trigger>` (e.g., `{param1}`, `{param2}`)
-2. **Match user command** - When user types matching command pattern
-3. **Extract parameter values** - Capture actual values from user input
-4. **Replace placeholders** - Substitute all `{param}` in `<definition>` with actual values
-5. **Execute instructions** - Run resulting instructions immediately
-
-### Example
-
-**Alias definition:**
-```xml
-<alias>
-  <trigger>/greet {name}</trigger>
-  <definition>Say hello to {name} enthusiastically!</definition>
-</alias>
-```
-
-**User types:** `/greet Alice`
-**System executes:** "Say hello to Alice enthusiastically!"
-
 ## Agent Commands
+
+**Note:** This system uses the Instruction Alias pattern defined in `aliases.md`. See that document for details on parameter substitution and literal response patterns.
 
 ### Command 1: Activate Specific Agent
 
@@ -113,7 +80,7 @@ This provides a visual interface for:
 
 ## Agent Activation Protocol
 
-When `/agent {name}` is executed:
+When `/agents {name}` is executed:
 
 1. **Discover agent file**
    - Check `.kiro/agents/{name}.md` exists
@@ -169,7 +136,7 @@ When `/agents` is executed:
    - Allow exit to normal mode
 
 4. **Handle operations**
-   - Agent activation → Execute `/agent {name}`
+   - Agent activation → Execute `/agents {name}`
    - Agent creation → Start creation wizard
    - Agent management → Modify agent files
    - Agent viewing → Display agent details
@@ -229,7 +196,7 @@ This description is used when creating `.kiro/agents/kiro-master.md` during auto
 ### Activate Specific Agent
 
 ```
-/agent refactor-architect
+/agents refactor-architect
 ```
 
 **Result:** AI immediately assumes refactor-architect role, loads agent files, applies protocols, and begins interaction according to agent's style.
@@ -245,7 +212,7 @@ This description is used when creating `.kiro/agents/kiro-master.md` during auto
 ### Switch Between Agents
 
 ```
-/agent kiro-master
+/agents kiro-master
 ```
 
 **Result:** Switch from current agent (e.g., refactor-architect) to kiro-master. Previous agent context is suspended, new agent context is loaded.
@@ -301,7 +268,7 @@ Agents can specify required steering documents in their `.md` definition file:
 ### For Agent Users
 
 1. **Use `/agents` for discovery** - See what agents are available
-2. **Use `/agent {name}` for direct activation** - When you know which agent you need
+2. **Use `/agents {name}` for direct activation** - When you know which agent you need
 3. **Let agents maintain focus** - Don't switch agents mid-task unless necessary
 4. **Provide clear context** - Help agents understand your needs
 5. **Use agent capabilities** - Leverage agent-specific tools and workflows
@@ -326,7 +293,7 @@ Agents can specify required steering documents in their `.md` definition file:
 
 ### Agent Not Activating
 
-**Problem:** `/agent {name}` doesn't work
+**Problem:** `/agents {name}` doesn't work
 **Solutions:**
 - Check agent files exist in `.kiro/agents/`
 - Verify filename matches command (case-sensitive)
@@ -356,8 +323,8 @@ Agents can specify required steering documents in their `.md` definition file:
 Potential improvements to agent system:
 
 **Agent enhancements:**
-- **Agent parameters** - `/agent refactor-architect --mode=strict`
-- **Agent chaining** - `/agent kiro-master then refactor-architect`
+- **Agent parameters** - `/agents refactor-architect --mode=strict`
+- **Agent chaining** - `/agents kiro-master then refactor-architect`
 - **Agent templates** - Quick agent creation from templates
 - **Agent marketplace** - Share agents with community
 - **Agent versioning** - Track agent changes over time
@@ -378,4 +345,4 @@ Potential improvements to agent system:
 
 ---
 
-**Agent system ready. Use `/agents` to begin or `/agent {name}` to activate specific agent.**
+**Agent system ready. Use `/agents` to begin or `/agents {name}` to activate specific agent.**

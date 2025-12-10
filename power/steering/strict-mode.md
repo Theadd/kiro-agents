@@ -62,13 +62,14 @@ State changed. Response Protocol now applies.
 ### Command 2: Interactive Control
 
 For interactive strict mode control, use the `/strict` slash command (without parameters).
-This provides a visual interface with buttons to:
+This provides a numbered choice interface to:
 - Enable strict mode
 - Disable strict mode
 - Learn more about strict mode
+- Check current state
 
 **Usage:**
-- Interactive: `/strict` (no parameters, loads `strict.md` steering file with userInput buttons)
+- Interactive: `/strict` (no parameters, loads `strict.md` steering file with numbered options)
 - Direct: `/strict on` or `/strict off` (with state)
 
 ## Use Case Guidelines

@@ -1,5 +1,59 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- 415ee0c: # Instruction Alias system with literal response pattern and extended documentation
+
+  Refactored the Instruction Alias system into a compact steering document with a separate comprehensive guide. Added support for literal response pattern to enable triggering native IDE features, and reduced context overhead by separating essential instructions from extended documentation.
+
+  ## Added
+
+  - Instruction Alias system as Core Feature #0 with compact steering document (`src/core/aliases.md`)
+  - Comprehensive alias documentation guide (`src/core/docs/aliases-guide.md`) with examples, best practices, and troubleshooting
+  - Literal Response Pattern for outputting exact text to trigger native IDE features
+  - Extended documentation directory structure (`src/core/docs/`)
+
+  ## Changed
+
+  - Refactored agent-system.md to reference aliases.md instead of containing inline alias documentation
+  - Updated build pipeline to include aliases.md in both npm and power distributions
+  - Improved project structure documentation to reflect new aliases and docs organization
+
+### Patch Changes
+
+- 28a5ff7: # Documentation consistency improvements and workspace steering setup
+
+  Standardized command syntax across all documentation and source files, resolved architectural inconsistencies, and added comprehensive workspace steering documents for better development experience.
+
+  ## Added
+
+  - Workspace steering documents (product.md, structure.md, tech.md) providing comprehensive project context
+  - .changeset/snapshots/ to .gitignore for session snapshot management
+
+  ## Changed
+
+  - Standardized command syntax from `/agent` to `/agents` throughout README and documentation
+  - Standardized command syntax from `/mode` to `/modes` for consistency
+  - Removed strict-mode.md loading from modes-system.md to eliminate duplicate loading when combining modes and agents
+
+  ## Fixed
+
+  - Command inconsistencies between README.md (singular) and source implementation (plural)
+  - Architectural coupling where modes-system.md unnecessarily loaded strict-mode.md
+  - Documentation clarity in MODE-SWITCHING-GUIDE.md and QUICK-REFERENCE.md
+
+- c4225e4: # Refactor strict mode control to use numbered choice pattern
+
+  Replaced userInput tool-based interaction with ADHD-C friendly numbered list format in strict mode control. This change improves compatibility with chit-chat interaction patterns and removes dependency on Kiro-specific tool constraints.
+
+  ## Changed
+
+  - Strict mode interactive control (`/strict`) now uses numbered choice pattern instead of userInput tool
+  - Updated documentation in both `strict.md` and `strict-mode.md` to reflect numbered options interface
+  - Replaced "visual buttons" terminology with "numbered choice interface" for consistency
+
 ## 1.1.0
 
 ### Minor Changes
