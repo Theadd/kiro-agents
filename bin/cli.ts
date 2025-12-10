@@ -7,18 +7,20 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const INSTALL_DIR = join(homedir(), ".kiro", "steering");
+const INSTALL_DIR = join(homedir(), ".kiro", "steering", "kiro-agents");
 
 // Files to install (relative to dist/ in package)
 const FILES_TO_INSTALL = [
   "agent-system.md",
   "modes-system.md",
-  "agent-system/strict-mode.md",
-  "agent-system/kiro-spec-mode.md",
-  "agent-system/kiro-vibe-mode.md",
-  "agent-system/interactions/chit-chat.md",
-  "agent-system/interactions/interaction-styles.md",
-  "agent-system/tools/client-tools.md",
+  "strict-mode.md",
+  "agents.md",
+  "modes.md",
+  "strict.md",
+  "interactions/chit-chat.md",
+  "interactions/interaction-styles.md",
+  "modes/kiro-spec-mode.md",
+  "modes/kiro-vibe-mode.md",
 ] as const;
 
 async function setWritable(filePath: string): Promise<void> {
@@ -45,7 +47,7 @@ async function installFile(relativePath: string): Promise<void> {
     await setWritable(destPath);
   }
   
-  // Get source file from package dist/
+  // Get source file from package build/npm/dist/
   const srcPath = join(__dirname, "..", "dist", relativePath);
   
   // Read file using fs for Node.js compatibility
@@ -66,7 +68,14 @@ async function installFile(relativePath: string): Promise<void> {
 }
 
 async function install(): Promise<void> {
-  console.log("📦 Installing kiro-agents to ~/.kiro/steering/\n");
+  console.log("📦 Installing kiro-agents to ~/.kiro/steering/kiro-agents/\n");
+  
+  // Remove existing installation if present
+  if (existsSync(INSTALL_DIR)) {
+    console.log("🗑️  Removing existing installation...\n");
+    const { rmSync } = await import("fs");
+    rmSync(INSTALL_DIR, { recursive: true, force: true });
+  }
   
   // Install all files
   for (const file of FILES_TO_INSTALL) {
@@ -76,6 +85,7 @@ async function install(): Promise<void> {
   console.log("\n✨ Installation completed successfully!");
   console.log(`\n📁 Files installed to: ${INSTALL_DIR}`);
   console.log("\n💡 Files are set to read-only. To modify them, change permissions first.");
+  console.log("\n🔄 To update, simply run 'npx kiro-agents' again.");
 }
 
 // Main execution

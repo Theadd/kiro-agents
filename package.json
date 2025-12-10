@@ -4,16 +4,21 @@
   "description": "AI agent system for Kiro IDE",
   "type": "module",
   "bin": {
-    "kiro-agents": "bin/cli.js"
+    "kiro-agents": "build/npm/bin/cli.js"
   },
   "files": [
-    "bin",
-    "dist"
+    "build/npm/bin",
+    "build/npm/dist"
   ],
   "scripts": {
-    "build": "bun run scripts/build.ts",
-    "watch": "bun run scripts/build.ts --watch",
-    "clean": "bun run scripts/clean.ts"
+    "build": "bun run scripts/build.ts npm",
+    "build:power": "bun run scripts/build.ts power",
+    "dev": "bun run scripts/build.ts dev",
+    "test": "bun run scripts/test.ts",
+    "clean": "bun run scripts/clean.ts",
+    "snapshot": "bun run scripts/snapshot.ts",
+    "finalize": "bun run scripts/finalize.ts",
+    "release": "bun run scripts/release.ts"
   },
   "keywords": [
     "kiro",
@@ -22,6 +27,7 @@
   "author": "R. Beltran",
   "license": "MIT",
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@types/bun": "latest"
   },
   "peerDependencies": {

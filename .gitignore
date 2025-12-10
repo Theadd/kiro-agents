@@ -153,3 +153,6 @@ __*
 
 # workspace steering docs
 .kiro/steering/
+
+# Changeset snapshots (temporary session data)
+.changeset/snapshots/

@@ -46,7 +46,9 @@ This serves dual purpose:
 - File locations not specified
 - Breaking changes implications
 
-## Activation Command
+## Activation Commands
+
+### Command 1: Direct State Change
 
 <alias>
   <trigger>/strict {state}</trigger>
@@ -56,6 +58,18 @@ This serves dual purpose:
 State changed. Response Protocol now applies.
   </definition>
 </alias>
+
+### Command 2: Interactive Control
+
+For interactive strict mode control, use the `/strict` slash command (without parameters).
+This provides a visual interface with buttons to:
+- Enable strict mode
+- Disable strict mode
+- Learn more about strict mode
+
+**Usage:**
+- Interactive: `/strict` (no parameters, loads `strict.md` steering file with userInput buttons)
+- Direct: `/strict on` or `/strict off` (with state)
 
 ## Use Case Guidelines
 

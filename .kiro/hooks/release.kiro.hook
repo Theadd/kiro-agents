@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "release",
+  "description": "Consume changesets, bump version, build package, run tests, publish to npm registry, create git tag, and push to GitHub. Displays release summary with version, changelog, npm URL, and GitHub release URL. Should only be run by maintainers on main branch after merging feature branches with changesets.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Consume changesets, bump version, and publish to npm registry:\n\n**Prerequisites check:**\n- Verify you're on the main branch\n- Confirm all feature branches with changesets have been merged\n- Ensure you have npm publish permissions\n\n**Execution:**\n\n1. Execute the release script: `bun run release`\n\n2. The script will automatically:\n   - **Version phase**:\n     * Run `changeset version` to consume all changeset files\n     * Bump package version in package.json (following semver)\n     * Update CHANGELOG.md with consolidated changes from all changesets\n     * Delete consumed changeset files\n   - **Build phase**:\n     * Run `bun run build` to compile the package\n     * Run `bun run test` to validate build output\n   - **Publish phase**:\n     * Run `npm publish` to publish to npm registry\n     * Create git tag for the new version (e.g., v1.2.0)\n     * Push tag to GitHub\n\n3. Monitor the script output for:\n   - ✅ Version bump confirmation (old → new)\n   - ✅ Build success\n   - ✅ Test validation\n   - ✅ npm publish success\n   - ✅ Git tag creation\n   - ✅ GitHub push confirmation\n\n4. After script completes, display release summary:\n   - 📦 New version number\n   - 📝 Changelog entries added\n   - 🔗 npm package URL: https://www.npmjs.com/package/kiro-agents\n   - 🏷️ GitHub release URL\n\n5. Confirm release was successful and all steps completed\n\n**Important notes:**\n- This command should ONLY be run by maintainers\n- Must be executed on the main branch\n- Requires npm authentication (run `npm login` if needed)\n- All changesets will be consumed and deleted\n- Version bump follows semantic versioning based on changeset types"
+  }
+}

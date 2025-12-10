@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "finalize",
+  "description": "Consolidates session snapshots and creates a changeset for the completed feature by executing the finalize script, which loads snapshots, analyzes git diff, uses AI to generate a coherent changelog, and prompts for commit actions",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Consolidate session snapshots and create a changeset for the completed feature:\n\n1. Execute the finalize script: `bun run finalize`\n2. The script will:\n   - Load all session snapshots from `.changeset/snapshots/`\n   - Analyze git diff from main branch to current branch\n   - Display AI analysis prompt showing snapshots and final commit\n   - Wait for AI to provide analysis\n3. When the script shows the AI prompt, analyze the data and provide JSON output:\n   - Determine semantic version type (major/minor/patch)\n   - Write user-facing summary and description\n   - List changes by category (added/changed/fixed/removed)\n   - Include relevant findings and decisions from snapshots\n   - Filter out temporary/experimental changes that didn't make it to final commit\n4. The script will:\n   - Create changeset file in `.changeset/{id}.md` with your analysis\n   - Clean up snapshot files\n   - Display the generated changeset\n   - Show interactive prompt with 3 options:\n     * 1. ✅ Commit changeset now (auto-commits)\n     * 2. 📝 Review changeset first (shows manual commands)\n     * 3. ❌ Cancel (keeps changeset, doesn't commit)\n5. Wait for user to select an option (the script handles the rest)\n6. After script completes, remind user of next steps based on their choice\n\nThe changeset will be consumed during release to update CHANGELOG.md and bump version."
+  }
+}
