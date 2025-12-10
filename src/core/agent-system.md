@@ -7,42 +7,9 @@ description: Generic agent activation system with instruction commands for seaml
 
 Generic agent activation and management system for Kiro using instruction commands with parameter support.
 
-## Instruction Alias with Parameters
-
-### Parameter Substitution Protocol
-
-When processing instructions, if you encounter an XML structure `<alias>` with variables in `{curly_braces}`:
-
-```xml
-<alias>
-  <trigger>COMMAND {param1} {param2}</trigger>
-  <definition>
-    Instructions with {param1} and {param2} placeholders
-  </definition>
-</alias>
-```
-
-**Processing steps:**
-1. **Extract parameter names** from `<trigger>` (e.g., `{param1}`, `{param2}`)
-2. **Match user command** - When user types matching command pattern
-3. **Extract parameter values** - Capture actual values from user input
-4. **Replace placeholders** - Substitute all `{param}` in `<definition>` with actual values
-5. **Execute instructions** - Run resulting instructions immediately
-
-### Example
-
-**Alias definition:**
-```xml
-<alias>
-  <trigger>/greet {name}</trigger>
-  <definition>Say hello to {name} enthusiastically!</definition>
-</alias>
-```
-
-**User types:** `/greet Alice`
-**System executes:** "Say hello to Alice enthusiastically!"
-
 ## Agent Commands
+
+**Note:** This system uses the Instruction Alias pattern defined in `aliases.md`. See that document for details on parameter substitution and literal response patterns.
 
 ### Command 1: Activate Specific Agent
 

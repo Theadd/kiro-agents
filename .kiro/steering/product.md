@@ -1,7 +1,3 @@
----
-inclusion: always
----
-
 # Product Overview
 
 kiro-agents is a steering document system for Kiro IDE that provides an agent framework, mode switching, and interaction patterns optimized for reduced cognitive load.
@@ -26,6 +22,22 @@ When working on this codebase, follow these principles:
 5. **Build-Time Processing** - Substitutions and transformations happen during build, not runtime
 
 ## Core Features
+
+### 0. Instruction Alias System
+
+**Purpose**: Create custom commands with parameter substitution and literal responses
+
+**Implementation**:
+- Defined in `src/core/aliases.md` (compact steering document)
+- Complete guide in `src/core/docs/aliases-guide.md`
+- Two patterns: parameter substitution and literal response
+- Used by agent system, mode system, and user-defined aliases
+
+**Key Behaviors**:
+- Parameter aliases substitute values from user input
+- Literal response aliases output exact text (for triggering native IDE features)
+- Aliases processed before other instructions
+- Can be defined in any steering document with `inclusion: always`
 
 ### 1. Agent System
 

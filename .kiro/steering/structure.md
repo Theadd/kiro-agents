@@ -6,10 +6,13 @@
 kiro-agents/
 ├── src/                          # Source files
 │   ├── core/                     # Cross-IDE compatible
+│   │   ├── aliases.md            # Instruction alias system (compact)
 │   │   ├── agent-system.md       # Core agent system
 │   │   ├── agents.md             # Interactive agent menu
 │   │   ├── strict-mode.md        # Strict mode rules
 │   │   ├── strict.md             # Interactive strict control
+│   │   ├── docs/                 # Extended documentation
+│   │   │   └── aliases-guide.md  # Complete alias documentation
 │   │   └── interactions/
 │   │       ├── chit-chat.md      # ADHD-C patterns
 │   │       └── interaction-styles.md
@@ -65,6 +68,7 @@ kiro-agents/
 ### Source Layer (`src/`)
 
 **Core** - Cross-IDE compatible components:
+- Instruction alias system (aliases.md)
 - Agent system protocols
 - Strict mode definitions
 - Interaction patterns (chit-chat, styles)
@@ -116,6 +120,7 @@ kiro-agents/
 ### npm Build
 
 ```
+src/core/aliases.md                → build/npm/dist/aliases.md
 src/core/agent-system.md           → build/npm/dist/agent-system.md
 src/core/agents.md                 → build/npm/dist/agents.md
 src/kiro/steering/modes-system.md  → build/npm/dist/modes-system.md
@@ -133,6 +138,7 @@ src/kiro/.../kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
 ```
 src/kiro/POWER.md                  → power/POWER.md
 src/kiro/mcp.json                  → power/mcp.json
+src/core/aliases.md                → power/steering/aliases.md
 src/core/agent-system.md           → power/steering/agent-system.md
 src/core/agents.md                 → power/steering/agents.md
 src/kiro/steering/modes-system.md  → power/steering/modes-system.md
