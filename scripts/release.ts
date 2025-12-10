@@ -15,15 +15,17 @@ async function main() {
   
   // Check if there are changesets to consume
   try {
-    const changesets = execSync("ls .changeset/*.md 2>/dev/null | grep -v README", { encoding: "utf-8" }).trim();
-    if (!changesets) {
+    const { readdirSync } = await import("fs");
+    const changesets = readdirSync(".changeset")
+      .filter(f => f.endsWith(".md") && f !== "README.md");
+    
+    if (changesets.length === 0) {
       console.error("❌ No changesets found");
       console.error("💡 Merge feature branches with changesets first");
       process.exit(1);
     }
     
-    const changesetCount = changesets.split("\n").length;
-    console.log(`📦 Found ${changesetCount} changeset(s) to consume\n`);
+    console.log(`📦 Found ${changesets.length} changeset(s) to consume\n`);
   } catch {
     console.error("❌ No changesets found");
     console.error("💡 Merge feature branches with changesets first");
@@ -38,7 +40,7 @@ async function main() {
   // Step 1: Version bump + changelog update
   console.log("📝 Step 1: Consuming changesets and updating version...");
   try {
-    execSync("changeset version", { stdio: "inherit" });
+    execSync("bunx changeset version", { stdio: "inherit" });
   } catch (error) {
     console.error("\n❌ Changeset version failed");
     console.error("💡 Make sure @changesets/cli is installed: bun add -D @changesets/cli");
@@ -74,7 +76,7 @@ async function main() {
   // Step 4: Publish to npm
   console.log("📤 Step 4: Publishing to npm...");
   try {
-    execSync("changeset publish", { stdio: "inherit" });
+    execSync("bunx changeset publish", { stdio: "inherit" });
   } catch (error) {
     console.error("\n❌ Publish failed");
     console.error("💡 Make sure you're logged in to npm: npm login");

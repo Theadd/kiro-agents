@@ -1,5 +1,74 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- e6b0574: # Add AI-powered versioning system with session snapshots
+
+  Implemented hybrid AI + Changesets versioning system that captures rich development context through session snapshots. Enables collaborative changelog generation with automatic filtering of temporary changes.
+
+  ## Added
+
+  - /snapshot command - Captures session context (purpose, findings, decisions, limitations)
+  - /finalize command - Consolidates snapshots into changesets with AI analysis
+  - /release command - Automates version bumping, changelog updates, and npm publishing
+  - Session snapshot system - Stores development context across multiple sessions
+  - Comprehensive documentation (docs/VERSIONING.md, CONTRIBUTING.md, .changeset/README.md)
+
+  ## Changed
+
+  - Build system now supports versioning workflow with new scripts
+  - Project structure updated with .changeset/ directory and .kiro/hooks/
+  - Steering documents updated with versioning system architecture
+
+  ## Key Findings
+
+  - AI session context captures 'why' and 'how' that git commits cannot
+  - Gitignored snapshots prevent merge conflicts while committed changesets enable coordination
+  - Multi-session support essential for features that exceed context window limits
+
+  ## Design Decisions
+
+  - Hybrid AI + Changesets approach balances automation with multi-developer coordination
+  - Separated /snapshot (incremental) from /finalize (consolidation) to support frequent commits and multi-session features
+  - Kiro slash commands via hooks provide seamless IDE integration
+
+- e6b0574: # Add AI-powered versioning system with interactive workflows
+
+  Implemented hybrid AI + Changesets versioning system with session snapshots, interactive confirmation prompts, and Kiro slash command hooks. The system captures rich development context across multiple sessions and consolidates it into user-facing changelogs.
+
+  ## Added
+
+  - Session snapshot system (/snapshot) for capturing development context
+  - Interactive finalize workflow (/finalize) with 3-option confirmation prompt
+  - Release automation (/release) with prerequisites and monitoring
+  - Kiro hook files (.kiro.hook format) for slash commands
+  - Comprehensive versioning documentation in docs/VERSIONING.md
+  - AI-powered changeset consolidation from multiple sessions
+
+  ## Changed
+
+  - Hook format from .json to proper .kiro.hook files via Kiro UI
+  - Finalize workflow now includes interactive commit/review/cancel options
+  - Snapshot workflow enhanced with explicit AI auto-update instructions
+
+  ## Removed
+
+  - Old .json hook files (replaced with .kiro.hook format)
+
+  ## Key Findings
+
+  - Kiro hooks require .kiro.hook files created via UI, not programmatic .json files
+  - Console prompts using readline work universally across all contexts
+  - Session snapshots capture 'why' decisions were made, not just 'what' changed
+
+  ## Design Decisions
+
+  - Chose console prompts over userInput tool for universal compatibility
+  - Implemented 3-option confirmation for flexibility: commit now, review first, or cancel
+  - Separated snapshot (incremental) from finalize (consolidation) for better workflow
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -10,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Dual Build Pipeline System
+
 - **Three build modes** for different use cases:
   - `bun run build` - npm package build (compiles CLI, processes files, auto-cleans)
   - `bun run build:power` - Kiro Power distribution build
@@ -23,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `{{{MODE_COMMANDS}}}` - Mode-specific command lists
 
 #### Interactive Command System
+
 - **Interactive agent management** (`/agents`) - Visual menu for agent operations
 - **Interactive mode management** (`/modes`) - Visual menu for mode switching
 - **Interactive strict mode control** (`/strict`) - Visual buttons using userInput tool
@@ -32,6 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `/strict {state}` - Change strict mode state
 
 #### New Source Files
+
 - `src/core/agents.md` - Interactive agent management interface
 - `src/core/strict.md` - Interactive strict mode control with userInput
 - `src/kiro/steering/modes.md` - Interactive mode management interface
@@ -39,6 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/kiro/mcp.json` - Empty MCP server configuration (prepared for future)
 
 #### Build Infrastructure
+
 - `scripts/test.ts` - Automated build validation script
 - Updated `scripts/build.ts` - Complete rewrite for dual build support
 - Updated `scripts/clean.ts` - Cleans both build and power directories
@@ -46,6 +119,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 #### Command Structure
+
 - **Breaking**: Changed command names from singular to plural for consistency:
   - `/agent {name}` → `/agents {name}`
   - `/mode {name}` → `/modes {name}`
@@ -53,21 +127,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Unified**: Same command name for both interactive and direct usage
 
 #### Installation Behavior
+
 - **npm installation** now installs to `~/.kiro/steering/kiro-agents/` (subdirectory)
 - **Auto-cleanup**: Removes old installation before installing new version
 - **Simplified updates**: Just re-run `npx kiro-agents` to update
 
 #### File Organization
+
 - **npm build**: Flatter structure, includes interactive files
 - **Power build**: Hierarchical structure with `steering/` subdirectories
 - **Excluded files**: `conversation-language.md` and `client-tools.md` not included in builds (work in progress)
 
 #### Build Process
+
 - **npm build**: Now auto-cleans `build/npm/` after successful build
 - **Power build**: Outputs to `power/` directory (committed to GitHub)
 - **Dev mode**: Replaces old watch mode, builds to user directory
 
 #### Configuration
+
 - Enhanced `src/kiro/config.ts` with dynamic substitution functions
 - Updated `package.json` scripts:
   - `build` → npm package build
@@ -76,11 +154,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed `build:npm` (now just `build`)
 
 ### Fixed
+
 - **File mappings**: Corrected to include all interactive files in npm build
 - **Clean script**: Now removes correct directories (`build`, `power` instead of `dist`)
 - **CLI paths**: Updated to use new `build/npm/` structure
 
 ### Removed
+
 - `index.ts` - Obsolete test file
 - Old `dist/` directory structure - Replaced by `build/npm/dist/`
 - Workspace `.kiro/steering/` auto-copy - No longer copies to workspace during build
@@ -88,6 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Architecture Changes
 
 ### Before
+
 ```
 Single build target (npm only)
 dist/ → npm package
@@ -95,6 +176,7 @@ dist/ → npm package
 ```
 
 ### After
+
 ```
 Three build targets:
 1. npm → build/npm/ (temporary, auto-cleaned)
@@ -107,17 +189,20 @@ Three build targets:
 ### For Users
 
 **npm installation** (no changes needed):
+
 ```bash
 npx kiro-agents  # Still works, now installs to subdirectory
 ```
 
 **New Power installation**:
+
 ```bash
 # In Kiro IDE:
 # Powers panel → Add from GitHub → https://github.com/user/kiro-agents
 ```
 
 **New commands** (breaking changes):
+
 ```bash
 # Old → New
 /agent {name}  → /agents {name}
@@ -132,6 +217,7 @@ npx kiro-agents  # Still works, now installs to subdirectory
 ### For Developers
 
 **New build commands**:
+
 ```bash
 # Old → New
 bun run build        # Still builds npm, now auto-cleans
@@ -141,6 +227,7 @@ bun run build:power  # New: builds Power distribution
 ```
 
 **New file structure**:
+
 - Source files unchanged
 - Build outputs: `build/npm/` (temp) and `power/` (committed)
 - Dev mode: `~/.kiro/steering/kiro-agents/`
@@ -148,11 +235,13 @@ bun run build:power  # New: builds Power distribution
 ## Testing
 
 All builds validated with automated test suite:
+
 ```bash
 bun run test  # Validates both npm and Power builds
 ```
 
 Tests verify:
+
 - File existence and counts
 - Substitution processing
 - Frontmatter validity
