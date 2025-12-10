@@ -36,8 +36,6 @@ This file contains:
 - File organization rules
 - Integration points
 
-**Also load `strict-mode.md` steering document** to enable `/strict {state}` command for this mode. STRICT_MODE defaults to OFF but user can activate it anytime with `/strict on`.
-
 ### Step 2: Assume Mode Role
 
 For this session, you are in **{mode_name} mode**.
@@ -119,11 +117,10 @@ This provides a visual interface for:
 
 ## Mode Activation Protocol
 
-When `/mode {name}` is executed:
+When `/modes {name}` is executed:
 
 1. **Load mode definition**
    - Read `kiro-{name}-mode.md` from agent-system directory
-   - Load `strict-mode.md` steering document
    - Parse mode configuration
    - Understand mode workflows
 
@@ -166,7 +163,7 @@ When `/modes` is executed:
    - Allow staying in current mode
 
 4. **Handle operations**
-   - Mode switching → Execute `/mode {name}`
+   - Mode switching → Execute `/modes {name}`
    - View details → Show mode definition
    - Comparison → Explain differences
    - Help → Explain mode system
@@ -182,7 +179,7 @@ When `/modes` is executed:
 - Custom agents: Domain-specific expertise
 
 **They work together:**
-- Modes can activate agents: `/mode spec` then `/agent kiro-master`
+- Modes can activate agents: `/modes spec` then `/agents kiro-master`
 - Agents inherit mode protocols: Agent in spec mode follows spec workflow
 - Context preserved: Switch modes/agents without losing work
 - Layered capabilities: Mode + Agent + Strict mode all active simultaneously
@@ -198,13 +195,13 @@ When `/modes` is executed:
 ### Switch Kiro Modes
 
 ```
-/mode vibe
+/modes vibe
 ```
 
 **Result:** AI switches to Vibe mode - flexible, conversational development. No formal workflows, quick iterations, direct changes.
 
 ```
-/mode spec
+/modes spec
 ```
 
 **Result:** AI switches to Spec mode - structured feature development with requirements, design, and task planning.
@@ -220,9 +217,9 @@ When `/modes` is executed:
 ### Combined with Agents
 
 ```
-/mode spec
+/modes spec
 [Work on structured feature planning]
-/agent kiro-master
+/agents kiro-master
 [Use kiro-master agent while in spec mode]
 ```
 
@@ -250,7 +247,7 @@ When `/modes` is executed:
 
 **Mode enhancements:**
 - **Custom modes** - User-defined modes beyond vibe/spec
-- **Mode parameters** - `/mode spec --strict --minimal-tests`
+- **Mode parameters** - `/modes spec --strict --minimal-tests`
 - **Mode presets** - Save mode configurations
 - **Mode history** - Track mode usage patterns
 - **Automated transitions** - Suggest mode switch when appropriate
@@ -273,6 +270,6 @@ When `/modes` is executed:
 **Modes system ready.**
 
 **Quick start:**
-- `/mode vibe` - Flexible development
-- `/mode spec` - Structured planning
+- `/modes vibe` - Flexible development
+- `/modes spec` - Structured planning
 - `/modes` - Interactive mode management

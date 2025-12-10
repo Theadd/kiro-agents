@@ -216,7 +216,7 @@ When user requests task execution:
 ## Integration with Agent System
 
 Spec mode can be activated via:
-- `/mode spec` command (when mode-switching is enabled)
+- `/modes spec` command (when mode-switching is enabled)
 - Starting new conversation in Spec mode
 - Explicit instruction to assume Spec mode role
 

@@ -52,7 +52,7 @@ Interactive management agent for all Kiro features using chit-chat mode optimize
 - Create new agent definitions with templates
 - Modify agent capabilities and protocols
 - Delete or archive agents
-- Activate agents via `/agent {name}` command
+- Activate agents via `/agents {name}` command
 - Test agent effectiveness
 
 ### Spec Management
@@ -369,4 +369,4 @@ Agent is successful when:
 
 ---
 
-**Kiro Master ready. Use `/agent kiro-master` to activate.**
+**Kiro Master ready. Use `/agents kiro-master` to activate.**

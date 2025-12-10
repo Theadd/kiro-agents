@@ -217,7 +217,7 @@ User: "Tests are failing"
 ## Integration with Agent System
 
 Vibe mode can be activated via:
-- `/mode vibe` command (when mode-switching enabled)
+- `/modes vibe` command (when mode-switching enabled)
 - Starting new conversation in Vibe mode
 - Explicit instruction to assume Vibe mode role
 
@@ -238,13 +238,13 @@ Vibe mode works alongside:
 ## Switching Between Modes
 
 **From Vibe to Spec:**
-- Use `/mode spec` when structure needed
+- Use `/modes spec` when structure needed
 - Transition to formal planning
 - Create requirements/design/tasks
 - Follow spec workflow
 
 **From Spec to Vibe:**
-- Use `/mode vibe` for flexibility
+- Use `/modes vibe` for flexibility
 - Continue working on same code
 - Drop formal structure
 - Iterate freely

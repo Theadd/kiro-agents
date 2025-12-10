@@ -7,15 +7,15 @@ inclusion: manual
 ## Mode Commands
 
 ```bash
-/mode vibe          # Flexible, conversational development
-/mode spec          # Structured feature planning
+/modes vibe          # Flexible, conversational development
+/modes spec          # Structured feature planning
 /modes              # Interactive mode management
 ```
 
 ## Agent Commands
 
 ```bash
-/agent {name}       # Activate specific agent
+/agents {name}       # Activate specific agent
 /agents             # Interactive agent management
 ```
 
@@ -59,23 +59,23 @@ inclusion: manual
 
 ### Explore → Formalize
 ```
-/mode vibe          # Prototype and explore
+/modes vibe          # Prototype and explore
 [Build proof of concept]
-/mode spec          # Formalize the design
+/modes spec          # Formalize the design
 [Create requirements, design, tasks]
 ```
 
 ### Plan → Implement
 ```
-/mode spec          # Create formal plan
+/modes spec          # Create formal plan
 [Write requirements, design, tasks]
-/mode vibe          # Implement quickly
+/modes vibe          # Implement quickly
 [Code without ceremony]
 ```
 
 ### Precision When Needed
 ```
-/mode vibe          # Start flexible
+/modes vibe          # Start flexible
 /strict on          # Add precision
 [Critical section with no assumptions]
 /strict off         # Return to flexible
@@ -85,16 +85,16 @@ inclusion: manual
 
 ```bash
 # Structured planning with precision
-/mode spec
+/modes spec
 /strict on
 
 # Flexible development with agent
-/mode vibe
-/agent kiro-master
+/modes vibe
+/agents kiro-master
 
 # Full stack
-/mode spec
-/agent kiro-master
+/modes spec
+/agents kiro-master
 /strict on
 ```
 

@@ -43,20 +43,20 @@ By extracting the mode-specific protocols into steering documents and using inst
 
 ```bash
 # Switch modes directly
-/mode vibe          # Switch to flexible development mode
-/mode spec          # Switch to structured planning mode
+/modes vibe          # Switch to flexible development mode
+/modes spec          # Switch to structured planning mode
 
 # Interactive mode management
 /modes              # See available modes, compare, and switch
 
 # Works with other commands
 /strict on          # Enable precision mode (works in any mode)
-/agent kiro-master  # Activate agent (works in any mode)
+/agents kiro-master  # Activate agent (works in any mode)
 ```
 
 ### Command Flow
 
-When user types `/mode spec`:
+When user types `/modes spec`:
 
 1. **Extract parameter**: `mode_name = "spec"`
 2. **Load mode definition**: Read `kiro-spec-mode.md`
@@ -115,11 +115,11 @@ Base: Vibe mode (flexible interaction)
 ### Example 1: Exploration to Formalization
 
 ```
-User: /mode vibe
+User: /modes vibe
 [Explore feature idea, prototype code]
 
 User: This is working well, let's formalize it
-User: /mode spec
+User: /modes spec
 [Create requirements, design, task list]
 [All prototype code still available]
 ```
@@ -127,11 +127,11 @@ User: /mode spec
 ### Example 2: Spec to Implementation
 
 ```
-User: /mode spec
+User: /modes spec
 [Create requirements.md, design.md, tasks.md]
 
 User: Let's implement this quickly
-User: /mode vibe
+User: /modes vibe
 [Implement tasks without formal ceremony]
 [Spec documents still available for reference]
 ```
@@ -139,12 +139,12 @@ User: /mode vibe
 ### Example 3: Combined with Agents
 
 ```
-User: /mode spec
-User: /agent kiro-master
+User: /modes spec
+User: /agents kiro-master
 User: /strict on
 [Structured feature planning with kiro-master's capabilities and precision]
 
-User: /mode vibe
+User: /modes vibe
 [kiro-master still active, now in flexible mode]
 ```
 
@@ -168,7 +168,7 @@ User: /mode vibe
 ### Mode Detection
 
 The AI determines current mode by:
-1. Checking most recent `/mode {name}` command
+1. Checking most recent `/modes {name}` command
 2. Analyzing active protocols in context
 3. Defaulting to mode from conversation start
 
@@ -208,38 +208,38 @@ Mode switching works because:
 ### Pattern 1: Hybrid Development
 
 ```
-1. /mode spec - Create formal requirements
-2. /mode vibe - Prototype quickly
-3. /mode spec - Update design based on prototype
-4. /mode vibe - Implement with flexibility
-5. /mode spec - Create final task list
+1. /modes spec - Create formal requirements
+2. /modes vibe - Prototype quickly
+3. /modes spec - Update design based on prototype
+4. /modes vibe - Implement with flexibility
+5. /modes spec - Create final task list
 ```
 
 ### Pattern 2: Agent-Enhanced Modes
 
 ```
-1. /mode spec - Structured planning
-2. /agent kiro-master - Add feature management
+1. /modes spec - Structured planning
+2. /agents kiro-master - Add feature management
 3. [Work on specs with kiro-master's capabilities]
-4. /mode vibe - Switch to flexible implementation
+4. /modes vibe - Switch to flexible implementation
 5. [kiro-master still active, now in vibe mode]
 ```
 
 ### Pattern 3: Precision When Needed
 
 ```
-1. /mode vibe - Start flexible
+1. /modes vibe - Start flexible
 2. /strict on - Add precision for critical section
 3. [Work with precision protocols]
 4. /strict off - Return to flexible
-5. /mode spec - Formalize if needed
+5. /modes spec - Formalize if needed
 ```
 
 ## Troubleshooting
 
 ### Mode Not Switching
 
-**Problem:** `/mode {name}` doesn't work
+**Problem:** `/modes {name}` doesn't work
 
 **Solutions:**
 - Verify mode file exists: `kiro-{name}-mode.md`
@@ -282,7 +282,7 @@ Mode switching works because:
 
 **Concept:**
 ```
-User: /agent kiro-master
+User: /agents kiro-master
 Agent: I'll create 3 sub-tasks for this feature
 Agent: Each task will have its own session with:
   - Initial context from current session
@@ -346,6 +346,6 @@ The system is production-ready and can be extended with custom modes, mode prese
 ---
 
 **Ready to use:**
-- `/mode vibe` - Flexible development
-- `/mode spec` - Structured planning
+- `/modes vibe` - Flexible development
+- `/modes spec` - Structured planning
 - `/modes` - Interactive mode management
