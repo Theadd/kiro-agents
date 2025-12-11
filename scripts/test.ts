@@ -30,8 +30,6 @@ async function testNpmBuild() {
   
   // Check dist files exist
   const distFiles = [
-    "build/npm/dist/agent-system.md",
-    "build/npm/dist/modes-system.md",
     "build/npm/dist/strict-mode.md",
     "build/npm/dist/agents.md",
     "build/npm/dist/modes.md",
@@ -111,9 +109,7 @@ async function testPowerBuild() {
   
   // Check steering files exist
   const steeringFiles = [
-    "power/steering/agent-system.md",
     "power/steering/agents.md",
-    "power/steering/modes-system.md",
     "power/steering/modes.md",
     "power/steering/strict-mode.md",
     "power/steering/strict.md",

@@ -99,7 +99,7 @@ async function main() {
   // Step 2: Build (without cleanup for npm publish)
   console.log("🔨 Step 2: Building package...");
   try {
-    // Build npm package but don't clean (needed for npm publish)
+    // Build npm package with npm-no-clean mode (preserves artifacts for npm publish)
     execSync("bun run scripts/build.ts npm-no-clean", { stdio: "inherit" });
   } catch (error) {
     console.error("\n❌ Build failed");

@@ -75,3 +75,26 @@ spec
 ````
 
 User types: `/spec` → AI responds: `spec`
+
+## Agent System Alias
+
+The agent activation command uses parameter substitution to load agent definitions dynamically:
+
+<alias>
+  <trigger>/agents {agent_name}</trigger>
+  <definition>
+## Agent Activation: {agent_name}
+
+You are now activating the **{agent_name}** agent.
+
+**Load and execute activation protocol:**
+1. Read `.kiro/agents/{agent_name}.md` into context
+2. Read `{{{PROTOCOLS_PATH}}}/agent-activation.mdx` into context
+3. Follow all steps from the "Agent Activation Steps" section in agent-activation.mdx
+4. Use `{agent_name}` as the agent identifier throughout the protocol
+  </definition>
+</alias>
+
+This alias enables users to activate any agent with `/agents {name}` syntax.
+
+{{{KIRO_MODE_ALIASES}}}
