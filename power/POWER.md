@@ -4,7 +4,7 @@ displayName: "Kiro Agents & Modes System"
 description: "Advanced AI agent system with specialized agents, mode switching, strict mode, and interactive workflows for Kiro IDE"
 keywords: ["agent", "agents", "mode", "modes", "vibe", "spec", "strict", "workflow", "kiro-master", "chit-chat", "interactive"]
 author: "R. Beltran"
-version: "1.2.0"
+version: "1.3.0"
 ---
 
 # Kiro Agents & Modes System
@@ -333,4 +333,4 @@ AVAILABLE AGENTS
 - kiro-master
 ```
 
-**Version:** 1.2.0
+**Version:** 1.3.0
