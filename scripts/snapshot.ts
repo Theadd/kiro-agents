@@ -190,6 +190,8 @@ async function createSnapshot(analysis: Awaited<ReturnType<typeof analyzeSession
   const snapshotsDir = ".changeset/snapshots";
   if (!existsSync(snapshotsDir)) {
     mkdirSync(snapshotsDir, { recursive: true });
+    // Create .gitkeep to preserve directory structure
+    writeFileSync(join(snapshotsDir, ".gitkeep"), "");
   }
   
   // Write snapshot

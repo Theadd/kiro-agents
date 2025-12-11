@@ -313,6 +313,27 @@ ${analysis.description}
   return filename;
 }
 
+/**
+ * Removes all session snapshot files from `.changeset/snapshots/` directory.
+ * 
+ * Preserves `.gitkeep` file to maintain directory structure in git. Called during
+ * Phase 2 (commit) after changeset is validated and committed. Snapshots are
+ * gitignored and only used for AI analysis during finalization.
+ * 
+ * **Behavior:**
+ * - Skips cleanup if directory doesn't exist
+ * - Filters out `.gitkeep` to preserve directory
+ * - Removes all `.json` snapshot files
+ * - Reports count of cleaned files
+ * 
+ * @example Typical cleanup
+ * ```typescript
+ * cleanupSnapshots();
+ * // Removes: snapshot-abc123.json, snapshot-def456.json
+ * // Preserves: .gitkeep
+ * // Output: "🧹 Cleaned up 2 snapshots"
+ * ```
+ */
 function cleanupSnapshots(): void {
   const snapshotsDir = ".changeset/snapshots";
   
@@ -322,7 +343,7 @@ function cleanupSnapshots(): void {
     return;
   }
   
-  const files = readdirSync(snapshotsDir);
+  const files = readdirSync(snapshotsDir).filter(f => f !== ".gitkeep");
   
   files.forEach(file => {
     rmSync(join(snapshotsDir, file));
