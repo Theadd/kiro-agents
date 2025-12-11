@@ -8,36 +8,49 @@ keywords: ["agents", "management", "create", "activate", "interactive"]
 
 You are now in **agent management mode** using chit-chat interaction protocol.
 
-## Step 1: Load Chit-Chat Mode
+## Agent Management Steps
 
-Apply protocols from `chit-chat.md` steering document:
-- Use diff blocks to show progress
-- Provide numbered choice lists (4-6 options, up to 16 if needed)
-- Maintain single focus per message
-- Use visual formatting (bold, code blocks, lists)
-- Optimize for ADHD-C (minimal cognitive load)
+When entering agent management mode:
 
-## Step 2: Auto-Setup and Scan Agents Directory
+### Step 1: Activate Chit-Chat Mode
+
+Load and apply protocols from `chit-chat.md` steering document:
+
+- **Use diff blocks** to show progress and current state
+- **Provide numbered choice lists** (4-8 options, up to 16 if needed)
+- **Maintain single focus** per message
+- **Use visual formatting** (bold, code blocks, lists)
+- **Optimize for ADHD-C** (minimal cognitive load)
+
+Begin with a diff block showing:
+```diff
+  👉 Agent management mode
+  ⏳ [Current operation]
+```
+
+### Step 2: Scan Agents Directory
 
 **CRITICAL: You MUST execute `listDirectory` tool on `.kiro/agents/` to get the actual list of agents.**
 
 **DO NOT rely on open editor files or context - always scan the directory explicitly.**
 
-**First, execute `listDirectory` on `.kiro/agents/`:**
+Execute `listDirectory` on `.kiro/agents/`:
 
-If directory doesn't exist OR directory is empty:
-1. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
-2. Show diff block indicating setup completion
-3. Continue to Step 3 with kiro-master as available agent
+**If directory doesn't exist OR directory is empty:**
+1. **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent creation protocol
+2. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
+3. Follow the agent definition structure from agent-creation.mdx protocol
+4. Show diff block indicating setup completion
+5. Continue to Step 3 with kiro-master as available agent
 
-If directory exists with agents:
+**If directory exists with agents:**
 1. **Execute `listDirectory` tool** to get complete list of `.md` files
 2. Extract agent names from filenames (remove `.md` extension)
 3. Read frontmatter metadata for descriptions
 4. Categorize by agent type if metadata available
 5. **List ALL agents found** - do not filter or assume based on context
 
-## Step 3: Present Agent Selection
+### Step 3: Present Agent Selection
 
 Use this response structure:
 
@@ -63,24 +76,31 @@ Use this response structure:
 6. **Agent system help** - Explain how agents work
 7. **Exit** - Return to normal mode
 
-## Step 4: Handle User Choice
+### Step 4: Handle User Choice
 
 Based on user selection:
 
-**Option 1 - Activate agent:**
+#### Option 1 - Activate Agent
+
 - Show numbered list of available agents
 - User selects agent by number
 - Execute `/agents {selected_agent_name}` command
 - Agent activates immediately
 
-**Option 2 - Create new agent:**
-- Start agent creation workflow
+#### Option 2 - Create New Agent
+
+- **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent creation protocol
+- Follow all steps from the "Agent Creation Steps" section in agent-creation.mdx
+- Start agent creation workflow with interactive wizard
 - Ask for agent type (code-focused, documentation, testing, etc.)
 - Collect agent name, description, capabilities
-- Generate `.md` file with all agent definition
+- Generate `.md` file with all agent definition following protocol structure
+- Validate agent definition per protocol
 - Offer to activate new agent
 
-**Option 3 - Manage existing agent:**
+#### Option 3 - Manage Existing Agent
+
+- **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent structure reference
 - Show numbered list of available agents
 - User selects agent to manage
 - Offer management options:
@@ -89,19 +109,22 @@ Based on user selection:
   - Change interaction protocol
   - Add/remove integrations
   - Delete agent
+- Use agent definition structure from protocol as reference for modifications
+- Apply changes to agent `.md` file
+- Validate changes against protocol requirements
+- Reload agent if currently active
 
-**Option 4 - View agent details:**
+#### Option 4 - View Agent Details
+
 - Show numbered list of available agents
 - User selects agent to view
 - Display full `.md` content with formatting
 - Show agent protocols and capabilities summary
 - Offer to activate or manage agent
 
-**Option 5 - List all commands:**
-- Show all available slash commands in the system
-- Display command syntax and brief description
-- Group by category (agents, modes, utilities)
-- Format as table for quick reference:
+#### Option 5 - List All Commands
+
+Show all available slash commands in the system:
 
 ```
 Available Commands:
@@ -110,29 +133,28 @@ AGENT COMMANDS
   /agents {name}    Activate specific agent
   /agents           Interactive agent management
 
-MODE COMMANDS (see modes-system.md)
-  /modes {name}     Switch Kiro mode (vibe/spec)
-  /modes            Interactive mode management
-  /strict {state}   Control strict mode (on/off)
-  /strict           Interactive strict mode control
+{{{MODE_COMMANDS}}}
 
 Note: Commands are defined in steering documents.
 New commands can be added via Instruction Alias pattern.
 ```
 
-**Option 6 - Agent system help:**
-- Explain agent system architecture
-- Show command usage examples
-- Describe agent file structure
-- Explain how to create custom agents
-- Document best practices
+#### Option 6 - Agent System Help
 
-**Option 7 - Exit:**
+Explain agent system:
+- Agent system architecture
+- Command usage examples
+- Agent file structure
+- How to create custom agents
+- Best practices for agent usage
+
+#### Option 7 - Exit
+
 - Confirm exit from agent management mode
 - Return to normal Kiro interaction
 - Preserve any changes made
 
-## Step 5: Maintain Chit-Chat Mode
+### Step 5: Maintain Chit-Chat Mode
 
 Continue using diff blocks and numbered choices throughout agent management session.
 
@@ -141,6 +163,17 @@ After each action:
 - Show current focus
 - Provide next action choices
 - Allow going back or canceling
+
+**Context Preservation:**
+- Use diff blocks to show progress
+- Preserve user decisions
+- Allow going back to previous step
+- Enable canceling operations
+
+---
+
+**Agent management mode active. Present choices to user.**
+
 
 ## Initial Agent
 
