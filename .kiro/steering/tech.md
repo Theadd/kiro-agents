@@ -152,6 +152,8 @@ Captures context that git commits don't:
 - `{{{COMMANDS_LIST}}}` - Auto-generated command list
 - `{{{AGENT_LIST}}}` - List of available agents
 - `{{{MODE_COMMANDS}}}` - Mode-specific commands
+- `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injects agent-management.mdx content
+- `{{{PROTOCOLS_PATH}}}` - Path to protocols directory
 
 **Example**:
 ```typescript
@@ -163,8 +165,20 @@ export const substitutions = {
   '{{{COMMANDS_LIST}}}': () => `### Agent Commands
 - \`/agents\` - Interactive agent management
 - \`/agents {name}\` - Activate specific agent`,
+  '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => {
+    // Reads agent-management.mdx and injects content
+    const content = readFileSync('src/core/protocols/agent-management.mdx', 'utf-8');
+    return content.slice(content.indexOf('## Agent Management Steps'));
+  }
 }
 ```
+
+**Protocol Injection Pattern**:
+- Steering documents (`.md`) can be minimal "shells"
+- Protocol files (`.mdx`) contain the detailed implementation
+- Build-time substitution injects protocol content into shells
+- Single source of truth for reusable workflows
+- Example: `agents.md` is a shell, `agent-management.mdx` is injected
 
 ## Dependencies
 

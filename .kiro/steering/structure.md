@@ -12,7 +12,13 @@ kiro-agents/
 │   │   ├── strict-mode.md        # Strict mode rules
 │   │   ├── strict.md             # Interactive strict control
 │   │   ├── docs/                 # Extended documentation
-│   │   │   └── aliases-guide.md  # Complete alias documentation
+│   │   │   ├── aliases-guide.md  # Complete alias documentation
+│   │   │   └── agent-system-guide.md  # Complete agent system guide
+│   │   ├── protocols/            # Protocol files (auxiliary .mdx)
+│   │   │   ├── agent-activation.mdx  # Agent activation protocol
+│   │   │   ├── agent-management.mdx  # Agent management protocol
+│   │   │   ├── agent-creation.mdx    # Agent creation protocol
+│   │   │   └── mode-switching.mdx    # Mode switching protocol
 │   │   └── interactions/
 │   │       ├── chit-chat.md      # ADHD-C patterns
 │   │       └── interaction-styles.md
@@ -44,6 +50,7 @@ kiro-agents/
 │   ├── POWER.md                  # Power metadata
 │   ├── mcp.json                  # MCP config
 │   └── steering/                 # Organized steering files
+│       └── protocols/            # Protocol files (.mdx, not in UI)
 ├── docs/                         # Documentation
 │   └── VERSIONING.md             # Versioning system guide
 ├── .changeset/                   # Changesets
@@ -127,6 +134,10 @@ src/kiro/steering/modes-system.md  → build/npm/dist/modes-system.md
 src/kiro/steering/modes.md         → build/npm/dist/modes.md
 src/core/strict-mode.md            → build/npm/dist/strict-mode.md
 src/core/strict.md                 → build/npm/dist/strict.md
+src/core/protocols/agent-activation.mdx → build/npm/dist/protocols/agent-activation.mdx
+src/core/protocols/agent-management.mdx → build/npm/dist/protocols/agent-management.mdx
+src/core/protocols/agent-creation.mdx   → build/npm/dist/protocols/agent-creation.mdx
+src/core/protocols/mode-switching.mdx   → build/npm/dist/protocols/mode-switching.mdx
 src/core/interactions/chit-chat.md → build/npm/dist/interactions/chit-chat.md
 src/core/.../interaction-styles.md → build/npm/dist/interactions/interaction-styles.md
 src/kiro/.../kiro-spec-mode.md     → build/npm/dist/modes/kiro-spec-mode.md
@@ -145,6 +156,10 @@ src/kiro/steering/modes-system.md  → power/steering/modes-system.md
 src/kiro/steering/modes.md         → power/steering/modes.md
 src/core/strict-mode.md            → power/steering/strict-mode.md
 src/core/strict.md                 → power/steering/strict.md
+src/core/protocols/agent-activation.mdx → power/steering/protocols/agent-activation.mdx
+src/core/protocols/agent-management.mdx → power/steering/protocols/agent-management.mdx
+src/core/protocols/agent-creation.mdx   → power/steering/protocols/agent-creation.mdx
+src/core/protocols/mode-switching.mdx   → power/steering/protocols/mode-switching.mdx
 src/core/interactions/chit-chat.md → power/steering/interactions/chit-chat.md
 src/core/.../interaction-styles.md → power/steering/interactions/interaction-styles.md
 src/kiro/.../kiro-spec-mode.md     → power/steering/modes/kiro-spec-mode.md
@@ -158,6 +173,7 @@ src/kiro/.../kiro-vibe-mode.md     → power/steering/modes/kiro-vibe-mode.md
 - Kiro-specific files in `src/kiro/`
 - Configuration uses import + extend pattern
 - Interactive files (agents.md, modes.md, strict.md) in appropriate locations
+- Protocol files (.mdx) as single source of truth, injected via substitutions
 
 **Build Process**:
 - Deterministic builds (same input = same output)
