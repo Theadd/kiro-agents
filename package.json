@@ -1,7 +1,15 @@
 {
   "name": "kiro-agents",
   "version": "1.3.0",
-  "description": "AI agent system for Kiro IDE",
+  "description": "Advanced AI agent system for Kiro IDE - Create specialized AI agents, switch interaction modes, and enhance development workflows with minimal cognitive overhead",
+  "homepage": "https://github.com/Theadd/kiro-agents#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Theadd/kiro-agents.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Theadd/kiro-agents/issues"
+  },
   "type": "module",
   "bin": {
     "kiro-agents": "build/npm/bin/cli.js"
@@ -24,7 +32,22 @@
   },
   "keywords": [
     "kiro",
-    "ai-agents"
+    "kiro-ide",
+    "ai-agents",
+    "ai-assistant",
+    "agent-system",
+    "development-tools",
+    "ide-extension",
+    "ai-workflow",
+    "code-assistant",
+    "developer-productivity",
+    "steering-documents",
+    "ai-modes",
+    "strict-mode",
+    "vibe-mode",
+    "spec-mode",
+    "typescript",
+    "bun"
   ],
   "author": "R. Beltran",
   "license": "MIT",

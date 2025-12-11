@@ -154,6 +154,9 @@ __*
 # workspace steering docs
 # .kiro/steering/
 
+# workspace agents
+.kiro/agents/
+
 # Changeset snapshots (temporary session data)
 .changeset/snapshots/
 
