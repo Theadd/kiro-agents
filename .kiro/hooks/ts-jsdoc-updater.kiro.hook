@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "TypeScript JSDoc Updater",
+  "description": "Monitors all *.ts files in the repository. When changes are detected, asks the agent to update JSDoc comments in the modified files and all dependent files according to the technical documentation guidelines: one-line summary with optional extended description, inline property descriptions, concise technical content, skip obvious docs, multiple labeled examples, and proper references.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "The file {filePath} has been modified. Please review and update the JSDoc comments in this file and all files that depend on it according to these guidelines:\n\n1. **One-line summary + optional extended description** - Component purpose, use cases, important notes\n2. **Type properties** - Inline `/** Description (e.g., 'value') */` above each prop, include type/default for non-trivial props\n3. **Content** - Concise, technically accurate, framework context when relevant, critical distinctions highlighted\n4. **Quality** - Skip obvious docs, update atomically with code, practical focus over internals unless internals do need clarifications\n5. **Multiple examples** - Separate @example blocks with labels, use bullet lists for options/behaviors\n6. **References** - Use @see for external docs, backticks for technical terms, nested props can omit examples if clear\n\nFirst, identify all files that import or depend on {filePath}. Then update JSDoc comments in both the modified file and its dependents to ensure documentation consistency across the codebase."
+  }
+}
