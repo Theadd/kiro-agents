@@ -94,7 +94,7 @@ Include context that git commits don't capture (the "why" and "how").
 }
 
 function getGitMetadata() {
-  const branch = execSync("git branch --show-current", { encoding: "utf-8" }).trim();
+  const branch = execSync("git --no-pager branch --show-current", { encoding: "utf-8" }).trim();
   
   // Get commits since last snapshot or since branch creation
   let commits: string[];
@@ -108,7 +108,7 @@ function getGitMetadata() {
   }
   
   try {
-    commits = execSync(`git log ${baseRef}..HEAD --oneline`, { encoding: "utf-8" })
+    commits = execSync(`git --no-pager log --no-color ${baseRef}..HEAD --oneline`, { encoding: "utf-8" })
       .trim()
       .split("\n")
       .filter(Boolean);
@@ -119,7 +119,7 @@ function getGitMetadata() {
   // Get changed files
   let filesChanged: string[];
   try {
-    filesChanged = execSync(`git diff --name-only ${baseRef}...HEAD`, { encoding: "utf-8" })
+    filesChanged = execSync(`git --no-pager diff --name-only --no-color ${baseRef}...HEAD`, { encoding: "utf-8" })
       .trim()
       .split("\n")
       .filter(Boolean);
@@ -131,7 +131,7 @@ function getGitMetadata() {
   let linesAdded = 0;
   let linesRemoved = 0;
   try {
-    const stats = execSync(`git diff --shortstat ${baseRef}...HEAD`, { encoding: "utf-8" }).trim();
+    const stats = execSync(`git --no-pager diff --shortstat --no-color ${baseRef}...HEAD`, { encoding: "utf-8" }).trim();
     linesAdded = parseInt(stats.match(/(\d+) insertion/)?.[1] || "0");
     linesRemoved = parseInt(stats.match(/(\d+) deletion/)?.[1] || "0");
   } catch {
@@ -216,7 +216,7 @@ async function main() {
   console.log("📸 Session Snapshot\n");
   
   // Check if on feature branch
-  const branch = execSync("git branch --show-current", { encoding: "utf-8" }).trim();
+  const branch = execSync("git --no-pager branch --show-current", { encoding: "utf-8" }).trim();
   if (branch === "main" || branch === "master") {
     console.error("❌ Cannot create snapshot on main branch");
     console.error("💡 Create a feature branch first");

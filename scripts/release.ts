@@ -1,12 +1,56 @@
 #!/usr/bin/env bun
+/**
+ * Automated release workflow for publishing to npm and GitHub.
+ * 
+ * Consumes changesets, bumps version, updates CHANGELOG, publishes to npm,
+ * and pushes tags to GitHub. Must be run from main branch by maintainers.
+ * 
+ * **Prerequisites:**
+ * - On main/master branch
+ * - Changesets exist in `.changeset/` (from merged feature branches)
+ * - Logged into npm (`npm login`)
+ * - Git remote configured
+ * 
+ * **Workflow:**
+ * 1. Validates branch and changesets
+ * 2. Consumes changesets and bumps version
+ * 3. Builds package (npm mode without cleanup)
+ * 4. Commits version bump
+ * 5. Publishes to npm
+ * 6. Pushes to GitHub with tags
+ * 
+ * @example
+ * ```bash
+ * # Via npm script
+ * bun run release
+ * 
+ * # Via Kiro hook
+ * /release
+ * 
+ * # Direct execution
+ * bun run scripts/release.ts
+ * ```
+ * 
+ * **Critical Distinction:** This is for maintainers only. Contributors use
+ * `/finalize` to create changesets, maintainers use `/release` to publish.
+ * 
+ * @see scripts/finalize.ts - For creating changesets from feature branches
+ * @see docs/VERSIONING.md - Complete versioning workflow documentation
+ */
 import { execSync } from "child_process";
 import { readFileSync } from "fs";
 
+/**
+ * Main release workflow execution.
+ * 
+ * Orchestrates the complete release process with validation at each step.
+ * Exits with code 1 on any failure to prevent partial releases.
+ */
 async function main() {
   console.log("🚀 Release Process\n");
   
-  // Check if on main branch
-  const branch = execSync("git branch --show-current", { encoding: "utf-8" }).trim();
+  // Check if on main branch (disable pager for non-interactive execution)
+  const branch = execSync("git --no-pager branch --show-current", { encoding: "utf-8" }).trim();
   if (branch !== "main" && branch !== "master") {
     console.error("❌ Release must be run from main branch");
     console.error(`   Current branch: ${branch}`);

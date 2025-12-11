@@ -38,7 +38,7 @@
  * but only the git diff determines what goes in the changelog. This prevents documenting
  * experimental work, gitignored files, or features that didn't make the final commit.
  */
-import { readdirSync, readFileSync, writeFileSync, rmSync } from "fs";
+import { readdirSync, readFileSync, writeFileSync, rmSync, existsSync } from "fs";
 import { execSync } from "child_process";
 import { join } from "path";
 
@@ -125,6 +125,12 @@ interface FinalAnalysis {
  */
 function loadSnapshots(): SessionSnapshot[] {
   const snapshotsDir = ".changeset/snapshots";
+  
+  // Ensure snapshots directory exists
+  if (!existsSync(snapshotsDir)) {
+    return [];
+  }
+  
   const files = readdirSync(snapshotsDir).filter(f => f.endsWith(".json"));
   
   return files.map(file => {
@@ -150,15 +156,15 @@ function loadSnapshots(): SessionSnapshot[] {
  * ```
  */
 function getSquashedCommit(): { message: string; diff: string; files: string[] } {
-  // Get the final state vs main
-  const diff = execSync("git diff main...HEAD", { encoding: "utf-8" });
-  const files = execSync("git diff --name-only main...HEAD", { encoding: "utf-8" })
+  // Get the final state vs main (disable pager for non-interactive execution)
+  const diff = execSync("git --no-pager diff --no-color main...HEAD", { encoding: "utf-8" });
+  const files = execSync("git --no-pager diff --name-only --no-color main...HEAD", { encoding: "utf-8" })
     .trim()
     .split("\n")
     .filter(Boolean);
   
   // Get all commit messages (will be squashed)
-  const messages = execSync("git log main..HEAD --format=%B", { encoding: "utf-8" });
+  const messages = execSync("git --no-pager log --no-color main..HEAD --format=%B", { encoding: "utf-8" });
   
   return { message: messages, diff, files };
 }
@@ -309,6 +315,13 @@ ${analysis.description}
 
 function cleanupSnapshots(): void {
   const snapshotsDir = ".changeset/snapshots";
+  
+  // Check if directory exists before cleaning
+  if (!existsSync(snapshotsDir)) {
+    console.log("\n🧹 No snapshots to clean up");
+    return;
+  }
+  
   const files = readdirSync(snapshotsDir);
   
   files.forEach(file => {
@@ -386,7 +399,7 @@ function autoSquashCommits(changesetFile: string): void {
     }
     
     // 2. Count commits since main
-    const commitCount = parseInt(execSync("git rev-list --count main..HEAD", { encoding: "utf-8" }).trim());
+    const commitCount = parseInt(execSync("git --no-pager rev-list --count main..HEAD", { encoding: "utf-8" }).trim());
     
     if (commitCount <= 1) {
       console.log("ℹ️  Only 1 commit, no squash needed");
@@ -516,7 +529,7 @@ async function analyzePhase() {
  */
 function validateChangesetAgainstDiff(changesetFile: string): { valid: boolean; errors: string[] } {
   const content = readFileSync(changesetFile, "utf-8");
-  const actualFiles = execSync("git diff --name-only main...HEAD", { encoding: "utf-8" })
+  const actualFiles = execSync("git --no-pager diff --name-only --no-color main...HEAD", { encoding: "utf-8" })
     .trim()
     .split("\n")
     .filter(Boolean);
