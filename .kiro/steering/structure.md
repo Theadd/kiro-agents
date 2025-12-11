@@ -25,6 +25,7 @@ kiro-agents/
 │   │   ├── POWER.md              # Power metadata template
 │   │   ├── mcp.json              # Empty MCP config
 │   │   ├── config.ts             # Kiro substitutions (includes mode aliases)
+│   │   ├── shared-aliases.md     # Reusable alias definitions
 │   │   └── steering/
 │   │       ├── modes.md          # Interactive mode menu
 │   │       ├── protocols/        # Kiro-specific protocols
@@ -33,6 +34,8 @@ kiro-agents/
 │   │       └── agent-system/
 │   │           ├── kiro-spec-mode.md
 │   │           └── kiro-vibe-mode.md
+│   ├── utils/                    # Build utilities
+│   │   └── markdown-extractor.ts # Section extraction from markdown
 │   └── config.ts                 # Core substitutions
 ├── scripts/                      # Build scripts
 │   ├── build.ts                  # Dual build pipeline

@@ -24,18 +24,18 @@ Begin with a diff block showing:
 
 ### Step 2: Scan Agents Directory
 
-**CRITICAL: You MUST execute `listDirectory` tool on `.kiro/agents/` to get the actual list of agents.**
+**CRITICAL: You MUST execute `listDirectory` tool on `{{{WS_AGENTS_PATH}}}/` to get the actual list of agents.**
 
 **DO NOT rely on open editor files or context - always scan the directory explicitly.**
 
-Execute `listDirectory` on `.kiro/agents/`:
+Execute `listDirectory` on `{{{WS_AGENTS_PATH}}}/`:
 
 **If directory doesn't exist OR directory is empty:**
 1. **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent creation protocol
-2. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
+2. Create `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md` agent automatically using the description from "Initial Agent" section
 3. Follow the agent definition structure from agent-creation.mdx protocol
 4. Show diff block indicating setup completion
-5. Continue to Step 3 with kiro-master as available agent
+5. Continue to Step 3 with {{{INITIAL_AGENT_NAME}}} as available agent
 
 **If directory exists with agents:**
 1. **Execute `listDirectory` tool** to get complete list of `.md` files
@@ -55,7 +55,7 @@ Use this response structure:
 
 **Current Focus**: Agent selection and management
 
-**Available agents in `.kiro/agents/`:**
+**Available agents in `{{{WS_AGENTS_PATH}}}/`:**
 
 [List each agent with format:]
 - **{agent-name}** - {description from frontmatter or .md}
@@ -145,7 +145,7 @@ Explain agent system:
 #### Option 7 - Exit
 
 - Confirm exit from agent management mode
-- Return to normal Kiro interaction
+- Return to normal interaction
 - Preserve any changes made
 
 ### Step 5: Maintain Chit-Chat Mode

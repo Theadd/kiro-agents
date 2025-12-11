@@ -93,3 +93,13 @@ Traditional AI assistants overwhelm you with context and options. kiro-agents:
 ## License
 
 MIT
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+**Important**: Do not modify files in `power/` directory. This is auto-generated during release. See contributing guide for details.
+
+## License
+
+MIT

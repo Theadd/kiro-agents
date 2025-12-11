@@ -1,331 +1,195 @@
 # Contributing to kiro-agents
 
-Thanks for your interest in contributing! This guide will help you get started.
-
-## Development Setup
-
-### Prerequisites
-
-- [Bun](https://bun.sh/) - JavaScript runtime and package manager
-- Git
-- Node.js (for npm publishing)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Theadd/kiro-agents.git
-cd kiro-agents
-
-# Install dependencies
-bun install
-
-# Run dev mode (builds to ~/.kiro/steering/kiro-agents/)
-bun run dev
-```
+Thank you for your interest in contributing! This guide will help you get started.
 
 ## Development Workflow
 
-### 1. Create a Feature Branch
+### Making Changes
+
+1. **Fork and clone** the repository
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/kiro-agents.git
+   cd kiro-agents
+   ```
+
+2. **Install dependencies**
+   ```bash
+   bun install
+   ```
+
+3. **Create a branch** from `main`
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+4. **Make changes** in `src/` directory only
+   - `src/core/` - Cross-IDE compatible features
+   - `src/kiro/` - Kiro-specific extensions
+
+5. **Test your changes**
+   ```bash
+   bun run test
+   ```
+
+6. **Commit and push**
+   ```bash
+   git commit -m "feat: your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+7. **Open a Pull Request** to `main`
+
+## Important: DO NOT Modify power/ Directory
+
+**⚠️  The `power/` directory is auto-generated and should NOT be modified in PRs.**
+
+### Why?
+
+- `power/` is the Kiro Power distribution built from `src/`
+- It's regenerated during release to stay in sync with npm package
+- Manual changes will be overwritten and cause inconsistencies
+
+### Testing Power Locally
+
+If you need to test Power distribution:
 
 ```bash
-git checkout -b feature/your-feature-name
-```
-
-### 2. Make Changes
-
-Work on your feature with frequent commits:
-
-```bash
-# Make changes
-git add .
-git commit -m "wip: initial work on feature"
-
-# More changes
-git add .
-git commit -m "wip: progress on feature"
-```
-
-**Tip**: Commit frequently! This gives you safety nets for rollbacks.
-
-### 3. Capture Session Context
-
-After each development session, capture the context:
-
-```bash
-/snapshot
-```
-
-Or via command line:
-
-```bash
-bun run snapshot
-```
-
-The AI agent will analyze your session and create a snapshot that captures:
-- **Purpose**: What you were trying to achieve
-- **Changes**: What was added, modified, removed, or attempted
-- **Findings**: Important discoveries or insights
-- **Limitations**: Blockers or constraints encountered
-- **Decisions**: Design decisions and reasoning
-
-Snapshots are stored in `.changeset/snapshots/` (gitignored).
-
-### 4. Continue Development
-
-Repeat steps 2-3 across multiple sessions as needed. The system handles:
-- Multiple sessions per feature
-- Context window limitations
-- Failed experiments (they'll be filtered out later)
-- Frequent commits for safety
-
-### 5. Finalize Your Feature
-
-When your feature is complete and you're satisfied:
-
-```bash
-/finalize
-```
-
-Or via command line:
-
-```bash
-bun run finalize
-```
-
-This will:
-- Analyze all your session snapshots
-- Compare with the final git diff
-- Filter out temporary/experimental changes
-- Generate a consolidated changeset
-- Clean up snapshots
-- **Prompt you for next action**
-
-You'll see an interactive prompt:
-
-```
-✅ Changeset created successfully! What would you like to do?
-
-  1. ✅ Commit changeset now
-  2. 📝 Review changeset first
-  3. ❌ Cancel (keep changeset, don't commit)
-
-Enter your choice (1-3):
-```
-
-**Choose your option:**
-- **Option 1**: Automatically commits the changeset (recommended for quick workflow)
-- **Option 2**: Shows commands to review and commit manually (recommended if you want to edit)
-- **Option 3**: Keeps changeset but doesn't commit (if you need to make changes first)
-
-### 6. Squash and Push
-
-If you chose to commit (option 1) or committed manually (option 2):
-
-Squash your WIP commits:
-
-```bash
-git rebase -i main
-```
-
-Push your branch:
-
-```bash
-git push origin feature/your-feature-name
-```
-
-### 7. Push and Create PR
-
-```bash
-git push origin feature/your-feature-name
-```
-
-Create a pull request on GitHub.
-
-## Changeset Format
-
-Changesets use this format:
-
-```markdown
----
-"kiro-agents": minor
----
-
-# Feature summary
-
-Brief description of what changed and why.
-
-## Added
-- New feature X
-- New capability Y
-
-## Changed
-- Modified behavior Z
-
-## Fixed
-- Bug fix W
-
-## Key Findings
-- Important discovery A
-
-## Design Decisions
-- Chose approach B because C
-```
-
-### Version Types
-
-- **major**: Breaking changes, API changes, architectural changes
-- **minor**: New features, backwards-compatible additions
-- **patch**: Bug fixes, documentation, refactoring
-
-## Testing
-
-### Run Tests
-
-```bash
-bun run test
-```
-
-This validates:
-- Build outputs exist
-- File counts match expectations
-- Substitutions applied correctly
-- Frontmatter validity
-
-### Manual Testing
-
-**npm package**:
-```bash
-bun run build
-bun link
-kiro-agents
-```
-
-**Power distribution**:
-```bash
+# Generate power/ locally
 bun run build:power
-# Install from local path in Kiro IDE
+
+# Install from local directory in Kiro IDE
+# (Use local path in Powers panel)
+
+# DO NOT commit the generated files
+git restore power/
 ```
 
-**Dev mode**:
+### CI Protection
+
+- PRs that modify `power/` will **fail CI automatically**
+- Maintainers will regenerate `power/` after merging your PR
+- This ensures npm and Power distributions stay synchronized
+
+## Build Commands
+
 ```bash
+# Run all tests
+bun run test
+
+# Build Power distribution (for local testing only)
+bun run build:power
+
+# Build npm distribution
+bun run build
+
+# Clean build artifacts
+bun run clean
+
+# Dev mode (builds to ~/.kiro/steering/kiro-agents/ with watch)
 bun run dev
-# Files in ~/.kiro/steering/kiro-agents/
 ```
 
 ## Project Structure
 
 ```
 kiro-agents/
-├── src/                    # Source files
-│   ├── core/              # Cross-IDE compatible
-│   └── kiro/              # Kiro-specific
-├── scripts/               # Build and release scripts
-├── .changeset/            # Changesets and snapshots
-├── .kiro/                 # Workspace config
-│   ├── agents/           # Custom agents
-│   ├── hooks/            # Slash commands
-│   └── steering/         # Workspace steering
-└── docs/                  # Documentation
+├── src/
+│   ├── core/          # Cross-IDE compatible (NO Kiro-specific code)
+│   ├── kiro/          # Kiro-specific extensions
+│   ├── utils/         # Build utilities
+│   └── config.ts      # Base config (reference pattern)
+├── scripts/           # Build and release scripts
+├── power/             # ⚠️  AUTO-GENERATED - DO NOT EDIT
+├── build/             # Temporary artifacts (gitignored)
+└── docs/              # Documentation
 ```
 
-## Build System
+## Cross-IDE Compatibility Rules
 
-### Build Modes
+**Files in `src/core/` MUST be IDE-agnostic:**
 
-**npm** - Package distribution:
+❌ **Prohibited:**
+- Mentions of "Kiro" (IDE name)
+- Kiro-specific paths (`.kiro/`)
+- Kiro-specific features (MCP servers, Powers, etc.)
+- Kiro-specific agent names (`kiro-master`)
+
+✅ **Required:**
+- Use substitutions: `{{{WS_AGENTS_PATH}}}`, `{{{INITIAL_AGENT_NAME}}}`
+- Generic terminology: "IDE" instead of "Kiro IDE"
+- Generic paths: `.ai-agents/agents` (base) → `.kiro/agents` (Kiro override)
+
+## Versioning System
+
+We use an AI-powered versioning system with Changesets:
+
+### During Development
+
 ```bash
-bun run build
+# After each development session
+bun run snapshot  # or /snapshot in Kiro IDE
+
+# Captures context: purpose, findings, decisions
+# Stored in .changeset/snapshots/ (gitignored)
 ```
 
-**power** - Kiro Power distribution:
+### When Feature Complete
+
 ```bash
-bun run build:power
+# Consolidate snapshots into changeset
+bun run finalize  # or /finalize in Kiro IDE
+
+# AI analyzes snapshots vs git diff
+# Generates changeset in .changeset/*.md
+# Commit the changeset file
 ```
 
-**dev** - Development mode (watch):
+### Release (Maintainers Only)
+
 ```bash
-bun run dev
+# Publish to npm and update power/
+bun run release  # or /release in Kiro IDE
+
+# Consumes changesets
+# Bumps version
+# Updates CHANGELOG.md
+# Publishes to npm
+# Creates git tag
 ```
 
-### Configuration
-
-Dynamic substitutions in `src/config.ts` and `src/kiro/config.ts`:
-- `{{{VERSION}}}` - Package version
-- `{{{COMMANDS_LIST}}}` - Auto-generated commands
-- `{{{AGENT_LIST}}}` - Available agents
-
-## Release Process (Maintainers Only)
-
-### Prerequisites
-
-- Write access to repository
-- npm publish permissions
-- On `main` branch
-
-### Steps
-
-1. **Merge feature branches** with changesets
-2. **Run release command**:
-   ```bash
-   /release
-   ```
-   Or:
-   ```bash
-   bun run release
-   ```
-
-This will:
-- Consume all changesets
-- Bump version in `package.json`
-- Update `CHANGELOG.md`
-- Build the package
-- Publish to npm
-- Create git tag
-- Push to GitHub
+See `docs/VERSIONING.md` for detailed documentation.
 
 ## Code Style
 
-- **TypeScript** for scripts and configuration
-- **Markdown** for documentation and steering files
-- **ESM modules** throughout
-- **Bun** as primary runtime
+- **TypeScript** for build scripts
+- **Markdown** for steering documents
+- **Frontmatter** required in all steering documents
+- **Substitutions** for dynamic content: `{{{PLACEHOLDER}}}`
 
-## Documentation
+## Testing
 
-- **Steering documents** in `.kiro/steering/` - Project architecture
-- **User documentation** in `docs/` - User-facing guides
-- **Inline comments** for complex logic
-- **Frontmatter** in markdown files for metadata
+All PRs must pass tests:
 
-## Getting Help
+```bash
+bun run test
+```
 
-- **Issues**: Open an issue on GitHub
-- **Discussions**: Use GitHub Discussions
-- **Documentation**: Check `docs/VERSIONING.md` for versioning details
+Tests validate:
+- Build outputs exist
+- Substitutions applied correctly
+- Frontmatter valid
+- No unprocessed placeholders
 
-## Tips for Success
+## Questions or Issues?
 
-### Use Snapshots Liberally
-
-Don't wait until the end - capture context after each session. It's easier to consolidate rich context than to remember everything later.
-
-### Commit Frequently
-
-Frequent commits give you rollback points. Don't worry about messy history - you'll squash before merging.
-
-### Let AI Filter
-
-Don't worry about documenting failed experiments in snapshots. The AI will filter them out during finalization by comparing with the final commit.
-
-### Review Changesets
-
-Always review the generated changeset before committing. The AI does a good job, but you know your changes best.
-
-### Ask Questions
-
-If you're unsure about the workflow, open an issue or discussion. We're here to help!
+- Open an issue for bugs or feature requests
+- Start a discussion for questions
+- Check existing issues before creating new ones
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the same license as the project.
+
+---
+
+**Thank you for contributing to kiro-agents! 🎉**

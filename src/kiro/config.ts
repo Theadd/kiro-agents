@@ -7,6 +7,7 @@
  * 
  * **Architecture:**
  * - Imports base config's `injectProtocol` helper for protocol injection
+ * - Imports `extractSection` for markdown section extraction
  * - Overrides substitution keys with Kiro functionality
  * - MUST have same keys as `src/config.ts` (cross-IDE compatibility)
  * 
@@ -16,14 +17,16 @@
  * - Can read filesystem, package.json, etc.
  * 
  * @see src/config.ts - Base config with all required keys and injectProtocol function
+ * @see src/utils/markdown-extractor.ts - Section extraction utilities
  */
 import { readFileSync, readdirSync } from "fs";
 import { injectProtocol } from "../config";
+import { extractSection } from "../utils/markdown-extractor";
 
 /**
- * Gets package version from package.json.
+ * Reads package version from package.json (fallback: '1.0.0').
  * 
- * @returns Version string (e.g., '1.4.0') or '1.0.0' if not found
+ * @returns Version string (e.g., '1.4.0')
  */
 function getVersion(): string {
   try {
@@ -35,12 +38,9 @@ function getVersion(): string {
 }
 
 /**
- * Lists available agents from `.kiro/agents/` directory.
+ * Scans `.kiro/agents/` for agent definitions (fallback message if directory missing).
  * 
- * Scans for `.md` files and formats as bullet list. Falls back to
- * default message if directory doesn't exist (e.g., during build).
- * 
- * @returns Markdown bullet list of agent names
+ * @returns Markdown bullet list of agent names without .md extension
  */
 function getAgentList(): string {
   try {
@@ -79,21 +79,17 @@ function getCommandsList(): string {
 }
 
 /**
- * Resolves steering path based on build target.
+ * Resolves steering directory path based on build target (npm vs power distribution).
  * 
- * Power distribution installs to `.kiro/powers/installed/kiro-agents/`,
- * npm distribution installs to `~/.kiro/steering/kiro-agents/`.
- * Used for generating correct protocol paths in substitutions.
- * 
- * @param target - Build target (npm/power/dev)
+ * @param target - Build target ('npm' | 'power' | 'dev')
  * @returns Absolute path to steering directory
  * 
- * @example npm/dev target
+ * @example npm/dev builds
  * ```typescript
  * getSteeringsPath('npm') // '~/.kiro/steering/kiro-agents'
  * ```
  * 
- * @example power target
+ * @example Power builds
  * ```typescript
  * getSteeringsPath('power') // '~/.kiro/powers/installed/kiro-agents/steering'
  * ```
@@ -107,16 +103,28 @@ const getSteeringsPath = (target: string) => {
 }
 
 /**
- * Kiro-specific substitution map for build-time content replacement.
+ * Kiro-specific substitution map for build-time content replacement with multi-pass support.
  * 
- * Overrides base config substitutions with Kiro-specific implementations.
- * Each function receives SubstitutionOptions and returns replacement string.
+ * Overrides base config substitutions with Kiro implementations. Each function receives
+ * `SubstitutionOptions` (with `target` property) and returns replacement string. Supports
+ * nested substitutions where replacement values contain additional placeholders that get
+ * resolved in subsequent build passes.
  * 
- * **Protocol Injections:**
- * - `AGENT_MANAGEMENT_PROTOCOL` - Injects from core protocols (src/core/protocols/)
- * - `MODE_MANAGEMENT_PROTOCOL` - Injects from Kiro protocols (src/kiro/steering/protocols/)
+ * **Protocol injections:**
+ * - `AGENT_MANAGEMENT_PROTOCOL` - Injects from `src/core/protocols/agent-management.mdx`
+ * - `MODE_MANAGEMENT_PROTOCOL` - Injects from `src/kiro/steering/protocols/mode-management.mdx`
  * 
- * @see src/config.ts - Base substitutions and injectProtocol function
+ * **Nested substitutions:**
+ * - `KIRO_MODE_ALIASES` - Extracts section containing `{{{KIRO_PROTOCOLS_PATH}}}` placeholder
+ * - Build system resolves nested placeholders automatically via multi-pass processing
+ * 
+ * **Agent system overrides:**
+ * - Can override `WS_AGENTS_PATH`, `INITIAL_AGENT_NAME`, `INITIAL_AGENT_DESCRIPTION` if Kiro needs different values
+ * - Base config provides cross-IDE defaults (`.ai-agents/agents`, `project-master`)
+ * - Kiro typically uses `.kiro/agents/` and `kiro-master` instead
+ * 
+ * @see src/config.ts - Base substitutions with all required keys
+ * @see scripts/build.ts - Multi-pass substitution processor
  */
 export const substitutions = {
   '{{{VERSION}}}': getVersion,
@@ -136,29 +144,41 @@ export const substitutions = {
 - **Enhanced mode integration** - Better coordination with modes system`,
   '{{{PROTOCOLS_PATH}}}': ({ target }: any) => getSteeringsPath(target) + '/protocols',
   '{{{KIRO_PROTOCOLS_PATH}}}': ({ target }: any) => getSteeringsPath(target) + '/protocols',
+  /** Override workspace agents path for Kiro */
+  '{{{WS_AGENTS_PATH}}}': () => '.kiro/agents',
+  /** Override initial agent name for Kiro */
+  '{{{INITIAL_AGENT_NAME}}}': () => 'kiro-master',
+  /** Override initial agent description for Kiro */
+  '{{{INITIAL_AGENT_DESCRIPTION}}}': () => '**kiro-master** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, powers, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities',
   /** Injects agent management protocol from core protocols directory */
   '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('agent-management.mdx', '## Agent Management Steps'),
   /** Injects mode management protocol from Kiro-specific protocols directory */
   '{{{MODE_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('mode-management.mdx', '## Mode Management Steps', 'src/kiro/steering/protocols'),
-  '{{{KIRO_MODE_ALIASES}}}': ({ target }: any) => `
-## Mode System Alias
-
-The mode switching command uses parameter substitution to load mode definitions dynamically:
-
-<alias>
-  <trigger>/modes {mode_name}</trigger>
-  <definition>
-## Mode Switch: {mode_name}
-
-You are now switching to **{mode_name} mode**.
-
-**Load and execute mode switching protocol:**
-1. Read \`kiro-{mode_name}-mode.md\` from agent-system directory into context
-2. Read \`${getSteeringsPath(target)}/protocols/mode-switching.mdx\` into context
-3. Follow all steps from the "Mode Switch Steps" section in mode-switching.mdx
-4. Use \`{mode_name}\` as the mode identifier throughout the protocol
-  </definition>
-</alias>
-
-This alias enables users to switch modes with \`/modes {name}\` syntax.`
+  /** 
+   * Injects mode system alias from shared aliases file with nested substitution support.
+   * 
+   * Extracts section containing `{{{KIRO_PROTOCOLS_PATH}}}` placeholder. The build system's
+   * multi-pass processor automatically resolves the nested placeholder in a subsequent pass.
+   * 
+   * **Processing flow:**
+   * 1. First pass: This function returns content with `{{{KIRO_PROTOCOLS_PATH}}}`
+   * 2. Second pass: Build system resolves `{{{KIRO_PROTOCOLS_PATH}}}` to actual path
+   * 
+   * @example Multi-pass resolution
+   * ```typescript
+   * // Pass 1: Returns "Path: {{{KIRO_PROTOCOLS_PATH}}}/mode-switching.mdx"
+   * // Pass 2: Resolves to "Path: ~/.kiro/steering/kiro-agents/protocols/mode-switching.mdx"
+   * ```
+   */
+  '{{{KIRO_MODE_ALIASES}}}': ({ target }: any) => {
+    try {
+      // Extract section from shared aliases file (contains {{{KIRO_PROTOCOLS_PATH}}} placeholder)
+      const content = extractSection('src/kiro/shared-aliases.md', 'Mode System Alias');
+      
+      // Return content with nested placeholder - build system will resolve in next pass
+      return content;
+    } catch (error: any) {
+      return `<!-- Error loading mode alias: ${error.message} -->`;
+    }
+  }
 }

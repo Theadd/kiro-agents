@@ -179,12 +179,54 @@ npx kiro-agents  # or bunx kiro-agents
 3. **Instruction Aliases**: Use `<alias><trigger>` pattern for commands
 4. **Cross-IDE Compatibility**: Core features should work in any AI IDE
 
+### Cross-IDE Compatibility Rules
+
+**CRITICAL**: Files in `src/core/` MUST be completely IDE-agnostic.
+
+**Prohibited in src/core/**:
+- ❌ Mentions of "Kiro" (IDE name)
+- ❌ Kiro-specific paths (`.kiro/`)
+- ❌ Kiro-specific features (MCP servers, Powers, etc.)
+- ❌ Kiro-specific agent names (`kiro-master`)
+
+**Required patterns**:
+- ✅ Use substitutions for IDE-specific values: `{{{WS_AGENTS_PATH}}}`, `{{{INITIAL_AGENT_NAME}}}`
+- ✅ Generic terminology: "IDE" instead of "Kiro IDE"
+- ✅ Generic paths: `.ai-agents/agents` (base) → `.kiro/agents` (Kiro override)
+- ✅ Generic names: `project-master` (base) → `kiro-master` (Kiro override)
+
+**Build system architecture**:
+- ALL kiro-agents builds use `src/kiro/config.ts` (kiro-agents IS for Kiro IDE)
+- `src/config.ts` exists as reference pattern for future IDE-X projects
+- npm and power are distribution channels, NOT different products
+- Substitutions enable target-aware paths (npm vs power installation locations)
+
 ### Build System Rules
 
 1. **Three Build Modes**: npm, power, dev
 2. **Deterministic Builds**: Same input = same output
 3. **Dynamic Substitutions**: Applied at build time via config functions
 4. **File Mapping**: Explicit mapping from `src/` to target directories
+
+### Power Distribution Protection
+
+**Problem**: `power/` is committed to git but should only be modified by maintainers during release to prevent desynchronization between npm and Power distributions.
+
+**Solution**: Multi-layer protection
+1. **CI/CD Check**: GitHub Action (`.github/workflows/validate-pr.yml`) fails PRs that modify `power/`
+2. **Documentation**: `CONTRIBUTING.md` explains why and how to test Power locally
+3. **Warning Comments**: `power/POWER.md` has clear warning at top about auto-generation
+
+**Workflow**:
+- **Contributors**: Modify `src/` only, CI prevents `power/` changes in PRs
+- **Maintainers**: After merging PR, run `bun run build:power && git commit` to update `power/`
+- **Release**: `bun run release` publishes both npm and regenerates `power/` with matching version
+
+**Benefits**:
+- Prevents accidental desynchronization between distribution channels
+- Contributors can test Power locally without committing changes
+- Clear error messages guide contributors to correct workflow
+- Maintainers control when Power distribution is updated
 
 ### Versioning Rules
 

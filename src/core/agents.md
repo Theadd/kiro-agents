@@ -14,10 +14,18 @@ You are now in **agent management mode** using chit-chat interaction protocol.
 
 When auto-setup detects no agents exist, create the initial agent:
 
-**kiro-master** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, powers, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities
+{{{INITIAL_AGENT_DESCRIPTION}}}
 
-This description is used when creating `.kiro/agents/kiro-master.md` during auto-setup.
+This description is used when creating `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md` during auto-setup.
 
 ---
 
-**Begin agent management mode now.**
+**Quick Commands:**
+
+```
+/agents           Interactive agent management
+
+{{{MODE_COMMANDS}}}
+```
+
+Note: Commands are defined in steering documents.
