@@ -42,14 +42,11 @@
 
 - fa0fbd5: # Enhanced repository metadata and discoverability
 
-  Improved project discoverability through GitHub features, enhanced documentation structure, and better package metadata. Added GitHub Sponsors support and internal documentation organization for maintainer guides.
+  Improved project discoverability through GitHub features, enhanced documentation structure, and better package metadata. Added GitHub Sponsors support.
 
   ## Added
 
   - GitHub Sponsors funding configuration
-  - Internal documentation structure (`docs/__internal/`) for maintainer-only guides
-  - SEO checklist and social preview guide for repository optimization
-  - SEO specialist agent for repository discoverability tasks
 
   ## Changed
 
