@@ -1,42 +1,128 @@
 #!/usr/bin/env bun
+/**
+ * AI-powered changeset finalization with validation safeguards.
+ * 
+ * Two-phase workflow prevents phantom changelog entries by validating against actual git diff:
+ * 1. **analyze** - Loads snapshots, shows diff, creates changeset with TODOs
+ * 2. **commit** - Validates changeset, cleans snapshots, commits and squashes
+ * 
+ * @example Phase 1: Analysis
+ * ```bash
+ * bun run finalize:analyze
+ * # Displays: snapshots, git diff, file list, AI instructions
+ * # Creates: .changeset/{id}.md with TODO placeholders
+ * ```
+ * 
+ * @example Phase 2: AI Updates Changeset
+ * AI must:
+ * - Use git diff as source of truth (not snapshots)
+ * - Verify each item exists in actual file changes
+ * - Replace ALL TODO placeholders
+ * - Follow validation checklist
+ * 
+ * @example Phase 3: Commit
+ * ```bash
+ * bun run finalize:commit
+ * # Validates: No TODOs, no phantom file references
+ * # Commits: Changeset file
+ * # Squashes: All commits into one with descriptive message
+ * ```
+ * 
+ * **Validation Safeguards:**
+ * - Checks for TODO placeholders (prevents incomplete changesets)
+ * - Validates file references against git diff (prevents phantom entries)
+ * - Extracts path patterns and cross-references with actual changed files
+ * - Fails fast with clear error messages
+ * 
+ * **Critical Distinction:** Session snapshots provide context about what was attempted,
+ * but only the git diff determines what goes in the changelog. This prevents documenting
+ * experimental work, gitignored files, or features that didn't make the final commit.
+ */
 import { readdirSync, readFileSync, writeFileSync, rmSync } from "fs";
 import { execSync } from "child_process";
 import { join } from "path";
 
+/**
+ * Session snapshot captured by `/snapshot` command.
+ * 
+ * Contains rich context about development session including purpose, findings,
+ * and decisions that git commits don't capture. Used for context during changeset
+ * generation but NOT as source of truth for changelog content.
+ */
 interface SessionSnapshot {
+  /** Unique snapshot identifier */
   id: string;
+  /** ISO timestamp of snapshot creation */
   timestamp: string;
+  /** Git branch name */
   branch: string;
+  /** Commit SHAs included in session */
   commits: string[];
+  /** High-level purpose of the session */
   purpose: string;
+  /** Categorized changes made during session */
   changes: {
+    /** New features/files added */
     added: string[];
+    /** Existing features/files modified */
     modified: string[];
+    /** Features/files removed */
     removed: string[];
+    /** Things attempted but not completed (important: may not be in final commit) */
     attempted: string[];
   };
+  /** Important discoveries during session */
   findings: string[];
+  /** Blockers or constraints encountered */
   limitations: string[];
+  /** Design decisions and rationale */
   decisions: string[];
+  /** Files changed in session */
   filesChanged: string[];
+  /** Lines added in session */
   linesAdded: number;
+  /** Lines removed in session */
   linesRemoved: number;
 }
 
+/**
+ * Placeholder analysis structure for changeset creation.
+ * 
+ * Contains TODO placeholders that AI must replace with actual content
+ * based on git diff analysis. Used only during Phase 1 (analyze).
+ */
 interface FinalAnalysis {
+  /** Semantic version bump type */
   type: "major" | "minor" | "patch";
+  /** One-line summary */
   summary: string;
+  /** 2-3 sentence description */
   description: string;
+  /** Categorized changelog entries */
   details: {
+    /** New user-facing features */
     added: string[];
+    /** Modified behaviors */
     changed: string[];
+    /** Bug fixes */
     fixed: string[];
+    /** Removed features */
     removed: string[];
   };
+  /** Key findings (optional) */
   findings: string[];
+  /** Design decisions (optional) */
   decisions: string[];
 }
 
+/**
+ * Loads all session snapshots from `.changeset/snapshots/` directory.
+ * 
+ * Snapshots are gitignored and accumulate across development sessions.
+ * Sorted chronologically to show development progression.
+ * 
+ * @returns Array of session snapshots sorted by timestamp (oldest first)
+ */
 function loadSnapshots(): SessionSnapshot[] {
   const snapshotsDir = ".changeset/snapshots";
   const files = readdirSync(snapshotsDir).filter(f => f.endsWith(".json"));
@@ -47,6 +133,22 @@ function loadSnapshots(): SessionSnapshot[] {
   }).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 }
 
+/**
+ * Gets final commit state by comparing current branch against main.
+ * 
+ * This is the SOURCE OF TRUTH for changelog generation. Only changes
+ * present in this diff should appear in the changeset, regardless of
+ * what's in session snapshots.
+ * 
+ * @returns Object containing commit messages, full diff, and changed file list
+ * 
+ * @example
+ * ```typescript
+ * const { files, diff } = getSquashedCommit();
+ * // files: ['README.md', 'package.json']
+ * // diff: 'diff --git a/README.md b/README.md\n...'
+ * ```
+ */
 function getSquashedCommit(): { message: string; diff: string; files: string[] } {
   // Get the final state vs main
   const diff = execSync("git diff main...HEAD", { encoding: "utf-8" });
@@ -61,6 +163,20 @@ function getSquashedCommit(): { message: string; diff: string; files: string[] }
   return { message: messages, diff, files };
 }
 
+/**
+ * Displays AI analysis prompt with snapshots, diff, and validation instructions.
+ * 
+ * **Critical Design:** File list is shown FIRST (before snapshots) to emphasize
+ * that git diff is the source of truth. Snapshots provide context but should NOT
+ * be used as changelog content unless verified against the file list.
+ * 
+ * **Validation Checklist:** Explicit checklist prevents common failure mode where
+ * AI includes experimental/gitignored content from snapshots that didn't make the
+ * final commit (e.g., `docs/__internal/` that's gitignored).
+ * 
+ * @param snapshots - Session snapshots for context
+ * @param finalCommit - Git diff and file list (source of truth)
+ */
 function displayAIPrompt(snapshots: SessionSnapshot[], finalCommit: ReturnType<typeof getSquashedCommit>): void {
   console.log("🤖 AI Agent: Please analyze and provide changeset content\n");
   
@@ -68,26 +184,32 @@ function displayAIPrompt(snapshots: SessionSnapshot[], finalCommit: ReturnType<t
 📋 AI Analysis Required
 ${"─".repeat(60)}
 
-**Session Snapshots (${snapshots.length} sessions):**
+**FILES IN FINAL COMMIT (SOURCE OF TRUTH):**
+${finalCommit.files.map(f => `  ✓ ${f}`).join("\n")}
+
+**Session Snapshots (context only - verify against files above):**
 ${JSON.stringify(snapshots, null, 2)}
 
-**Final Commit:**
-Files changed: ${finalCommit.files.join(", ")}
-
-Diff (truncated):
+**Git Diff (what actually changed):**
 ${finalCommit.diff.slice(0, 3000)}
 
-**Instructions:**
-1. Compare snapshots with final commit
-2. Identify what from snapshots is present in final commit
-3. Ignore temporary/removed changes that didn't make it to final
-4. Determine semantic version type:
+**CRITICAL INSTRUCTIONS:**
+1. **ONLY use the git diff below as source of truth** - snapshots provide context but NOT changelog content
+2. **Cross-reference**: For each item in snapshots, verify it exists in the diff's file list
+3. **Strict validation**: If a file/feature is NOT in the diff, it MUST NOT be in the changeset
+4. **Determine semantic version type**:
    - **major**: Breaking changes, API changes, architectural changes
    - **minor**: New features, new capabilities, backwards-compatible additions
    - **patch**: Bug fixes, documentation, refactoring, minor improvements
-5. Write user-facing changelog entry (not technical implementation details)
-6. Update the changeset file in .changeset/ (replace all TODO placeholders)
-7. Run: bun run finalize:commit
+5. **Write user-facing changelog** based ONLY on what's in the diff
+6. **Update changeset file** in .changeset/ (replace all TODO placeholders)
+7. **Run**: bun run finalize:commit
+
+**VALIDATION CHECKLIST:**
+- [ ] Every "Added" item corresponds to a new file in diff
+- [ ] Every "Changed" item corresponds to a modified file in diff
+- [ ] No references to files/directories not in the diff
+- [ ] No references to gitignored content
 
 **Changeset Format:**
 ---
@@ -116,6 +238,14 @@ ${"─".repeat(60)}
   console.log(prompt);
 }
 
+/**
+ * Creates placeholder analysis with TODO markers for AI to replace.
+ * 
+ * Used during Phase 1 (analyze) to create changeset template. AI must
+ * replace ALL TODO placeholders before Phase 2 (commit) will succeed.
+ * 
+ * @returns FinalAnalysis with TODO placeholders
+ */
 function createPlaceholderAnalysis(): FinalAnalysis {
   return {
     type: "minor",
@@ -308,6 +438,19 @@ function autoSquashCommits(changesetFile: string): void {
   }
 }
 
+/**
+ * Phase 1: Analysis - Loads snapshots, shows diff, creates changeset template.
+ * 
+ * **Workflow:**
+ * 1. Loads all session snapshots from `.changeset/snapshots/`
+ * 2. Gets git diff from main to current branch (source of truth)
+ * 3. Displays AI prompt with file list, snapshots, and diff
+ * 4. Creates changeset file with TODO placeholders
+ * 5. Exits and waits for AI to update changeset
+ * 
+ * **Critical:** This phase only prepares data. AI must analyze and update
+ * the changeset file before Phase 2 (commit) can proceed.
+ */
 async function analyzePhase() {
   console.log("🎯 Finalize Changes - Phase 1: Analysis\n");
   
@@ -334,7 +477,7 @@ async function analyzePhase() {
   
   // Create changeset with TODOs
   const analysis = createPlaceholderAnalysis();
-  const changesetFile = createChangeset(analysis);
+  createChangeset(analysis);
   
   console.log("\n✅ Phase 1 complete!");
   console.log("💡 AI agent should now:");
@@ -343,6 +486,99 @@ async function analyzePhase() {
   console.log("   3. Execute: bun run finalize:commit");
 }
 
+/**
+ * Validates changeset content against actual git diff to prevent phantom entries.
+ * 
+ * **Critical Safeguard:** Prevents the failure mode where AI includes content from
+ * session snapshots that didn't make the final commit (experimental work, gitignored
+ * files, attempted features that were reverted).
+ * 
+ * **How It Works:**
+ * 1. Extracts all path-like patterns from changeset (e.g., `docs/__internal/`, `.kiro/agents/`)
+ * 2. Gets actual changed files from git diff
+ * 3. Cross-references each path against actual files
+ * 4. Reports any paths that don't exist in the commit
+ * 
+ * **Pattern Matching:**
+ * - Matches: `path/to/file` (backtick-wrapped) or path/to/file (plain text)
+ * - Skips: URLs (http://), npm packages (@scope/package)
+ * - Validates: Only paths with slashes (likely file/directory references)
+ * 
+ * @param changesetFile - Path to changeset file to validate
+ * @returns Validation result with errors array
+ * 
+ * @example Validation Failure
+ * ```typescript
+ * // Changeset mentions: "Added docs/__internal/ directory"
+ * // Git diff shows: README.md, package.json (no docs/__internal/)
+ * // Result: { valid: false, errors: ['Referenced path not in commit: docs/__internal/'] }
+ * ```
+ */
+function validateChangesetAgainstDiff(changesetFile: string): { valid: boolean; errors: string[] } {
+  const content = readFileSync(changesetFile, "utf-8");
+  const actualFiles = execSync("git diff --name-only main...HEAD", { encoding: "utf-8" })
+    .trim()
+    .split("\n")
+    .filter(Boolean);
+  
+  const errors: string[] = [];
+  
+  // Extract all file/directory references from changeset
+  // Look for common patterns: `path/to/file`, docs/__internal/, .kiro/agents/, etc.
+  const pathPattern = /`([^`]+\/[^`]+)`|([a-zA-Z0-9_-]+\/[a-zA-Z0-9_\/-]+)/g;
+  const matches = content.matchAll(pathPattern);
+  
+  for (const match of matches) {
+    const path = match[1] || match[2];
+    if (!path) continue;
+    
+    // Skip common non-file references
+    if (path.includes("://") || path.startsWith("http")) continue;
+    if (path.includes("@") || path.includes("npm")) continue;
+    
+    // Check if this path or any file under it exists in actualFiles
+    const pathExists = actualFiles.some(f => 
+      f === path || 
+      f.startsWith(path + "/") || 
+      path.startsWith(f + "/")
+    );
+    
+    if (!pathExists && path.includes("/")) {
+      errors.push(`Referenced path not in commit: ${path}`);
+    }
+  }
+  
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Phase 2: Commit - Validates changeset, cleans snapshots, commits and squashes.
+ * 
+ * **Validation Steps:**
+ * 1. Checks for TODO placeholders (ensures AI completed the changeset)
+ * 2. Validates file references against git diff (prevents phantom entries)
+ * 3. Fails fast with clear error messages if validation fails
+ * 
+ * **Workflow:**
+ * 1. Finds most recent changeset file
+ * 2. Validates content (no TODOs, no phantom files)
+ * 3. Cleans up session snapshots
+ * 4. Commits changeset with "chore: add changeset" message
+ * 5. Auto-squashes all commits into one with descriptive message
+ * 
+ * **Critical Safeguards:**
+ * - TODO check prevents incomplete changesets from being committed
+ * - Path validation prevents documenting files that don't exist in commit
+ * - Both checks must pass before any git operations occur
+ * 
+ * @example Validation Failure
+ * ```bash
+ * bun run finalize:commit
+ * # ❌ Changeset validation failed:
+ * #    - Referenced path not in commit: docs/__internal/
+ * # 💡 The changeset references files/paths not in the actual commit
+ * ```
+ */
 async function commitPhase() {
   console.log("🎯 Finalize Changes - Phase 2: Commit\n");
   
@@ -369,6 +605,19 @@ async function commitPhase() {
   }
   
   console.log("✅ Changeset verified (no TODOs)");
+  
+  // Validate changeset against actual diff
+  const validation = validateChangesetAgainstDiff(changesetFile);
+  if (!validation.valid) {
+    console.error("\n❌ Changeset validation failed:");
+    validation.errors.forEach(err => console.error(`   - ${err}`));
+    console.error("\n💡 The changeset references files/paths not in the actual commit");
+    console.error("   Please review and update the changeset file");
+    console.error(`   File: ${changesetFile}`);
+    process.exit(1);
+  }
+  
+  console.log("✅ Changeset validated against git diff");
   
   // Cleanup snapshots
   cleanupSnapshots();
