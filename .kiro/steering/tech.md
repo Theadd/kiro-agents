@@ -143,9 +143,15 @@ Captures context that git commits don't:
 
 **Dynamic Substitutions**:
 - Defined in `src/config.ts` (core) and `src/kiro/config.ts` (Kiro-specific)
-- Type: `{ [key: string]: () => string }`
-- Applied during build time
+- Type: `{ [key: string]: (options: SubstitutionOptions) => string }`
+- Applied during build time with recursive processing
 - Enables template-based content generation
+
+**Recursive Processing**:
+- Substitutions can contain other substitutions
+- System processes up to 10 iterations until no placeholders remain
+- Prevents infinite loops with iteration limit
+- Enables nested content injection patterns
 
 **Substitutions**:
 - `{{{VERSION}}}` - Package version from package.json
@@ -153,7 +159,9 @@ Captures context that git commits don't:
 - `{{{AGENT_LIST}}}` - List of available agents
 - `{{{MODE_COMMANDS}}}` - Mode-specific commands
 - `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injects agent-management.mdx content
-- `{{{PROTOCOLS_PATH}}}` - Path to protocols directory
+- `{{{PROTOCOLS_PATH}}}` - Path to protocols directory (target-aware)
+- `{{{KIRO_PROTOCOLS_PATH}}}` - Path to Kiro-specific protocols (target-aware)
+- `{{{KIRO_MODE_ALIASES}}}` - Injects mode system alias from shared-aliases.md
 
 **Example**:
 ```typescript
@@ -166,9 +174,14 @@ export const substitutions = {
 - \`/agents\` - Interactive agent management
 - \`/agents {name}\` - Activate specific agent`,
   '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => {
-    // Reads agent-management.mdx and injects content
-    const content = readFileSync('src/core/protocols/agent-management.mdx', 'utf-8');
-    return content.slice(content.indexOf('## Agent Management Steps'));
+    // Uses injectProtocol helper to read and extract content
+    return injectProtocol('agent-management.mdx', '## Agent Management Steps');
+  },
+  '{{{KIRO_MODE_ALIASES}}}': ({ target }) => {
+    // Uses extractSection to get content from shared file
+    let content = extractSection('src/kiro/shared-aliases.md', 'Mode System Alias');
+    // Can contain nested substitutions that will be processed recursively
+    return content;
   }
 }
 ```
@@ -179,6 +192,13 @@ export const substitutions = {
 - Build-time substitution injects protocol content into shells
 - Single source of truth for reusable workflows
 - Example: `agents.md` is a shell, `agent-management.mdx` is injected
+
+**Section Extraction Pattern**:
+- Shared content stored in dedicated markdown files (e.g., `shared-aliases.md`)
+- `extractSection()` utility extracts specific sections by title or anchor
+- Handles code blocks and XML tags correctly (no false header detection)
+- Enables reusable content blocks across multiple files
+- Example: Mode alias extracted from `shared-aliases.md` and injected into `aliases.md`
 
 ## Dependencies
 

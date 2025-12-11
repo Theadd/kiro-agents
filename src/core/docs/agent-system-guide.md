@@ -21,7 +21,7 @@ Comprehensive documentation for the agent activation and management system in Ki
 The Agent System provides specialized AI personas with defined capabilities and workflows. Agents are activated via instruction aliases and maintain their role throughout the session.
 
 **Key Concepts:**
-- **Agents** - Specialized AI personas defined in `.kiro/agents/{name}.md` files
+- **Agents** - Specialized AI personas defined in `{{{WS_AGENTS_PATH}}}/{name}.md` files
 - **Activation** - Loading agent definition and assuming agent role
 - **Management** - Interactive interface for viewing, creating, and managing agents
 - **Coordination** - Multiple agents working together or handing off tasks
@@ -47,11 +47,11 @@ The Agent System provides specialized AI personas with defined capabilities and 
 3. **Create your first agent** (if none exist)
    - Choose "Create new agent" from menu
    - Follow interactive wizard
-   - Agent file created in `.kiro/agents/`
+   - Agent file created in `{{{WS_AGENTS_PATH}}}/`
 
 4. **Activate an agent**
    ```
-   /agents kiro-master
+   /agents {{{INITIAL_AGENT_NAME}}}
    ```
 
 ### Common Workflows
@@ -67,7 +67,7 @@ The Agent System provides specialized AI personas with defined capabilities and 
 ```
 /agents refactor-architect  # Activate directly
 [Work with agent]           # Agent maintains role
-/agents kiro-master         # Switch to different agent
+/agents {{{INITIAL_AGENT_NAME}}}         # Switch to different agent
 ```
 
 ## Agent Activation
@@ -77,11 +77,11 @@ The Agent System provides specialized AI personas with defined capabilities and 
 When you execute `/agents {name}`, the system:
 
 1. **Discovers agent file**
-   - Checks `.kiro/agents/{name}.md` exists
+   - Checks `{{{WS_AGENTS_PATH}}}/{name}.md` exists
    - Shows error if missing, suggests `/agents` command
 
 2. **Loads agent definition**
-   - Reads `.kiro/agents/{name}.md` into context
+   - Reads `{{{WS_AGENTS_PATH}}}/{name}.md` into context
    - Loads `strict-mode.md` (enables `/strict` commands)
    - Parses frontmatter metadata
    - Understands agent capabilities and workflows
@@ -110,7 +110,7 @@ When you execute `/agents {name}`, the system:
 ### What Happens During Activation
 
 **Context Loading:**
-- Agent definition file (`.kiro/agents/{name}.md`)
+- Agent definition file (`{{{WS_AGENTS_PATH}}}/{name}.md`)
 - Strict mode steering (`strict-mode.md`)
 - Agent activation protocol (`protocols/agent-activation.mdx`)
 - Any additional steering documents specified by agent
@@ -140,7 +140,7 @@ When you execute `/agents` (without parameters), the system:
    - Maintains single focus per message
 
 2. **Scans agents directory**
-   - Lists all `.md` files in `.kiro/agents/`
+   - Lists all `.md` files in `{{{WS_AGENTS_PATH}}}/`
    - Excludes `.instructions.md` files
    - Extracts agent metadata from frontmatter
    - Categorizes agents by type (if specified)
@@ -195,7 +195,7 @@ When you execute `/agents` (without parameters), the system:
 
 ### Agent Definition Structure
 
-Agents are defined in `.kiro/agents/{name}.md` files with this structure:
+Agents are defined in `{{{WS_AGENTS_PATH}}}/{name}.md` files with this structure:
 
 ```markdown
 ---
@@ -372,7 +372,7 @@ Agents SHOULD have:
 ```
 
 **What happens:**
-1. System loads `.kiro/agents/refactor-architect.md`
+1. System loads `{{{WS_AGENTS_PATH}}}/refactor-architect.md`
 2. System loads `protocols/agent-activation.mdx`
 3. AI assumes refactor-architect role
 4. AI applies refactor-architect protocols
@@ -388,7 +388,7 @@ Agents SHOULD have:
 
 **What happens:**
 1. Chit-chat mode activates
-2. System scans `.kiro/agents/` directory
+2. System scans `{{{WS_AGENTS_PATH}}}/` directory
 3. AI presents numbered list of available agents
 4. AI offers management operations
 5. User selects option via number
@@ -398,17 +398,17 @@ Agents SHOULD have:
 ### Example 3: Switch Between Agents
 
 ```
-/agents kiro-master
+/agents {{{INITIAL_AGENT_NAME}}}
 ```
 
 **What happens:**
 1. Current agent context suspended (e.g., refactor-architect)
-2. System loads `.kiro/agents/kiro-master.md`
-3. AI assumes kiro-master role
+2. System loads `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md`
+3. AI assumes {{{INITIAL_AGENT_NAME}}} role
 4. File changes and history preserved
 5. Workflow state reset
 
-**Result:** Now in kiro-master agent, previous agent suspended but can be reactivated later.
+**Result:** Now in {{{INITIAL_AGENT_NAME}}} agent, previous agent suspended but can be reactivated later.
 
 ### Example 4: Create New Agent
 
@@ -426,7 +426,7 @@ Agents SHOULD have:
 5. AI generates agent definition file
 6. AI offers immediate activation
 
-**Result:** New agent created in `.kiro/agents/{name}.md`, ready to activate.
+**Result:** New agent created in `{{{WS_AGENTS_PATH}}}/{name}.md`, ready to activate.
 
 ## Integration Patterns
 
@@ -478,7 +478,7 @@ Agents work seamlessly with modes:
 
 ```
 /modes spec              # Switch to spec mode
-/agents kiro-master      # Activate kiro-master agent
+/agents {{{INITIAL_AGENT_NAME}}}      # Activate {{{INITIAL_AGENT_NAME}}} agent
 ```
 
 **Behavior:**
@@ -488,7 +488,7 @@ Agents work seamlessly with modes:
 - Both contexts active simultaneously
 
 **Example combinations:**
-- **Spec mode + kiro-master** - Structured feature planning with Kiro expertise
+- **Spec mode + {{{INITIAL_AGENT_NAME}}}** - Structured feature planning with Kiro expertise
 - **Vibe mode + refactor-architect** - Flexible refactoring exploration
 - **Spec mode + test-specialist** - Structured test planning
 
@@ -623,7 +623,7 @@ When task requires multiple perspectives:
 - Agent doesn't load
 
 **Possible Causes:**
-- Agent file doesn't exist in `.kiro/agents/`
+- Agent file doesn't exist in `{{{WS_AGENTS_PATH}}}/`
 - Filename doesn't match command (case-sensitive)
 - Agent file is malformed or missing required sections
 - Steering documents not loaded properly
@@ -632,12 +632,12 @@ When task requires multiple perspectives:
 1. **Check file exists:**
    ```
    # List agents directory
-   ls .kiro/agents/
+   ls {{{WS_AGENTS_PATH}}}/
    ```
 
 2. **Verify filename matches:**
    - Command: `/agents refactor-architect`
-   - File: `.kiro/agents/refactor-architect.md`
+   - File: `{{{WS_AGENTS_PATH}}}/refactor-architect.md`
    - Must match exactly (case-sensitive)
 
 3. **Check file structure:**
@@ -753,7 +753,7 @@ When task requires multiple perspectives:
 - Errors during creation
 
 **Possible Causes:**
-- `.kiro/agents/` directory doesn't exist
+- `{{{WS_AGENTS_PATH}}}/` directory doesn't exist
 - Permission issues
 - Invalid agent name
 - File already exists
@@ -761,11 +761,11 @@ When task requires multiple perspectives:
 **Solutions:**
 1. **Create agents directory:**
    ```bash
-   mkdir -p .kiro/agents
+   mkdir -p {{{WS_AGENTS_PATH}}}
    ```
 
 2. **Check permissions:**
-   - Verify write access to `.kiro/agents/`
+   - Verify write access to `{{{WS_AGENTS_PATH}}}/`
    - Check file system permissions
 
 3. **Use valid agent name:**
@@ -778,7 +778,7 @@ When task requires multiple perspectives:
    - Delete or rename existing agent first
 
 5. **Try manual creation:**
-   - Create file manually in `.kiro/agents/`
+   - Create file manually in `{{{WS_AGENTS_PATH}}}/`
    - Copy template from existing agent
    - Modify as needed
 
@@ -803,7 +803,7 @@ When task requires multiple perspectives:
 **Future feature** - Chain multiple agents:
 
 ```
-/agents kiro-master then refactor-architect
+/agents {{{INITIAL_AGENT_NAME}}} then refactor-architect
 ```
 
 **Potential uses:**

@@ -48,8 +48,8 @@ import { rmSync } from "fs";
  * 
  * Each target determines output location, processing steps, and cleanup behavior.
  * 
- * @property npm - Build npm package, compile CLI, clean after build (used by publish workflow)
- * @property npm-no-clean - Build npm package but preserve artifacts (used by release script for npm publish)
+ * @property npm - Build npm package, compile CLI, clean after build (for quick validation)
+ * @property npm-no-clean - Build npm package but preserve artifacts (used by test.ts and release.ts for inspection/publish)
  * @property power - Build Kiro Power distribution to `power/` directory (committed to GitHub)
  * @property dev - Build to user directory (`~/.kiro/steering/kiro-agents/`) with watch mode for rapid iteration
  */
@@ -166,15 +166,21 @@ interface SubstitutionOptions {
 }
 
 /**
- * Substitution function map for dynamic content replacement.
+ * Substitution function map for dynamic content replacement with multi-pass support.
  * 
  * Each function receives SubstitutionOptions and returns the replacement string.
- * Keys use triple-brace syntax (e.g., `{{{VERSION}}}`) in source files.
+ * Keys use triple-brace syntax (e.g., `{{{VERSION}}}`) in source files. Supports
+ * nested substitutions where replacement values contain additional placeholders.
  * 
  * **Common substitutions:**
  * - `{{{VERSION}}}` - Package version from package.json
  * - `{{{PROTOCOLS_PATH}}}` - Path to protocols directory (varies by target)
  * - `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injected protocol content from .mdx files
+ * - `{{{KIRO_MODE_ALIASES}}}` - Mode alias definition (contains nested `{{{KIRO_PROTOCOLS_PATH}}}`)
+ * 
+ * **Multi-pass processing:**
+ * Substitution values can contain placeholders that get resolved in subsequent passes.
+ * This enables modular content injection where injected content references other substitutions.
  * 
  * @example Basic substitution
  * ```typescript
@@ -192,6 +198,19 @@ interface SubstitutionOptions {
  *       : '~/.kiro/steering/.../protocols'
  * }
  * ```
+ * 
+ * @example Nested substitution (multi-pass)
+ * ```typescript
+ * {
+ *   '{{{KIRO_MODE_ALIASES}}}': ({ target }) => {
+ *     // Returns content containing {{{KIRO_PROTOCOLS_PATH}}}
+ *     return extractSection('src/kiro/shared-aliases.md', 'Mode System Alias');
+ *   },
+ *   '{{{KIRO_PROTOCOLS_PATH}}}': ({ target }) => 
+ *     target === 'power' ? '~/.kiro/powers/.../protocols' : '~/.kiro/steering/.../protocols'
+ * }
+ * // First pass resolves {{{KIRO_MODE_ALIASES}}}, second pass resolves {{{KIRO_PROTOCOLS_PATH}}}
+ * ```
  */
 type Substitutions = { [key: string]: (options: SubstitutionOptions) => string };
 
@@ -205,54 +224,85 @@ interface Config {
 }
 
 /**
- * Loads build configuration with substitution functions.
+ * Loads Kiro-specific build configuration with substitution functions.
  * 
- * Imports Kiro-specific config which extends base config. The config contains
- * functions that generate dynamic content based on build target and runtime state.
+ * Always loads `src/kiro/config.ts` which contains all substitutions needed for
+ * kiro-agents builds (npm, power, dev). The Kiro config extends base config patterns
+ * but provides Kiro-specific implementations for all substitution keys.
  * 
- * @returns Configuration object with substitution functions
+ * **Why Kiro config for all builds:**
+ * - kiro-agents is a Kiro-specific package (not cross-IDE)
+ * - All builds need Kiro paths, mode system, and enhanced features
+ * - Base config (`src/config.ts`) exists as reference pattern only
  * 
- * @example
+ * @returns Configuration object with Kiro-specific substitution functions
+ * 
+ * @example Loading config
  * ```typescript
  * const config = await loadConfig();
+ * // Always uses src/kiro/config.ts
  * // config.substitutions['{{{VERSION}}}']({ target: 'npm' }) => '1.4.0'
+ * // config.substitutions['{{{KIRO_MODE_ALIASES}}}']({ target: 'power' }) => '...'
  * ```
+ * 
+ * @see src/kiro/config.ts - Kiro-specific config with all substitutions
+ * @see src/config.ts - Base config pattern (reference only)
  */
 async function loadConfig(): Promise<Config> {
-  // Import kiro config (which imports core config)
+  // Import kiro config (which extends base config)
+  // Used for ALL kiro-agents builds (npm, power, dev)
   const kiroConfig = await import("../src/kiro/config.ts");
   return kiroConfig as Config;
 }
 
 /**
- * Applies all substitutions to file content.
+ * Applies all substitutions to file content with multi-pass processing.
  * 
- * Replaces all placeholder keys (e.g., `{{{VERSION}}}`) with values generated
- * by substitution functions. Processes all substitutions in order.
+ * Replaces placeholder keys (e.g., `{{{VERSION}}}`) with values from substitution
+ * functions. Supports nested substitutions where replacement values contain additional
+ * placeholders. Processes iteratively until no placeholders remain or max iterations reached.
  * 
- * **Processing:**
- * - Iterates through all substitution keys
- * - Calls each function with build options
- * - Replaces all occurrences of key with result
- * - Returns fully processed content
+ * **Multi-pass processing:**
+ * - Pass 1: Replaces all found placeholders with substitution values
+ * - Pass 2+: Processes any new placeholders introduced by previous pass
+ * - Continues until no placeholders remain (max 10 iterations)
+ * - Warns if circular reference detected (max iterations reached)
+ * 
+ * **Use cases:**
+ * - Simple: `{{{VERSION}}}` → `"1.4.0"`
+ * - Nested: `{{{KIRO_MODE_ALIASES}}}` contains `{{{KIRO_PROTOCOLS_PATH}}}` → both resolved
+ * - Chained: Substitution A injects placeholder B, which gets resolved in next pass
  * 
  * @param content - Original file content with placeholders
  * @param substitutions - Map of placeholder keys to replacement functions
  * @param options - Build options passed to substitution functions
- * @returns Processed content with all substitutions applied
+ * @returns Processed content with all substitutions applied (or warning if circular)
  * 
- * @example Simple substitution
+ * @example Simple substitution (single pass)
  * ```typescript
  * const content = "Version: {{{VERSION}}}";
  * const result = await applySubstitutions(content, substitutions, { target: 'npm' });
- * // result: "Version: 1.4.0"
+ * // Pass 1: "Version: 1.4.0" (no more placeholders, done)
  * ```
  * 
- * @example Multiple substitutions
+ * @example Nested substitution (multi-pass)
  * ```typescript
- * const content = "Version: {{{VERSION}}}\nPath: {{{PROTOCOLS_PATH}}}";
- * const result = await applySubstitutions(content, substitutions, { target: 'power' });
- * // result: "Version: 1.4.0\nPath: ~/.kiro/powers/.../protocols"
+ * // substitutions['{{{ALIAS}}}'] returns "Path: {{{PROTOCOLS_PATH}}}"
+ * // substitutions['{{{PROTOCOLS_PATH}}}'] returns "~/.kiro/steering/protocols"
+ * const content = "{{{ALIAS}}}";
+ * const result = await applySubstitutions(content, substitutions, { target: 'npm' });
+ * // Pass 1: "Path: {{{PROTOCOLS_PATH}}}" (found new placeholder)
+ * // Pass 2: "Path: ~/.kiro/steering/protocols" (no more placeholders, done)
+ * ```
+ * 
+ * @example Circular reference detection
+ * ```typescript
+ * // substitutions['{{{A}}}'] returns "{{{B}}}"
+ * // substitutions['{{{B}}}'] returns "{{{A}}}"
+ * const content = "{{{A}}}";
+ * const result = await applySubstitutions(content, substitutions, { target: 'npm' });
+ * // Pass 1-10: Keeps swapping A↔B
+ * // Warns: "Reached maximum substitution iterations (10). Possible circular reference."
  * ```
  */
 async function applySubstitutions(
@@ -261,10 +311,31 @@ async function applySubstitutions(
   options: SubstitutionOptions
 ): Promise<string> {
   let result = content;
+  let maxIterations = 10; // Prevent infinite loops
+  let iteration = 0;
   
-  for (const [key, fn] of Object.entries(substitutions)) {
-    const value = fn(options);
-    result = result.replaceAll(key, value);
+  // Keep processing until no more substitutions found or max iterations reached
+  while (iteration < maxIterations) {
+    let hasSubstitutions = false;
+    
+    for (const [key, fn] of Object.entries(substitutions)) {
+      if (result.includes(key)) {
+        const value = fn(options);
+        result = result.replaceAll(key, value);
+        hasSubstitutions = true;
+      }
+    }
+    
+    // If no substitutions were found in this pass, we're done
+    if (!hasSubstitutions) {
+      break;
+    }
+    
+    iteration++;
+  }
+  
+  if (iteration >= maxIterations) {
+    console.warn(`⚠️  Warning: Reached maximum substitution iterations (${maxIterations}). Possible circular reference.`);
   }
   
   return result;
@@ -483,16 +554,16 @@ async function buildDev(config: Config): Promise<void> {
 /**
  * Main build orchestrator for all distribution targets.
  * 
- * Loads configuration, executes target-specific build, and optionally cleans
+ * Loads Kiro configuration, executes target-specific build, and optionally cleans
  * artifacts. Handles npm, power, and dev builds with appropriate post-processing.
  * 
  * **Build Flow:**
- * 1. Load config with substitution functions
+ * 1. Load Kiro config with substitution functions
  * 2. Execute target-specific build (npm/power/dev)
  * 3. Clean artifacts if target is 'npm' (not 'npm-no-clean')
  * 
  * **Target behaviors:**
- * - `npm` - Compiles CLI, processes files, cleans after (for testing)
+ * - `npm` - Compiles CLI, processes files, cleans after (for quick validation)
  * - `npm-no-clean` - Same as npm but preserves artifacts (for release script)
  * - `power` - Processes files to power/ directory (for GitHub)
  * - `dev` - Builds to user directory with watch mode (for development)
@@ -502,25 +573,25 @@ async function buildDev(config: Config): Promise<void> {
  * @example npm build with cleanup
  * ```typescript
  * await build('npm');
- * // Builds to build/npm/, then cleans directory
+ * // Loads Kiro config, builds to build/npm/, then cleans directory
  * ```
  * 
  * @example npm build without cleanup (used by release script)
  * ```typescript
  * await build('npm-no-clean');
- * // Builds to build/npm/, preserves for npm publish
+ * // Loads Kiro config, builds to build/npm/, preserves for npm publish
  * ```
  * 
  * @example Power build
  * ```typescript
  * await build('power');
- * // Processes files to power/ directory
+ * // Loads Kiro config, processes files to power/ directory
  * ```
  */
 async function build(target: BuildTarget): Promise<void> {
   console.log(`🔨 Starting build: ${target}...\n`);
   
-  // Load configuration
+  // Load Kiro configuration (used for all builds)
   const config = await loadConfig();
   console.log(`📝 Loaded configuration with ${Object.keys(config.substitutions).length} substitutions\n`);
   

@@ -1,24 +1,116 @@
 #!/usr/bin/env bun
+/**
+ * Build validation test suite for kiro-agents package.
+ * 
+ * Validates npm and Power distributions by checking file existence, substitution
+ * processing, frontmatter validity, and structural integrity. Automatically builds
+ * npm distribution in no-clean mode to preserve artifacts for inspection.
+ * 
+ * **Test Coverage:**
+ * - npm build: CLI compilation, file mappings, substitution processing
+ * - Power build: POWER.md structure, mcp.json validity, steering frontmatter
+ * - Dev mode: Optional check for user directory installation
+ * 
+ * **Usage:**
+ * ```bash
+ * bun run test
+ * # Builds npm distribution, validates both npm and Power builds
+ * ```
+ * 
+ * **Exit Codes:**
+ * - 0: All tests passed
+ * - 1: Build failed or tests failed
+ * 
+ * @see scripts/build.ts - Build system that creates artifacts tested here
+ */
 import { existsSync } from "fs";
 import { readdir } from "fs/promises";
 import { join } from "path";
+import { spawnSync } from "bun";
 
+/**
+ * Test result record for validation tracking.
+ * 
+ * @property name - Test name displayed in output (e.g., 'CLI compiled')
+ * @property passed - Whether test passed validation
+ * @property message - Detailed result message (e.g., 'All 8 files present')
+ */
 interface TestResult {
+  /** Test name displayed in output (e.g., 'CLI compiled') */
   name: string;
+  /** Whether test passed validation */
   passed: boolean;
+  /** Detailed result message (e.g., 'All 8 files present') */
   message: string;
 }
 
+/** Global test results accumulator for summary reporting */
 const results: TestResult[] = [];
 
+/**
+ * Records test result and logs formatted output.
+ * 
+ * Adds result to global results array and prints formatted line with icon.
+ * Used by all test functions to maintain consistent reporting.
+ * 
+ * @param name - Test name (e.g., 'CLI compiled')
+ * @param passed - Whether test passed
+ * @param message - Result details (e.g., 'CLI found at build/npm/bin/cli.js')
+ * 
+ * @example
+ * ```typescript
+ * test('CLI compiled', true, 'CLI found at build/npm/bin/cli.js');
+ * // Logs: ✅ CLI compiled: CLI found at build/npm/bin/cli.js
+ * ```
+ */
 function test(name: string, passed: boolean, message: string) {
   results.push({ name, passed, message });
   const icon = passed ? "✅" : "❌";
   console.log(`${icon} ${name}: ${message}`);
 }
 
+/**
+ * Validates npm distribution build artifacts.
+ * 
+ * Automatically builds npm distribution in no-clean mode (preserves artifacts),
+ * then validates CLI compilation, file mappings, and substitution processing.
+ * Skips validation if build fails.
+ * 
+ * **Validation Steps:**
+ * 1. Build npm distribution with `npm-no-clean` target
+ * 2. Check CLI exists at `build/npm/bin/cli.js`
+ * 3. Verify all expected dist files present
+ * 4. Scan for unprocessed substitutions (e.g., `{{{VERSION}}}`)
+ * 
+ * **Expected Files:**
+ * - CLI: `build/npm/bin/cli.js`
+ * - Steering: `build/npm/dist/*.md`
+ * - Protocols: `build/npm/dist/protocols/*.mdx`
+ * - Interactions: `build/npm/dist/interactions/*.md`
+ * - Modes: `build/npm/dist/modes/*.md`
+ * 
+ * @example
+ * ```typescript
+ * await testNpmBuild();
+ * // Builds npm distribution, validates CLI and files
+ * ```
+ * 
+ * @see scripts/build.ts - Build system with npm-no-clean target
+ */
 async function testNpmBuild() {
   console.log("\n📦 Testing npm build...\n");
+  
+  // Build with npm-no-clean to preserve artifacts for testing
+  console.log("🔨 Building npm distribution (no-clean mode)...\n");
+  const buildResult = spawnSync(["bun", "run", "scripts/build.ts", "npm-no-clean"]);
+  
+  if (buildResult.exitCode !== 0) {
+    console.log("❌ Build failed, skipping npm tests\n");
+    test("npm build", false, "Build process failed");
+    return;
+  }
+  
+  console.log("✅ Build completed\n");
   
   // Check CLI exists
   const cliPath = "build/npm/bin/cli.js";
@@ -77,6 +169,32 @@ async function testNpmBuild() {
   );
 }
 
+/**
+ * Validates Kiro Power distribution artifacts.
+ * 
+ * Checks Power-specific files including POWER.md frontmatter, mcp.json validity,
+ * steering file structure, and frontmatter completeness. Assumes Power build
+ * already exists (run `bun run build:power` first).
+ * 
+ * **Validation Steps:**
+ * 1. Check POWER.md exists and has valid frontmatter
+ * 2. Verify mcp.json is valid JSON
+ * 3. Validate all steering files present
+ * 4. Check for unprocessed substitutions
+ * 5. Verify frontmatter in all steering files
+ * 
+ * **Expected Structure:**
+ * - `power/POWER.md` - Power metadata with frontmatter
+ * - `power/mcp.json` - Valid JSON structure
+ * - `power/steering/*.md` - Steering files with frontmatter
+ * - `power/steering/protocols/*.mdx` - Protocol files
+ * 
+ * @example
+ * ```typescript
+ * await testPowerBuild();
+ * // Validates power/ directory structure and content
+ * ```
+ */
 async function testPowerBuild() {
   console.log("\n⚡ Testing Power build...\n");
   
@@ -186,6 +304,24 @@ async function testPowerBuild() {
   );
 }
 
+/**
+ * Validates dev mode installation in user directory (optional check).
+ * 
+ * Checks if dev mode has been run by looking for files in user's Kiro directory.
+ * This is an optional test - passes even if directory doesn't exist (user may
+ * not have run `bun run dev` yet).
+ * 
+ * **Validation:**
+ * - Checks `~/.kiro/steering/kiro-agents/` exists
+ * - Counts files if directory present
+ * - Always passes (informational only)
+ * 
+ * @example
+ * ```typescript
+ * await testDevMode();
+ * // Checks ~/.kiro/steering/kiro-agents/ if exists
+ * ```
+ */
 async function testDevMode() {
   console.log("\n🔧 Testing dev mode (optional)...\n");
   
@@ -214,6 +350,30 @@ async function testDevMode() {
   }
 }
 
+/**
+ * Main test orchestrator and summary reporter.
+ * 
+ * Executes all test suites (npm, Power, dev), collects results, and prints
+ * summary. Exits with code 1 if any tests fail, 0 if all pass.
+ * 
+ * **Test Flow:**
+ * 1. Check if any build exists (build/ or power/)
+ * 2. Run npm build tests (builds automatically)
+ * 3. Run Power build tests (assumes already built)
+ * 4. Run dev mode tests (optional)
+ * 5. Print summary with pass/fail counts
+ * 6. Exit with appropriate code
+ * 
+ * **Exit Codes:**
+ * - 0: All tests passed
+ * - 1: No build found or tests failed
+ * 
+ * @example
+ * ```typescript
+ * await runTests();
+ * // Runs all tests, prints summary, exits with status code
+ * ```
+ */
 async function runTests() {
   console.log("🧪 Running build validation tests...\n");
   

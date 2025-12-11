@@ -1,0 +1,35 @@
+name: Validate PR
+on: 
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-power-directory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Check power/ not modified
+        run: |
+          # Get list of changed files in PR
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          
+          # Check if any file in power/ was modified
+          if echo "$CHANGED_FILES" | grep -q "^power/"; then
+            echo "❌ ERROR: PRs cannot modify power/ directory"
+            echo ""
+            echo "ℹ️  The power/ directory is auto-generated during release."
+            echo "ℹ️  Only maintainers can update it directly in main branch."
+            echo ""
+            echo "📝 Modified files in power/:"
+            echo "$CHANGED_FILES" | grep "^power/"
+            echo ""
+            echo "✅ To fix: Remove power/ changes from your PR"
+            echo "✅ Maintainers will regenerate power/ after merge"
+            exit 1
+          fi
+          
+          echo "✅ No modifications to power/ directory detected"

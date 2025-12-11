@@ -279,7 +279,7 @@ Quick access to frequently used agents:
 <!-- Kiro master shortcut -->
 <alias>
   <trigger>/km</trigger>
-  <definition>/agents kiro-master</definition>
+  <definition>/agents {{{INITIAL_AGENT_NAME}}}</definition>
 </alias>
 
 <!-- Refactor architect shortcut -->
