@@ -14,6 +14,10 @@ const NPM_FILE_MAPPINGS = [
   { src: "src/kiro/steering/modes-system.md", dest: "build/npm/dist/modes-system.md" },
   { src: "src/core/strict-mode.md", dest: "build/npm/dist/strict-mode.md" },
   
+  // Protocol files (auxiliary, not in steering list)
+  { src: "src/core/protocols/agent-activation.mdx", dest: "build/npm/dist/protocols/agent-activation.mdx" },
+  { src: "src/core/protocols/mode-switching.mdx", dest: "build/npm/dist/protocols/mode-switching.mdx" },
+  
   // Interactive interfaces (manual inclusion)
   { src: "src/core/agents.md", dest: "build/npm/dist/agents.md" },
   { src: "src/kiro/steering/modes.md", dest: "build/npm/dist/modes.md" },
@@ -40,6 +44,10 @@ const POWER_FILE_MAPPINGS = [
   { src: "src/kiro/steering/modes-system.md", dest: "power/steering/modes-system.md" },
   { src: "src/core/strict-mode.md", dest: "power/steering/strict-mode.md" },
   
+  // Protocol files (auxiliary, not in steering list)
+  { src: "src/core/protocols/agent-activation.mdx", dest: "power/steering/protocols/agent-activation.mdx" },
+  { src: "src/core/protocols/mode-switching.mdx", dest: "power/steering/protocols/mode-switching.mdx" },
+  
   // Interactive interfaces (manual inclusion)
   { src: "src/core/agents.md", dest: "power/steering/agents.md" },
   { src: "src/kiro/steering/modes.md", dest: "power/steering/modes.md" },
@@ -60,7 +68,11 @@ const DEV_FILE_MAPPINGS = NPM_FILE_MAPPINGS.map(mapping => ({
   dest: mapping.dest.replace("build/npm/dist/", "")
 }));
 
-type Substitutions = { [key: string]: () => string };
+interface SubstitutionOptions {
+  target: BuildTarget;
+}
+
+type Substitutions = { [key: string]: (options: SubstitutionOptions) => string };
 
 interface Config {
   substitutions: Substitutions;
@@ -72,18 +84,27 @@ async function loadConfig(): Promise<Config> {
   return kiroConfig as Config;
 }
 
-async function applySubstitutions(content: string, substitutions: Substitutions): Promise<string> {
+async function applySubstitutions(
+  content: string, 
+  substitutions: Substitutions, 
+  options: SubstitutionOptions
+): Promise<string> {
   let result = content;
   
   for (const [key, fn] of Object.entries(substitutions)) {
-    const value = fn();
+    const value = fn(options);
     result = result.replaceAll(key, value);
   }
   
   return result;
 }
 
-async function buildFile(srcPath: string, destPath: string, substitutions: Substitutions): Promise<void> {
+async function buildFile(
+  srcPath: string, 
+  destPath: string, 
+  substitutions: Substitutions, 
+  options: SubstitutionOptions
+): Promise<void> {
   // Read source file
   const file = Bun.file(srcPath);
   
@@ -96,7 +117,7 @@ async function buildFile(srcPath: string, destPath: string, substitutions: Subst
   const content = await file.text();
   
   // Apply substitutions
-  const processed = await applySubstitutions(content, substitutions);
+  const processed = await applySubstitutions(content, substitutions, options);
   
   // Ensure destination directory exists
   await Bun.write(destPath, processed, { createPath: true });
@@ -143,7 +164,7 @@ async function buildNpm(config: Config): Promise<void> {
   
   // Build all npm files
   for (const mapping of NPM_FILE_MAPPINGS) {
-    await buildFile(mapping.src, mapping.dest, config.substitutions);
+    await buildFile(mapping.src, mapping.dest, config.substitutions, { target: "npm" });
   }
   
   console.log("\n✅ npm distribution built in build/npm/");
@@ -157,7 +178,7 @@ async function buildPower(config: Config): Promise<void> {
   
   // Build all Power files
   for (const mapping of POWER_FILE_MAPPINGS) {
-    await buildFile(mapping.src, mapping.dest, config.substitutions);
+    await buildFile(mapping.src, mapping.dest, config.substitutions, { target: "power" });
   }
   
   console.log("\n✅ Power distribution built in power/");
@@ -171,7 +192,7 @@ async function buildDev(config: Config): Promise<void> {
   // Build all files to user directory
   for (const mapping of DEV_FILE_MAPPINGS) {
     const destPath = join(userSteeringPath, mapping.dest);
-    await buildFile(mapping.src, destPath, config.substitutions);
+    await buildFile(mapping.src, destPath, config.substitutions, { target: "dev" });
   }
   
   console.log(`\n✅ Dev build completed in ${userSteeringPath}/`);

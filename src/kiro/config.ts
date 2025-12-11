@@ -17,6 +17,7 @@
  * Build process uses this config for Kiro distributions.
  */
 import { readFileSync, readdirSync } from "fs";
+import { injectProtocol } from "../config";
 
 // Helper to get package version
 function getVersion(): string {
@@ -61,6 +62,14 @@ function getCommandsList(): string {
 - \`/strict off\` - Disable strict mode directly`;
 }
 
+const getSteeringsPath = (target: string) => {
+  if (target === 'power') {
+    return '~/.kiro/powers/installed/kiro-agents/steering';
+  } else {
+    return '~/.kiro/steering/kiro-agents';
+  }
+}
+
 export const substitutions = {
   '{{{VERSION}}}': getVersion,
   '{{{AGENT_LIST}}}': getAgentList,
@@ -76,5 +85,7 @@ export const substitutions = {
 **Integration enhancements:**
 - **Task sessions** - Agents create sub-tasks with own context
 - **Session continuation** - Resume interrupted work with full context
-- **Enhanced mode integration** - Better coordination with modes system`
+- **Enhanced mode integration** - Better coordination with modes system`,
+  '{{{PROTOCOLS_PATH}}}': ({ target }: any) => getSteeringsPath(target) + '/protocols',
+  '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('agent-management.mdx', '## Agent Management Steps')
 }
