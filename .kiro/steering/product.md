@@ -136,7 +136,7 @@ npx kiro-agents  # or bunx kiro-agents
 ### Initial Setup
 
 1. User installs via npm or Kiro Power
-2. Core system files installed (agent-system.md, modes-system.md, etc.)
+2. Core system files installed (aliases.md with injected mode aliases, etc.)
 3. User can immediately use `/agents`, `/modes`, `/strict` commands
 4. No agents exist initially (minimal overhead)
 

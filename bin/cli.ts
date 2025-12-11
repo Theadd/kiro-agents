@@ -11,8 +11,6 @@ const INSTALL_DIR = join(homedir(), ".kiro", "steering", "kiro-agents");
 
 // Files to install (relative to dist/ in package)
 const FILES_TO_INSTALL = [
-  "agent-system.md",
-  "modes-system.md",
   "strict-mode.md",
   "agents.md",
   "modes.md",

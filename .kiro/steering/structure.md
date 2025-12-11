@@ -6,8 +6,7 @@
 kiro-agents/
 ├── src/                          # Source files
 │   ├── core/                     # Cross-IDE compatible
-│   │   ├── aliases.md            # Instruction alias system (compact)
-│   │   ├── agent-system.md       # Core agent system
+│   │   ├── aliases.md            # Instruction alias system with injected Kiro aliases
 │   │   ├── agents.md             # Interactive agent menu
 │   │   ├── strict-mode.md        # Strict mode rules
 │   │   ├── strict.md             # Interactive strict control
@@ -25,10 +24,12 @@ kiro-agents/
 │   ├── kiro/                     # Kiro-specific
 │   │   ├── POWER.md              # Power metadata template
 │   │   ├── mcp.json              # Empty MCP config
-│   │   ├── config.ts             # Kiro substitutions
+│   │   ├── config.ts             # Kiro substitutions (includes mode aliases)
 │   │   └── steering/
-│   │       ├── modes-system.md   # Mode switching
 │   │       ├── modes.md          # Interactive mode menu
+│   │       ├── protocols/        # Kiro-specific protocols
+│   │       │   ├── mode-switching.mdx
+│   │       │   └── mode-management.mdx
 │   │       └── agent-system/
 │   │           ├── kiro-spec-mode.md
 │   │           └── kiro-vibe-mode.md
@@ -128,9 +129,7 @@ kiro-agents/
 
 ```
 src/core/aliases.md                → build/npm/dist/aliases.md
-src/core/agent-system.md           → build/npm/dist/agent-system.md
 src/core/agents.md                 → build/npm/dist/agents.md
-src/kiro/steering/modes-system.md  → build/npm/dist/modes-system.md
 src/kiro/steering/modes.md         → build/npm/dist/modes.md
 src/core/strict-mode.md            → build/npm/dist/strict-mode.md
 src/core/strict.md                 → build/npm/dist/strict.md
@@ -150,10 +149,10 @@ src/kiro/.../kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
 src/kiro/POWER.md                  → power/POWER.md
 src/kiro/mcp.json                  → power/mcp.json
 src/core/aliases.md                → power/steering/aliases.md
-src/core/agent-system.md           → power/steering/agent-system.md
 src/core/agents.md                 → power/steering/agents.md
-src/kiro/steering/modes-system.md  → power/steering/modes-system.md
 src/kiro/steering/modes.md         → power/steering/modes.md
+src/kiro/steering/protocols/mode-switching.mdx  → power/steering/protocols/mode-switching.mdx
+src/kiro/steering/protocols/mode-management.mdx → power/steering/protocols/mode-management.mdx
 src/core/strict-mode.md            → power/steering/strict-mode.md
 src/core/strict.md                 → power/steering/strict.md
 src/core/protocols/agent-activation.mdx → power/steering/protocols/agent-activation.mdx
