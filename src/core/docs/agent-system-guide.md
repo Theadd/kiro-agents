@@ -112,7 +112,7 @@ When you execute `/agents {name}`, the system:
 **Context Loading:**
 - Agent definition file (`{{{WS_AGENTS_PATH}}}/{name}.md`)
 - Strict mode steering (`strict-mode.md`)
-- Agent activation protocol (`protocols/agent-activation.mdx`)
+- Agent activation protocol (`protocols/agent-activation.md`)
 - Any additional steering documents specified by agent
 
 **State Changes:**
@@ -373,7 +373,7 @@ Agents SHOULD have:
 
 **What happens:**
 1. System loads `{{{WS_AGENTS_PATH}}}/refactor-architect.md`
-2. System loads `protocols/agent-activation.mdx`
+2. System loads `protocols/agent-activation.md`
 3. AI assumes refactor-architect role
 4. AI applies refactor-architect protocols
 5. AI begins interaction in refactor-architect style

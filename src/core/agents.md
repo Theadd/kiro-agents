@@ -6,6 +6,26 @@ keywords: ["agents", "management", "create", "activate", "interactive"]
 
 # Agent Management
 
+## Parameter Detection
+
+**CRITICAL: Check if user provided agent name as parameter**
+
+If the user's message contains `/agents {agent_name}` with a specific agent name (e.g., `/agents kiro-master`):
+
+1. **DO NOT execute the interactive management flow below**
+2. **INSTEAD, execute the instruction alias for agent activation:**
+   - Read `{{{WS_AGENTS_PATH}}}/{agent_name}.md` into context
+   - Read #[[file:protocols/agent-activation.md]] into context
+   - Follow all steps from the "Agent Activation Steps" section in agent-activation.md
+   - Use `{agent_name}` as the agent identifier throughout the protocol
+3. **Stop processing this document** - The agent activation protocol takes over
+
+**Only continue with interactive management flow below if user typed `/agents` without parameters.**
+
+---
+
+## Interactive Management Mode
+
 You are now in **agent management mode** using chit-chat interaction protocol.
 
 {{{AGENT_MANAGEMENT_PROTOCOL}}}

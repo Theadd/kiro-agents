@@ -158,7 +158,7 @@ Captures context that git commits don't:
 - `{{{COMMANDS_LIST}}}` - Auto-generated command list
 - `{{{AGENT_LIST}}}` - List of available agents
 - `{{{MODE_COMMANDS}}}` - Mode-specific commands
-- `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injects agent-management.mdx content
+- `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injects agent-management.md content
 - `{{{PROTOCOLS_PATH}}}` - Path to protocols directory (target-aware)
 - `{{{KIRO_PROTOCOLS_PATH}}}` - Path to Kiro-specific protocols (target-aware)
 - `{{{KIRO_MODE_ALIASES}}}` - Injects mode system alias from shared-aliases.md
@@ -175,7 +175,7 @@ export const substitutions = {
 - \`/agents {name}\` - Activate specific agent`,
   '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => {
     // Uses injectProtocol helper to read and extract content
-    return injectProtocol('agent-management.mdx', '## Agent Management Steps');
+    return injectProtocol('agent-management.md', '## Agent Management Steps');
   },
   '{{{KIRO_MODE_ALIASES}}}': ({ target }) => {
     // Uses extractSection to get content from shared file
@@ -188,10 +188,10 @@ export const substitutions = {
 
 **Protocol Injection Pattern**:
 - Steering documents (`.md`) can be minimal "shells"
-- Protocol files (`.mdx`) contain the detailed implementation
+- Protocol files (`.md`) contain the detailed implementation
 - Build-time substitution injects protocol content into shells
 - Single source of truth for reusable workflows
-- Example: `agents.md` is a shell, `agent-management.mdx` is injected
+- Example: `agents.md` is a shell, `agent-management.md` is injected
 
 **Section Extraction Pattern**:
 - Shared content stored in dedicated markdown files (e.g., `shared-aliases.md`)

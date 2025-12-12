@@ -31,9 +31,9 @@ Begin with a diff block showing:
 Execute `listDirectory` on `{{{WS_AGENTS_PATH}}}/`:
 
 **If directory doesn't exist OR directory is empty:**
-1. **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent creation protocol
+1. **Read #[[file:protocols/agent-creation.md]] into context** - Load agent creation protocol
 2. Create `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md` agent automatically using the description from "Initial Agent" section
-3. Follow the agent definition structure from agent-creation.mdx protocol
+3. Follow the agent definition structure from agent-creation.md protocol
 4. Show diff block indicating setup completion
 5. Continue to Step 3 with {{{INITIAL_AGENT_NAME}}} as available agent
 
@@ -83,8 +83,8 @@ Based on user selection:
 
 #### Option 2 - Create New Agent
 
-- **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent creation protocol
-- Follow all steps from the "Agent Creation Steps" section in agent-creation.mdx
+- **Read #[[file:protocols/agent-creation.md]] into context** - Load agent creation protocol
+- Follow all steps from the "Agent Creation Steps" section in agent-creation.md
 - Start agent creation workflow with interactive wizard
 - Ask for agent type (code-focused, documentation, testing, etc.)
 - Collect agent name, description, capabilities
@@ -94,7 +94,7 @@ Based on user selection:
 
 #### Option 3 - Manage Existing Agent
 
-- **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent structure reference
+- **Read #[[file:protocols/agent-creation.md]] into context** - Load agent structure reference
 - Show numbered list of available agents
 - User selects agent to manage
 - Offer management options:
