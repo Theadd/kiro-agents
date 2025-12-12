@@ -1,6 +1,6 @@
 {
   "name": "kiro-agents",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Advanced AI agent system for Kiro IDE - Create specialized AI agents, switch interaction modes, and enhance development workflows with minimal cognitive overhead",
   "homepage": "https://github.com/Theadd/kiro-agents#readme",
   "repository": {
