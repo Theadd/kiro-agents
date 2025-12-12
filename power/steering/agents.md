@@ -57,7 +57,9 @@ Begin with a diff block showing:
 Execute `listDirectory` on `.kiro/agents/`:
 
 **If directory doesn't exist OR directory is empty:**
-1. **Read #[[file:protocols/agent-creation.md]] into context** - Load agent creation protocol
+1. **Load agent creation protocol**:
+   - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
+   - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 2. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
 3. Follow the agent definition structure from agent-creation.md protocol
 4. Show diff block indicating setup completion
@@ -109,7 +111,9 @@ Based on user selection:
 
 #### Option 2 - Create New Agent
 
-- **Read #[[file:protocols/agent-creation.md]] into context** - Load agent creation protocol
+- **Load agent creation protocol**:
+  - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
+  - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 - Follow all steps from the "Agent Creation Steps" section in agent-creation.md
 - Start agent creation workflow with interactive wizard
 - Ask for agent type (code-focused, documentation, testing, etc.)
@@ -120,7 +124,9 @@ Based on user selection:
 
 #### Option 3 - Manage Existing Agent
 
-- **Read #[[file:protocols/agent-creation.md]] into context** - Load agent structure reference
+- **Load agent structure reference**:
+  - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
+  - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 - Show numbered list of available agents
 - User selects agent to manage
 - Offer management options:
