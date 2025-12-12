@@ -4,6 +4,7 @@ displayName: "Kiro Protocols"
 description: "Reusable protocol library for AI agents - Load step-by-step workflows on-demand for agent management, mode switching, and interactive patterns"
 keywords: ["protocols", "workflows", "agents", "modes", "procedures", "instructions"]
 author: "R. Beltran"
+version: "1.0.0"
 ---
 
 # Kiro Protocols
