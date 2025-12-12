@@ -162,3 +162,11 @@ __*
 
 # npm configuration with tokens
 .npmrc
+
+# Powers build artifacts (steering files are generated, not committed)
+powers/*/steering/
+powers/*/icon-placeholder.svg
+
+# Keep POWER.md and actual icons
+!powers/*/POWER.md
+!powers/*/icon.png

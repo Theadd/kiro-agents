@@ -1,0 +1,135 @@
+name: Publish Powers
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      power_name:
+        description: 'Specific power to build (leave empty for all)'
+        required: false
+        type: string
+
+jobs:
+  build-and-publish-powers:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install
+      
+      - name: Build powers
+        run: |
+          if [ -n "${{ github.event.inputs.power_name }}" ]; then
+            echo "🔨 Building specific power: ${{ github.event.inputs.power_name }}"
+            bun run build:powers ${{ github.event.inputs.power_name }}
+          else
+            echo "🔨 Building all powers"
+            bun run build:powers
+          fi
+      
+      - name: Validate powers
+        run: |
+          echo "✅ Validating power structure..."
+          
+          # Check each power has required files
+          for power_dir in powers/*/; do
+            power_name=$(basename "$power_dir")
+            
+            # Skip if not a directory
+            [ -d "$power_dir" ] || continue
+            
+            echo "Checking $power_name..."
+            
+            # Check POWER.md exists
+            if [ ! -f "$power_dir/POWER.md" ]; then
+              echo "❌ Missing POWER.md in $power_name"
+              exit 1
+            fi
+            
+            # Check steering directory exists
+            if [ ! -d "$power_dir/steering" ]; then
+              echo "❌ Missing steering/ directory in $power_name"
+              exit 1
+            fi
+            
+            # Check at least one steering file exists
+            if [ -z "$(ls -A $power_dir/steering/*.md 2>/dev/null)" ]; then
+              echo "❌ No steering files in $power_name/steering/"
+              exit 1
+            fi
+            
+            echo "✅ $power_name validated"
+          done
+          
+          echo "✅ All powers validated successfully"
+      
+      - name: Commit and push powers
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Add generated steering files
+          git add powers/*/steering/
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "ℹ️  No changes to commit"
+          else
+            git commit -m "chore: regenerate powers from source [skip ci]"
+            git push
+            echo "✅ Powers published to repository"
+          fi
+      
+      - name: Create power tags
+        if: github.event_name == 'release'
+        run: |
+          # Get release version
+          VERSION="${{ github.event.release.tag_name }}"
+          
+          # Create tags for each power
+          for power_dir in powers/*/; do
+            power_name=$(basename "$power_dir")
+            [ -d "$power_dir" ] || continue
+            
+            TAG="${power_name}-${VERSION}"
+            
+            echo "Creating tag: $TAG"
+            git tag -a "$TAG" -m "Release $power_name $VERSION"
+          done
+          
+          # Push all tags
+          git push --tags
+          
+          echo "✅ Power tags created and pushed"
+      
+      - name: Summary
+        run: |
+          echo "## 🎉 Powers Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The following powers have been built and published:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          for power_dir in powers/*/; do
+            power_name=$(basename "$power_dir")
+            [ -d "$power_dir" ] || continue
+            
+            # Count steering files
+            steering_count=$(ls -1 "$power_dir/steering/"*.md 2>/dev/null | wc -l)
+            
+            echo "- **$power_name** ($steering_count protocols)" >> $GITHUB_STEP_SUMMARY
+          done
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📦 Powers are now available for installation via Kiro IDE" >> $GITHUB_STEP_SUMMARY

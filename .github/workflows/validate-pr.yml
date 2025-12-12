@@ -4,7 +4,7 @@ on:
     branches: [main]
 
 jobs:
-  check-power-directory:
+  check-powers-directory:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -12,24 +12,46 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Check power/ not modified
+      - name: Check powers/ steering files not modified
         run: |
           # Get list of changed files in PR
           CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
           
-          # Check if any file in power/ was modified
-          if echo "$CHANGED_FILES" | grep -q "^power/"; then
-            echo "❌ ERROR: PRs cannot modify power/ directory"
+          # Check if any steering file in powers/ was modified
+          if echo "$CHANGED_FILES" | grep -q "^powers/.*/steering/"; then
+            echo "❌ ERROR: PRs cannot modify powers/*/steering/ directories"
             echo ""
-            echo "ℹ️  The power/ directory is auto-generated during release."
-            echo "ℹ️  Only maintainers can update it directly in main branch."
+            echo "ℹ️  Steering files in powers/ are auto-generated from src/ during build."
+            echo "ℹ️  Only maintainers can update them directly in main branch."
             echo ""
-            echo "📝 Modified files in power/:"
-            echo "$CHANGED_FILES" | grep "^power/"
+            echo "📝 Modified steering files in powers/:"
+            echo "$CHANGED_FILES" | grep "^powers/.*/steering/"
             echo ""
-            echo "✅ To fix: Remove power/ changes from your PR"
-            echo "✅ Maintainers will regenerate power/ after merge"
+            echo "✅ To fix: Remove powers/*/steering/ changes from your PR"
+            echo "✅ Instead, modify source files in src/core/protocols/ or src/kiro/steering/protocols/"
+            echo "✅ Maintainers will regenerate powers/ after merge"
             exit 1
           fi
           
-          echo "✅ No modifications to power/ directory detected"
+          echo "✅ No modifications to powers/*/steering/ directories detected"
+      
+      - name: Check old power/ directory not used
+        run: |
+          # Get list of changed files in PR
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
+          
+          # Check if old power/ directory was modified
+          if echo "$CHANGED_FILES" | grep -q "^power/"; then
+            echo "⚠️  WARNING: The old power/ directory is obsolete"
+            echo ""
+            echo "ℹ️  Use the new powers/ multi-power structure instead"
+            echo "ℹ️  Old power/ directory will be removed in future release"
+            echo ""
+            echo "📝 Modified files in old power/:"
+            echo "$CHANGED_FILES" | grep "^power/"
+            echo ""
+            echo "✅ To fix: Use powers/ directory for new powers"
+            exit 1
+          fi
+          
+          echo "✅ No modifications to obsolete power/ directory"

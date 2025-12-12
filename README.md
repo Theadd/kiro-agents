@@ -23,13 +23,16 @@ npx kiro-agents
 ```
 Installs to `~/.kiro/steering/kiro-agents/` - available in all workspaces.
 
-<!--
-**Workspace (Kiro Power):**
-1. Open Powers panel in Kiro IDE
-2. Add from GitHub: `https://github.com/theadd/kiro-agents`
+**Kiro Powers (recommended):**
 
-Installs to `.kiro/powers/kiro-agents/` - auto-updates, workspace-specific.
--->
+This repository provides multiple Kiro Powers that can be installed independently:
+
+1. **kiro-protocols** - Reusable protocol library for AI agents
+   - Install via Kiro IDE Powers panel
+   - Add repository: `https://github.com/theadd/kiro-agents`
+   - Select "Kiro Protocols" power
+
+See [powers/README.md](powers/README.md) for detailed power documentation.
 
 ## Quick Start
 
