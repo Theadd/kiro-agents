@@ -15,8 +15,8 @@ You are now switching to **{mode_name} mode**.
 
 **Load and execute mode switching protocol:**
 1. Read `kiro-{mode_name}-mode.md` from agent-system directory into context
-2. Read `{{{KIRO_PROTOCOLS_PATH}}}/mode-switching.mdx` into context
-3. Follow all steps from the "Mode Switch Steps" section in mode-switching.mdx
+2. Read #[[file:protocols/mode-switching.md]] into context
+3. Follow all steps from the "Mode Switch Steps" section in mode-switching.md
 4. Use `{mode_name}` as the mode identifier throughout the protocol
   </definition>
 </alias>

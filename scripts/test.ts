@@ -85,7 +85,7 @@ function test(name: string, passed: boolean, message: string) {
  * **Expected Files:**
  * - CLI: `build/npm/bin/cli.js`
  * - Steering: `build/npm/dist/*.md`
- * - Protocols: `build/npm/dist/protocols/*.mdx`
+ * - Protocols: `build/npm/dist/protocols/*.md`
  * - Interactions: `build/npm/dist/interactions/*.md`
  * - Modes: `build/npm/dist/modes/*.md`
  * 
@@ -187,7 +187,7 @@ async function testNpmBuild() {
  * - `power/POWER.md` - Power metadata with frontmatter
  * - `power/mcp.json` - Valid JSON structure
  * - `power/steering/*.md` - Steering files with frontmatter
- * - `power/steering/protocols/*.mdx` - Protocol files
+ * - `power/steering/protocols/*.md` - Protocol files
  * 
  * @example
  * ```typescript

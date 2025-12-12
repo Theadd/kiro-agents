@@ -67,7 +67,7 @@ type BuildTarget = "npm" | "npm-no-clean" | "power" | "dev";
  * 
  * **File categories:**
  * - Core system files (always loaded): aliases.md, strict-mode.md
- * - Protocol files (auxiliary): agent-activation.mdx, mode-switching.mdx, etc.
+ * - Protocol files (auxiliary): agent-activation.md, agent-management.md, agent-creation.md, mode-switching.md, mode-management.md
  * - Interactive interfaces (manual): agents.md, modes.md, strict.md
  * - Interaction patterns: chit-chat.md, interaction-styles.md
  * - Mode definitions: kiro-spec-mode.md, kiro-vibe-mode.md
@@ -80,9 +80,11 @@ const NPM_FILE_MAPPINGS = [
   { src: "src/core/strict-mode.md", dest: "build/npm/dist/strict-mode.md" },
   
   // Protocol files (auxiliary, not in steering list)
-  { src: "src/core/protocols/agent-activation.mdx", dest: "build/npm/dist/protocols/agent-activation.mdx" },
-  { src: "src/kiro/steering/protocols/mode-switching.mdx", dest: "build/npm/dist/protocols/mode-switching.mdx" },
-  { src: "src/kiro/steering/protocols/mode-management.mdx", dest: "build/npm/dist/protocols/mode-management.mdx" },
+  { src: "src/core/protocols/agent-activation.md", dest: "build/npm/dist/protocols/agent-activation.md" },
+  { src: "src/core/protocols/agent-management.md", dest: "build/npm/dist/protocols/agent-management.md" },
+  { src: "src/core/protocols/agent-creation.md", dest: "build/npm/dist/protocols/agent-creation.md" },
+  { src: "src/kiro/steering/protocols/mode-switching.md", dest: "build/npm/dist/protocols/mode-switching.md" },
+  { src: "src/kiro/steering/protocols/mode-management.md", dest: "build/npm/dist/protocols/mode-management.md" },
   
   // Interactive interfaces (manual inclusion)
   { src: "src/core/agents.md", dest: "build/npm/dist/agents.md" },
@@ -114,7 +116,7 @@ const NPM_FILE_MAPPINGS = [
  * **File categories:**
  * - Power metadata: POWER.md, mcp.json
  * - Core system files: aliases.md, agent-system.md, modes-system.md, strict-mode.md
- * - Protocol files: agent-activation.mdx, mode-switching.mdx, etc.
+ * - Protocol files: agent-activation.md, agent-management.md, agent-creation.md, mode-switching.md, mode-management.md
  * - Interactive interfaces: agents.md, modes.md, strict.md
  * - Interaction patterns: chit-chat.md, interaction-styles.md
  * - Mode definitions: kiro-spec-mode.md, kiro-vibe-mode.md
@@ -132,9 +134,11 @@ const POWER_FILE_MAPPINGS = [
   { src: "src/core/strict-mode.md", dest: "power/steering/strict-mode.md" },
   
   // Protocol files (auxiliary, not in steering list)
-  { src: "src/core/protocols/agent-activation.mdx", dest: "power/steering/protocols/agent-activation.mdx" },
-  { src: "src/kiro/steering/protocols/mode-switching.mdx", dest: "power/steering/protocols/mode-switching.mdx" },
-  { src: "src/kiro/steering/protocols/mode-management.mdx", dest: "power/steering/protocols/mode-management.mdx" },
+  { src: "src/core/protocols/agent-activation.md", dest: "power/steering/protocols/agent-activation.md" },
+  { src: "src/core/protocols/agent-management.md", dest: "power/steering/protocols/agent-management.md" },
+  { src: "src/core/protocols/agent-creation.md", dest: "power/steering/protocols/agent-creation.md" },
+  { src: "src/kiro/steering/protocols/mode-switching.md", dest: "power/steering/protocols/mode-switching.md" },
+  { src: "src/kiro/steering/protocols/mode-management.md", dest: "power/steering/protocols/mode-management.md" },
   
   // Interactive interfaces (manual inclusion)
   { src: "src/core/agents.md", dest: "power/steering/agents.md" },
@@ -175,7 +179,7 @@ interface SubstitutionOptions {
  * **Common substitutions:**
  * - `{{{VERSION}}}` - Package version from package.json
  * - `{{{PROTOCOLS_PATH}}}` - Path to protocols directory (varies by target)
- * - `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injected protocol content from .mdx files
+ * - `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injected protocol content from .md files
  * - `{{{KIRO_MODE_ALIASES}}}` - Mode alias definition (contains nested `{{{KIRO_PROTOCOLS_PATH}}}`)
  * 
  * **Multi-pass processing:**

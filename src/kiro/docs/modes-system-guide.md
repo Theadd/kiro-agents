@@ -160,7 +160,7 @@ When you execute `/modes {name}`, the system:
 
 **Context Loading:**
 - Mode definition file (`kiro-{name}-mode.md`)
-- Mode switching protocol (`protocols/mode-switching.mdx`)
+- Mode switching protocol (`protocols/mode-switching.md`)
 - Any additional steering documents specified by mode
 
 **State Changes:**
@@ -275,7 +275,7 @@ When you execute `/modes` (without parameters), the system:
 
 **What happens:**
 1. System loads `kiro-vibe-mode.md`
-2. System loads `protocols/mode-switching.mdx`
+2. System loads `protocols/mode-switching.md`
 3. AI assumes vibe mode protocols
 4. AI begins flexible, conversational interaction
 
@@ -289,7 +289,7 @@ When you execute `/modes` (without parameters), the system:
 
 **What happens:**
 1. System loads `kiro-spec-mode.md`
-2. System loads `protocols/mode-switching.mdx`
+2. System loads `protocols/mode-switching.md`
 3. AI assumes spec mode protocols
 4. AI begins structured workflow interaction
 

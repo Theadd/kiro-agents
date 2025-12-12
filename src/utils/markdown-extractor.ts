@@ -218,7 +218,7 @@ function extractSectionFromContent(content: string, query: string): string {
 /**
  * Extracts section from markdown file with scope-aware parsing.
  * 
- * @param filePath - Path relative to project root (e.g., 'src/core/protocols/agent-activation.mdx')
+ * @param filePath - Path relative to project root (e.g., 'src/core/protocols/agent-activation.md')
  * @param sectionQuery - Section title (exact) or anchor with # (e.g., "Installation" or "#installation")
  * @returns Extracted section content including header
  * @throws Error if file or section not found
@@ -237,7 +237,7 @@ function extractSectionFromContent(content: string, query: string): string {
  * 
  * @example Extract protocol section for injection
  * ```typescript
- * extractSection('src/core/protocols/agent-management.mdx', '## Agent Management Steps')
+ * extractSection('src/core/protocols/agent-management.md', '## Agent Management Steps')
  * // Returns from "## Agent Management Steps" to next ## header
  * ```
  */
@@ -258,7 +258,7 @@ export function extractSection(filePath: string, sectionQuery: string): string {
  * Returns a function that extracts section content, falling back to HTML comment on error.
  * Used in config.ts to inject protocol content into steering documents during build.
  * 
- * @param filePath - Path relative to project root (e.g., 'src/core/protocols/agent-activation.mdx')
+ * @param filePath - Path relative to project root (e.g., 'src/core/protocols/agent-activation.md')
  * @param sectionQuery - Section title or anchor (e.g., "## Agent Management Steps")
  * @returns Substitution function returning section content or error comment
  * 
@@ -266,7 +266,7 @@ export function extractSection(filePath: string, sectionQuery: string): string {
  * ```typescript
  * export const substitutions = {
  *   '{{{AGENT_PROTOCOL}}}': createSectionSubstitution(
- *     'src/core/protocols/agent-management.mdx',
+ *     'src/core/protocols/agent-management.md',
  *     '## Agent Management Steps'
  *   )
  * }

@@ -2,6 +2,8 @@
 
 AI agent system for Kiro IDE. Create specialized agents, switch interaction modes, and reduce cognitive load during development.
 
+> For just <kbd>~0.9K</kbd> of **base context** overheat
+
 ```bash
 npx kiro-agents
 ```

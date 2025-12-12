@@ -90,6 +90,23 @@ When working on this codebase, follow these principles:
 - Prevents assumption propagation
 - Works alongside agents and modes
 
+### 4. Debug Mode
+
+**Purpose**: Development mode that provides detailed tool execution information on errors
+
+**Implementation**:
+- Defined in `src/core/debug.md`
+- Controlled via `/debug {state}` command
+- Interactive control via `/debug` command
+- Manual inclusion for development/testing
+
+**Key Behaviors**:
+- Defaults to OFF, activated for development/testing
+- Shows exact tool parameters and outputs on errors
+- Prevents fallback to alternative sources
+- Reports all tool failures with full context
+- Requires explicit user guidance on errors
+
 ## Distribution Strategy
 
 ### npm Package (`kiro-agents`)
@@ -161,7 +178,8 @@ npx kiro-agents  # or bunx kiro-agents
 
 1. User can be in a mode AND use an agent: `/modes spec` then `/agents kiro-master`
 2. User can enable strict mode while in agent/mode: `/strict on`
-3. All features work together, layered capabilities
+3. User can enable debug mode for development: `/debug on`
+4. All features work together, layered capabilities
 
 ## Development Conventions
 

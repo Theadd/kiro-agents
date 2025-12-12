@@ -89,8 +89,8 @@ You are now activating the **{agent_name}** agent.
 
 **Load and execute activation protocol:**
 1. Read `{{{WS_AGENTS_PATH}}}/{agent_name}.md` into context
-2. Read `{{{PROTOCOLS_PATH}}}/agent-activation.mdx` into context
-3. Follow all steps from the "Agent Activation Steps" section in agent-activation.mdx
+2. Read #[[file:protocols/agent-activation.md]] into context
+3. Follow all steps from the "Agent Activation Steps" section in agent-activation.md
 4. Use `{agent_name}` as the agent identifier throughout the protocol
   </definition>
 </alias>

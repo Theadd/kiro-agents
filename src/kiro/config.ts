@@ -111,8 +111,8 @@ const getSteeringsPath = (target: string) => {
  * resolved in subsequent build passes.
  * 
  * **Protocol injections:**
- * - `AGENT_MANAGEMENT_PROTOCOL` - Injects from `src/core/protocols/agent-management.mdx`
- * - `MODE_MANAGEMENT_PROTOCOL` - Injects from `src/kiro/steering/protocols/mode-management.mdx`
+ * - `AGENT_MANAGEMENT_PROTOCOL` - Injects from `src/core/protocols/agent-management.md`
+ * - `MODE_MANAGEMENT_PROTOCOL` - Injects from `src/kiro/steering/protocols/mode-management.md`
  * 
  * **Nested substitutions:**
  * - `KIRO_MODE_ALIASES` - Extracts section containing `{{{KIRO_PROTOCOLS_PATH}}}` placeholder
@@ -151,9 +151,9 @@ export const substitutions = {
   /** Override initial agent description for Kiro */
   '{{{INITIAL_AGENT_DESCRIPTION}}}': () => '**kiro-master** - Interactive Kiro feature management with CRUD operations for MCP servers, hooks, agents, specs, powers, and steering documents. Includes .kiro/ directory maintenance, steering optimization, refactoring, and comprehensive analysis capabilities',
   /** Injects agent management protocol from core protocols directory */
-  '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('agent-management.mdx', '## Agent Management Steps'),
+  '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('agent-management.md', '## Agent Management Steps'),
   /** Injects mode management protocol from Kiro-specific protocols directory */
-  '{{{MODE_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('mode-management.mdx', '## Mode Management Steps', 'src/kiro/steering/protocols'),
+  '{{{MODE_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('mode-management.md', '## Mode Management Steps', 'src/kiro/steering/protocols'),
   /** 
    * Injects mode system alias from shared aliases file with nested substitution support.
    * 
@@ -166,8 +166,8 @@ export const substitutions = {
    * 
    * @example Multi-pass resolution
    * ```typescript
-   * // Pass 1: Returns "Path: {{{KIRO_PROTOCOLS_PATH}}}/mode-switching.mdx"
-   * // Pass 2: Resolves to "Path: ~/.kiro/steering/kiro-agents/protocols/mode-switching.mdx"
+   * // Pass 1: Returns "Path: {{{KIRO_PROTOCOLS_PATH}}}/mode-switching.md"
+   * // Pass 2: Resolves to "Path: ~/.kiro/steering/kiro-agents/protocols/mode-switching.md"
    * ```
    */
   '{{{KIRO_MODE_ALIASES}}}': ({ target }: any) => {

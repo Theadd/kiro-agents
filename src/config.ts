@@ -25,34 +25,34 @@
  */
 
 /**
- * Injects protocol content from .mdx files into steering documents (simple line-based extraction).
+ * Injects protocol content from .md files into steering documents (simple line-based extraction).
  * 
- * **Pattern:** Steering documents (`.md`) are minimal shells. Protocol files (`.mdx`) contain
+ * **Pattern:** Steering documents (`.md`) are minimal shells. Protocol files (`.md`) contain
  * detailed steps. This function injects protocol content at build time for single source of truth.
  * 
  * **Note:** This is a simple implementation using line-based extraction. For scope-aware parsing
  * that handles code blocks and XML tags correctly, use `extractSection` from `src/utils/markdown-extractor.ts`.
  * 
- * @param protocolFileName - Protocol file name (e.g., 'agent-management.mdx')
+ * @param protocolFileName - Protocol file name (e.g., 'agent-management.md')
  * @param startMarker - Optional heading to start from (e.g., '## Agent Management Steps')
  * @param customPath - Optional path relative to project root (default: 'src/core/protocols')
  * @returns Protocol content from marker onwards, full content if no marker, or error comment
  * 
  * @example Full protocol injection
  * ```typescript
- * injectProtocol('agent-activation.mdx')
+ * injectProtocol('agent-activation.md')
  * // Returns entire file from src/core/protocols/
  * ```
  * 
  * @example Section extraction (simple line-based)
  * ```typescript
- * injectProtocol('agent-management.mdx', '## Agent Management Steps')
+ * injectProtocol('agent-management.md', '## Agent Management Steps')
  * // Returns from first line matching marker onwards
  * ```
  * 
  * @example Custom protocol directory
  * ```typescript
- * injectProtocol('mode-management.mdx', '## Mode Steps', 'src/kiro/steering/protocols')
+ * injectProtocol('mode-management.md', '## Mode Steps', 'src/kiro/steering/protocols')
  * ```
  * 
  * @see src/utils/markdown-extractor.ts - Scope-aware alternative with proper parsing
@@ -159,7 +159,7 @@ export const substitutions = {
     }
   },
   /** Injects agent management protocol from core protocols directory */
-  '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('agent-management.mdx', '## Agent Management Steps'),
+  '{{{AGENT_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('agent-management.md', '## Agent Management Steps'),
   /** Mode management protocol - empty for base (Kiro-specific feature) */
   '{{{MODE_MANAGEMENT_PROTOCOL}}}': () => ''
 }
