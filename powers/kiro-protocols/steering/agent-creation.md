@@ -48,7 +48,7 @@ Requirements:
 - Lowercase with hyphens (e.g., `refactor-architect`)
 - No spaces or special characters
 - Descriptive of agent's purpose
-- Must be unique (check `{{{WS_AGENTS_PATH}}}/` directory)
+- Must be unique (check `.kiro/agents/` directory)
 
 #### 2.3: Agent Description
 
@@ -124,7 +124,7 @@ Example workflow:
 
 ### Step 3: Generate Agent Definition File
 
-Create `{{{WS_AGENTS_PATH}}}/{agent-name}.md` with this structure:
+Create `.kiro/agents/{agent-name}.md` with this structure:
 
 ```markdown
 ---
@@ -249,7 +249,7 @@ Show summary to user:
 
 **Agent Created:** `{agent-name}`
 
-**Location:** `{{{WS_AGENTS_PATH}}}/{agent-name}.md`
+**Location:** `.kiro/agents/{agent-name}.md`
 
 **Summary:**
 - Type: {type}

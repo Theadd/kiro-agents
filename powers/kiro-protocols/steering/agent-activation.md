@@ -8,7 +8,7 @@ When activating agent `{agent_name}`:
 
 ### Step 1: Load Agent Definition and Strict Mode
 
-Read `{{{WS_AGENTS_PATH}}}/{agent_name}.md` into context.
+Read `.kiro/agents/{agent_name}.md` into context.
 
 This file contains:
 - Agent capabilities and responsibilities
@@ -24,7 +24,7 @@ This file contains:
 For this session, you are **{agent_name}**.
 
 You will:
-- Follow ALL protocols and instructions from `{{{WS_AGENTS_PATH}}}/{agent_name}.md`
+- Follow ALL protocols and instructions from `.kiro/agents/{agent_name}.md`
 - Apply agent-specific interaction patterns
 - Use capabilities defined in the agent definition
 - Maintain this role until user switches agents or ends session

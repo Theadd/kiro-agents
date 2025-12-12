@@ -24,18 +24,18 @@ Begin with a diff block showing:
 
 ### Step 2: Scan Agents Directory
 
-**CRITICAL: You MUST execute `listDirectory` tool on `{{{WS_AGENTS_PATH}}}/` to get the actual list of agents.**
+**CRITICAL: You MUST execute `listDirectory` tool on `.kiro/agents/` to get the actual list of agents.**
 
 **DO NOT rely on open editor files or context - always scan the directory explicitly.**
 
-Execute `listDirectory` on `{{{WS_AGENTS_PATH}}}/`:
+Execute `listDirectory` on `.kiro/agents/`:
 
 **If directory doesn't exist OR directory is empty:**
 1. **Read #[[file:protocols/agent-creation.md]] into context** - Load agent creation protocol
-2. Create `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md` agent automatically using the description from "Initial Agent" section
+2. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
 3. Follow the agent definition structure from agent-creation.md protocol
 4. Show diff block indicating setup completion
-5. Continue to Step 3 with {{{INITIAL_AGENT_NAME}}} as available agent
+5. Continue to Step 3 with kiro-master as available agent
 
 **If directory exists with agents:**
 1. **Execute `listDirectory` tool** to get complete list of `.md` files
@@ -55,7 +55,7 @@ Use this response structure:
 
 **Current Focus**: Agent selection and management
 
-**Available agents in `{{{WS_AGENTS_PATH}}}/`:**
+**Available agents in `.kiro/agents/`:**
 
 [List each agent with format:]
 - **{agent-name}** - {description from frontmatter or .md}
@@ -127,7 +127,11 @@ AGENT COMMANDS
   /agents {name}    Activate specific agent
   /agents           Interactive agent management
 
-{{{MODE_COMMANDS}}}
+MODE COMMANDS (see modes-system.md)
+  /modes {name}     Switch Kiro mode (vibe/spec)
+  /modes            Interactive mode management
+  /strict {state}   Control strict mode (on/off)
+  /strict           Interactive strict mode control
 
 Note: Commands are defined in steering documents.
 New commands can be added via Instruction Alias pattern.
