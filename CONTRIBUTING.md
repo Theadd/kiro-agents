@@ -130,7 +130,7 @@ We use an AI-powered versioning system with Changesets:
 bun run snapshot  # or /snapshot in Kiro IDE
 
 # Captures context: purpose, findings, decisions
-# Stored in .changeset/snapshots/ (gitignored)
+# Stored in .kiro/session-snapshots/ (gitignored)
 ```
 
 ### When Feature Complete

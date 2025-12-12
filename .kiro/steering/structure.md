@@ -60,10 +60,10 @@ kiro-agents/
 ├── .changeset/                   # Changesets
 │   ├── config.json               # Changesets configuration
 │   ├── README.md                 # Workflow documentation
-│   ├── snapshots/                # Session snapshots (gitignored)
 │   └── *.md                      # Changeset files (committed)
 └── .kiro/                        # Workspace config
     ├── agents/                   # Custom agents
+    ├── session-snapshots/        # Session snapshots (gitignored)
     ├── hooks/                    # Kiro slash commands
     │   ├── snapshot.json         # /snapshot command
     │   ├── finalize.json         # /finalize command
@@ -191,7 +191,7 @@ src/kiro/.../kiro-vibe-mode.md     → power/steering/modes/kiro-vibe-mode.md
 - Files set to read-only after npm installation
 
 **Versioning**:
-- Session snapshots in `.changeset/snapshots/` (gitignored)
+- Session snapshots in `.kiro/session-snapshots/` (gitignored)
 - Final changesets in `.changeset/*.md` (committed)
 - Kiro hooks in `.kiro/hooks/` for slash commands
 - Documentation in `docs/VERSIONING.md`

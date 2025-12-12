@@ -1,13 +1,13 @@
 {
   "enabled": true,
   "name": "snapshot",
-  "description": "Captures development session context by running the snapshot script which analyzes git diff, prompts for session insights (goals, discoveries, blockers, decisions, approaches), and saves to .changeset/snapshots/ for later changelog generation",
+  "description": "Captures development session context by running the snapshot script which analyzes git diff, prompts for session insights (goals, discoveries, blockers, decisions, approaches), and saves to .kiro/session-snapshots/ for later changelog generation",
   "version": "1",
   "when": {
     "type": "userTriggered"
   },
   "then": {
     "type": "askAgent",
-    "prompt": "Capture the current development session context for changelog generation:\n\n1. Execute the snapshot script: `bun run snapshot`\n2. Wait for the script to complete and create the snapshot file\n3. Find the newly created snapshot file in `.changeset/snapshots/` (look for the most recent session-*.json)\n4. Read the snapshot file content\n5. Analyze the current session conversation to extract:\n   - **Purpose**: What were you trying to achieve in this session?\n   - **Changes**: What was added, modified, removed, or attempted?\n   - **Findings**: Important discoveries, insights, or learnings\n   - **Limitations**: Constraints, blockers, or issues encountered\n   - **Decisions**: Design decisions made and why\n6. Update the snapshot file, replacing all \"TODO\" placeholders with real analysis\n7. Confirm the snapshot was updated successfully with real context\n8. Remind user to run `/finalize` when feature is complete\n\nThis snapshot will be used later to generate a comprehensive changeset that captures not just what changed, but why and how."
+    "prompt": "Capture the current development session context for changelog generation:\n\n1. Execute the snapshot script: `bun run snapshot`\n2. Wait for the script to complete and create the snapshot file\n3. Find the newly created snapshot file in `.kiro/session-snapshots/` (look for the most recent session-*.json)\n4. Read the snapshot file content\n5. Analyze the current session conversation to extract:\n   - **Purpose**: What were you trying to achieve in this session?\n   - **Changes**: What was added, modified, removed, or attempted?\n   - **Findings**: Important discoveries, insights, or learnings\n   - **Limitations**: Constraints, blockers, or issues encountered\n   - **Decisions**: Design decisions made and why\n6. Update the snapshot file, replacing all \"TODO\" placeholders with real analysis\n7. Confirm the snapshot was updated successfully with real context\n8. Remind user to run `/finalize` when feature is complete\n\nThis snapshot will be used later to generate a comprehensive changeset that captures not just what changed, but why and how."
   }
 }

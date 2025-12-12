@@ -108,7 +108,7 @@ bun run release
 **During Development:**
 1. Work on feature with frequent commits
 2. Run `/snapshot` after each session
-3. Snapshots stored in `.changeset/snapshots/` (gitignored)
+3. Snapshots stored in `.kiro/session-snapshots/` (gitignored)
 
 **When Feature Complete:**
 1. Run `/finalize` to consolidate snapshots

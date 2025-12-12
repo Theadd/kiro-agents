@@ -116,7 +116,7 @@ interface FinalAnalysis {
 }
 
 /**
- * Loads all session snapshots from `.changeset/snapshots/` directory.
+ * Loads all session snapshots from `.kiro/session-snapshots/` directory.
  * 
  * Snapshots are gitignored and accumulate across development sessions.
  * Sorted chronologically to show development progression.
@@ -124,15 +124,15 @@ interface FinalAnalysis {
  * @returns Array of session snapshots sorted by timestamp (oldest first)
  */
 function loadSnapshots(): SessionSnapshot[] {
-  const snapshotsDir = ".changeset/snapshots";
-  
+  const snapshotsDir = ".kiro/session-snapshots";
+
   // Ensure snapshots directory exists
   if (!existsSync(snapshotsDir)) {
     return [];
   }
-  
+
   const files = readdirSync(snapshotsDir).filter(f => f.endsWith(".json"));
-  
+
   return files.map(file => {
     const content = readFileSync(join(snapshotsDir, file), "utf-8");
     return JSON.parse(content) as SessionSnapshot;
@@ -162,10 +162,10 @@ function getSquashedCommit(): { message: string; diff: string; files: string[] }
     .trim()
     .split("\n")
     .filter(Boolean);
-  
+
   // Get all commit messages (will be squashed)
   const messages = execSync("git --no-pager log --no-color main..HEAD --format=%B", { encoding: "utf-8" });
-  
+
   return { message: messages, diff, files };
 }
 
@@ -185,7 +185,7 @@ function getSquashedCommit(): { message: string; diff: string; files: string[] }
  */
 function displayAIPrompt(snapshots: SessionSnapshot[], finalCommit: ReturnType<typeof getSquashedCommit>): void {
   console.log("🤖 AI Agent: Please analyze and provide changeset content\n");
-  
+
   const prompt = `
 📋 AI Analysis Required
 ${"─".repeat(60)}
@@ -292,7 +292,7 @@ ${analysis.description}
   if (analysis.details.removed.length) {
     changesetContent += `## Removed\n${analysis.details.removed.map(i => `- ${i}`).join("\n")}\n\n`;
   }
-  
+
   // Add findings and decisions if they exist
   if (analysis.findings.length && !analysis.findings[0]!.startsWith("TODO")) {
     changesetContent += `## Key Findings\n${analysis.findings.map(f => `- ${f}`).join("\n")}\n\n`;
@@ -300,21 +300,21 @@ ${analysis.description}
   if (analysis.decisions.length && !analysis.decisions[0]!.startsWith("TODO")) {
     changesetContent += `## Design Decisions\n${analysis.decisions.map(d => `- ${d}`).join("\n")}\n\n`;
   }
-  
+
   const filename = `.changeset/${generateId()}.md`;
   writeFileSync(filename, changesetContent);
-  
+
   console.log(`✅ Changeset created: ${filename}`);
   console.log("\n📝 Content:");
   console.log("─".repeat(60));
   console.log(changesetContent);
   console.log("─".repeat(60));
-  
+
   return filename;
 }
 
 /**
- * Removes all session snapshot files from `.changeset/snapshots/` directory.
+ * Removes all session snapshot files from `.kiro/session-snapshots/` directory.
  * 
  * Preserves `.gitkeep` file to maintain directory structure in git. Called during
  * Phase 2 (commit) after changeset is validated and committed. Snapshots are
@@ -335,20 +335,20 @@ ${analysis.description}
  * ```
  */
 function cleanupSnapshots(): void {
-  const snapshotsDir = ".changeset/snapshots";
-  
+  const snapshotsDir = ".kiro/session-snapshots";
+
   // Check if directory exists before cleaning
   if (!existsSync(snapshotsDir)) {
     console.log("\n🧹 No snapshots to clean up");
     return;
   }
-  
+
   const files = readdirSync(snapshotsDir).filter(f => f !== ".gitkeep");
-  
+
   files.forEach(file => {
     rmSync(join(snapshotsDir, file));
   });
-  
+
   console.log(`\n🧹 Cleaned up ${files.length} snapshots`);
 }
 
@@ -377,15 +377,15 @@ function commitChangeset(): void {
 
 function parseChangeset(changesetFile: string): { type: string; summary: string; sections: { added: string[]; changed: string[]; fixed: string[]; removed: string[] } } {
   const content = readFileSync(changesetFile, "utf-8");
-  
+
   // Extract type from frontmatter
   const typeMatch = content.match(/^---\n"[^"]+": (major|minor|patch)\n---/m);
   const type: string = typeMatch ? typeMatch[1]! : "minor";
-  
+
   // Extract summary (first # heading after frontmatter)
   const summaryMatch = content.match(/^# (.+)$/m);
   const summary: string = summaryMatch ? summaryMatch[1]! : "Update";
-  
+
   // Extract sections
   const sections = {
     added: extractSection(content, "## Added"),
@@ -393,7 +393,7 @@ function parseChangeset(changesetFile: string): { type: string; summary: string;
     fixed: extractSection(content, "## Fixed"),
     removed: extractSection(content, "## Removed")
   };
-  
+
   return { type, summary, sections };
 }
 
@@ -401,7 +401,7 @@ function extractSection(content: string, heading: string): string[] {
   const regex = new RegExp(`${heading}\\n([\\s\\S]*?)(?=\\n## |$)`, "m");
   const match = content.match(regex);
   if (!match) return [];
-  
+
   return match[1]!
     .split("\n")
     .filter(line => line.trim().startsWith("-"))
@@ -411,17 +411,17 @@ function extractSection(content: string, heading: string): string[] {
 function autoSquashCommits(changesetFile: string): void {
   try {
     console.log("\n🔄 Auto-squashing commits...");
-    
+
     // 1. Stash any unstaged changes
     const hasUnstaged = execSync("git diff --quiet || echo 'has-changes'", { encoding: "utf-8" }).trim();
     if (hasUnstaged === "has-changes") {
       console.log("📦 Stashing unstaged changes...");
       execSync("git stash push -u -m 'finalize: temporary stash'", { stdio: "inherit" });
     }
-    
+
     // 2. Count commits since main
     const commitCount = parseInt(execSync("git --no-pager rev-list --count main..HEAD", { encoding: "utf-8" }).trim());
-    
+
     if (commitCount <= 1) {
       console.log("ℹ️  Only 1 commit, no squash needed");
       if (hasUnstaged === "has-changes") {
@@ -430,41 +430,41 @@ function autoSquashCommits(changesetFile: string): void {
       }
       return;
     }
-    
+
     console.log(`🎯 Squashing ${commitCount} commits into 1...`);
-    
+
     // 3. Parse changeset to generate descriptive commit message
     const { type, summary, sections } = parseChangeset(changesetFile);
-    
+
     // 4. Build commit message
     const commitType = type === "major" ? "feat!" : type === "minor" ? "feat" : "fix";
     let commitMsg = `${commitType}: ${summary.toLowerCase()}`;
-    
+
     // Add bullet points for each section
     const bullets: string[] = [];
     sections.added.forEach(item => bullets.push(`- ${item}`));
     sections.changed.forEach(item => bullets.push(`- ${item}`));
     sections.fixed.forEach(item => bullets.push(`- ${item}`));
     sections.removed.forEach(item => bullets.push(`- ${item}`));
-    
+
     if (bullets.length > 0) {
       commitMsg += "\n\n" + bullets.join("\n");
     }
-    
+
     // 5. Soft reset to main
     execSync("git reset --soft main", { stdio: "inherit" });
-    
+
     // 6. Create single commit with descriptive message
     execSync(`git commit -m "${commitMsg.replace(/"/g, '\\"')}"`, { stdio: "inherit" });
-    
+
     console.log("✅ Commits squashed successfully!");
-    
+
     // 7. Restore stashed changes if any
     if (hasUnstaged === "has-changes") {
       console.log("📦 Restoring stashed changes...");
       execSync("git stash pop", { stdio: "inherit" });
     }
-    
+
   } catch (error) {
     console.error("❌ Failed to squash commits:", error);
     console.log("\n💡 You can manually squash with: git rebase -i main");
@@ -476,7 +476,7 @@ function autoSquashCommits(changesetFile: string): void {
  * Phase 1: Analysis - Loads snapshots, shows diff, creates changeset template.
  * 
  * **Workflow:**
- * 1. Loads all session snapshots from `.changeset/snapshots/`
+ * 1. Loads all session snapshots from `.kiro/session-snapshots/`
  * 2. Gets git diff from main to current branch (source of truth)
  * 3. Displays AI prompt with file list, snapshots, and diff
  * 4. Creates changeset file with TODO placeholders
@@ -487,7 +487,7 @@ function autoSquashCommits(changesetFile: string): void {
  */
 async function analyzePhase() {
   console.log("🎯 Finalize Changes - Phase 1: Analysis\n");
-  
+
   // Load snapshots
   const snapshots = loadSnapshots();
   if (snapshots.length === 0) {
@@ -495,24 +495,24 @@ async function analyzePhase() {
     console.error("💡 Run /snapshot first to capture session context");
     process.exit(1);
   }
-  
+
   console.log(`📸 Found ${snapshots.length} session snapshot(s):`);
   snapshots.forEach((s, i) => {
     console.log(`   ${i + 1}. ${s.timestamp.split("T")[0]} - ${s.purpose}`);
   });
   console.log();
-  
+
   // Get final commit state
   const finalCommit = getSquashedCommit();
   console.log(`📦 Final commit affects ${finalCommit.files.length} files\n`);
-  
+
   // Display AI prompt
   displayAIPrompt(snapshots, finalCommit);
-  
+
   // Create changeset with TODOs
   const analysis = createPlaceholderAnalysis();
   createChangeset(analysis);
-  
+
   console.log("\n✅ Phase 1 complete!");
   console.log("💡 AI agent should now:");
   console.log("   1. Analyze the snapshots and diff above");
@@ -554,34 +554,34 @@ function validateChangesetAgainstDiff(changesetFile: string): { valid: boolean; 
     .trim()
     .split("\n")
     .filter(Boolean);
-  
+
   const errors: string[] = [];
-  
+
   // Extract all file/directory references from changeset
   // Look for common patterns: `path/to/file`, docs/__internal/, .kiro/agents/, etc.
   const pathPattern = /`([^`]+\/[^`]+)`|([a-zA-Z0-9_-]+\/[a-zA-Z0-9_\/-]+)/g;
   const matches = content.matchAll(pathPattern);
-  
+
   for (const match of matches) {
     const path = match[1] || match[2];
     if (!path) continue;
-    
+
     // Skip common non-file references
     if (path.includes("://") || path.startsWith("http")) continue;
     if (path.includes("@") || path.includes("npm")) continue;
-    
+
     // Check if this path or any file under it exists in actualFiles
-    const pathExists = actualFiles.some(f => 
-      f === path || 
-      f.startsWith(path + "/") || 
+    const pathExists = actualFiles.some(f =>
+      f === path ||
+      f.startsWith(path + "/") ||
       path.startsWith(f + "/")
     );
-    
+
     if (!pathExists && path.includes("/")) {
       errors.push(`Referenced path not in commit: ${path}`);
     }
   }
-  
+
   return { valid: errors.length === 0, errors };
 }
 
@@ -615,20 +615,20 @@ function validateChangesetAgainstDiff(changesetFile: string): { valid: boolean; 
  */
 async function commitPhase() {
   console.log("🎯 Finalize Changes - Phase 2: Commit\n");
-  
+
   // Find the most recent changeset file
   const changesetFiles = readdirSync(".changeset")
     .filter(f => f.endsWith(".md") && f !== "README.md")
     .sort();
-  
+
   if (changesetFiles.length === 0) {
     console.error("❌ No changeset found");
     console.error("💡 Run 'bun run finalize:analyze' first");
     process.exit(1);
   }
-  
+
   const changesetFile = `.changeset/${changesetFiles[changesetFiles.length - 1]}`;
-  
+
   // Verify changeset was updated
   const content = readFileSync(changesetFile, "utf-8");
   if (content.includes("TODO")) {
@@ -637,9 +637,9 @@ async function commitPhase() {
     console.error(`   File: ${changesetFile}`);
     process.exit(1);
   }
-  
+
   console.log("✅ Changeset verified (no TODOs)");
-  
+
   // Validate changeset against actual diff
   const validation = validateChangesetAgainstDiff(changesetFile);
   if (!validation.valid) {
@@ -650,17 +650,17 @@ async function commitPhase() {
     console.error(`   File: ${changesetFile}`);
     process.exit(1);
   }
-  
+
   console.log("✅ Changeset validated against git diff");
-  
+
   // Cleanup snapshots
   cleanupSnapshots();
-  
+
   // Commit and squash
   console.log("\n🚀 Starting automatic finalization...");
   commitChangeset();
   autoSquashCommits(changesetFile);
-  
+
   console.log("\n✨ Finalization complete!");
   console.log("\n💡 Next steps:");
   console.log("1. Review: git log -1");
@@ -671,7 +671,7 @@ async function commitPhase() {
 
 async function main() {
   const command = process.argv[2] || "analyze";
-  
+
   if (command === "analyze") {
     await analyzePhase();
   } else if (command === "commit") {

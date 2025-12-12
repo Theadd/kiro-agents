@@ -20,7 +20,7 @@ git commit -m "wip: more progress"
 /snapshot
 ```
 
-This creates a snapshot in `.changeset/snapshots/` (gitignored) that captures:
+This creates a snapshot in `.kiro/session-snapshots/` (gitignored) that captures:
 - Purpose of the session
 - Changes made (added/modified/removed/attempted)
 - Findings and discoveries
@@ -99,10 +99,15 @@ This:
 .changeset/
 ├── config.json           # Changesets configuration
 ├── README.md            # This file
-├── snapshots/           # Session snapshots (gitignored)
-│   ├── session-abc.json
-│   └── session-def.json
+.changeset/
+├── config.json           # Changesets configuration
+├── README.md            # This file
 └── feature-xyz.md       # Final changeset (committed)
+
+.kiro/
+└── session-snapshots/   # Session snapshots (gitignored)
+    ├── session-abc.json
+    └── session-def.json
 ```
 
 ## AI-Powered Features

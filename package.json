@@ -52,7 +52,7 @@
   "author": "R. Beltran",
   "license": "MIT",
   "devDependencies": {
-    "@changesets/cli": "^2.29.8",
+    "@changesets/cli": "2.27.9",
     "@types/bun": "latest"
   },
   "peerDependencies": {

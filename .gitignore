@@ -158,7 +158,7 @@ __*
 .kiro/agents/
 
 # Changeset snapshots (temporary session data)
-.changeset/snapshots/
+.kiro/session-snapshots/
 
 # npm configuration with tokens
 .npmrc

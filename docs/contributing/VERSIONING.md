@@ -12,7 +12,7 @@ Run after each development session to document your work:
 /snapshot
 ```
 
-Creates snapshot in `.changeset/snapshots/` (gitignored) with:
+Creates snapshot in `.kiro/session-snapshots/` (gitignored) with:
 - Purpose and changes
 - Findings and decisions
 - Git metadata
@@ -96,6 +96,8 @@ git rebase -i main && git push
 
 ```
 .changeset/
-├── snapshots/           # Session snapshots (gitignored)
 └── feature-xyz.md       # Final changeset (committed)
+
+.kiro/
+└── session-snapshots/   # Session snapshots (gitignored)
 ```
