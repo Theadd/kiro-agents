@@ -52,6 +52,56 @@ import { readdirSync, existsSync, mkdirSync, copyFileSync, readFileSync, writeFi
 import { join } from "path";
 
 /**
+ * Build options passed to substitution functions during power processing.
+ * 
+ * Currently only supports 'power' target since powers are always built for
+ * Kiro Power distribution (not npm). Future expansion could support multiple
+ * power distribution channels.
+ * 
+ * @property target - Build target, always 'power' for power builds
+ */
+interface SubstitutionOptions {
+  /** Build target for power distribution (always 'power') */
+  target: 'power';
+}
+
+/**
+ * Map of placeholder keys to replacement functions for build-time content injection.
+ * 
+ * Similar to main build system (`scripts/build.ts`) but power-specific. Each function
+ * receives `SubstitutionOptions` and returns string to replace placeholder in source files.
+ * 
+ * **Note:** Currently unused in build-powers.ts but defined for future protocol processing
+ * where powers may need dynamic content (e.g., version numbers, generated lists).
+ * 
+ * @example Future usage
+ * ```typescript
+ * const substitutions: Substitutions = {
+ *   '{{{POWER_VERSION}}}': ({ target }) => '1.0.0',
+ *   '{{{PROTOCOL_LIST}}}': ({ target }) => protocols.map(p => `- ${p}`).join('\n')
+ * };
+ * ```
+ */
+type Substitutions = { [key: string]: (options: SubstitutionOptions) => string };
+
+/**
+ * Configuration object containing substitution functions for power builds.
+ * 
+ * Mirrors structure from main build config (`src/config.ts`, `src/kiro/config.ts`)
+ * but for power-specific processing. Currently defined for future expansion when
+ * powers need dynamic content generation during build.
+ * 
+ * @property substitutions - Map of placeholder keys to replacement functions
+ * 
+ * @see src/config.ts - Main build substitutions pattern
+ * @see src/kiro/config.ts - Kiro-specific substitutions
+ */
+interface Config {
+  /** Substitution functions for dynamic content replacement */
+  substitutions: Substitutions;
+}
+
+/**
  * Power configuration defining source protocols and build behavior.
  * 
  * Each power is built independently with its own set of protocols copied from
@@ -203,24 +253,82 @@ function generateIconPlaceholder(powerPath: string, powerName: string): void {
 }
 
 /**
- * Copies protocol files from source directory to power steering directory.
+ * Loads Kiro-specific build configuration with substitution functions.
  * 
- * Creates steering/ subdirectory if needed and copies each protocol listed in
- * config. Warns if source protocol not found but continues with remaining files.
+ * @returns Configuration object with substitution functions
+ */
+async function loadConfig(): Promise<Config> {
+  const kiroConfig = await import("../src/kiro/config.ts");
+  return kiroConfig as Config;
+}
+
+/**
+ * Applies all substitutions to file content with multi-pass processing.
+ * 
+ * @param content - Original file content with placeholders
+ * @param substitutions - Map of placeholder keys to replacement functions
+ * @param options - Build options passed to substitution functions
+ * @returns Processed content with all substitutions applied
+ */
+async function applySubstitutions(
+  content: string,
+  substitutions: Substitutions,
+  options: SubstitutionOptions
+): Promise<string> {
+  let result = content;
+  let maxIterations = 10;
+  let iteration = 0;
+  
+  while (iteration < maxIterations) {
+    let hasSubstitutions = false;
+    
+    for (const [key, fn] of Object.entries(substitutions)) {
+      if (result.includes(key)) {
+        const value = fn(options);
+        result = result.replaceAll(key, value);
+        hasSubstitutions = true;
+      }
+    }
+    
+    if (!hasSubstitutions) {
+      break;
+    }
+    
+    iteration++;
+  }
+  
+  if (iteration >= maxIterations) {
+    console.warn(`⚠️  Warning: Reached maximum substitution iterations (${maxIterations})`);
+  }
+  
+  return result;
+}
+
+/**
+ * Copies and processes protocol files from source directory to power steering directory.
+ * 
+ * Creates steering/ subdirectory if needed, reads each protocol, applies substitutions,
+ * and writes processed content. Warns if source protocol not found but continues.
  * 
  * @param config - Power configuration with source directory and protocol list
  * @param powerPath - Destination power directory (e.g., 'powers/kiro-protocols')
+ * @param substitutions - Substitution functions to apply
  * 
  * @example
  * ```typescript
- * copyProtocols(
+ * await copyProtocols(
  *   { sourceDir: 'src/core/protocols', protocols: ['agent-activation'] },
- *   'powers/kiro-protocols'
+ *   'powers/kiro-protocols',
+ *   substitutions
  * );
- * // Copies src/core/protocols/agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
+ * // Reads, processes, and writes agent-activation.md with substitutions applied
  * ```
  */
-function copyProtocols(config: PowerConfig, powerPath: string): void {
+async function copyProtocols(
+  config: PowerConfig,
+  powerPath: string,
+  substitutions: Substitutions
+): Promise<void> {
   const steeringDir = join(powerPath, "steering");
   
   // Create steering directory if it doesn't exist
@@ -228,7 +336,7 @@ function copyProtocols(config: PowerConfig, powerPath: string): void {
     mkdirSync(steeringDir, { recursive: true });
   }
   
-  // Copy each protocol
+  // Copy and process each protocol
   for (const protocol of config.protocols) {
     const srcPath = join(config.sourceDir, `${protocol}.md`);
     const destPath = join(steeringDir, `${protocol}.md`);
@@ -238,26 +346,39 @@ function copyProtocols(config: PowerConfig, powerPath: string): void {
       continue;
     }
     
-    copyFileSync(srcPath, destPath);
-    console.log(`  ✅ Copied: ${protocol}.md`);
+    // Read source file
+    const content = readFileSync(srcPath, "utf-8");
+    
+    // Apply substitutions
+    const processed = await applySubstitutions(content, substitutions, { target: 'power' });
+    
+    // Write processed content
+    writeFileSync(destPath, processed, "utf-8");
+    
+    console.log(`  ✅ Processed: ${protocol}.md`);
   }
 }
 
 /**
- * Copies Kiro-specific protocols (mode-switching, mode-management) to power.
+ * Copies and processes Kiro-specific protocols (mode-switching, mode-management) to power.
  * 
  * Special handling for kiro-protocols power which includes both core protocols
  * and Kiro-specific mode system protocols. Only runs for kiro-protocols power.
+ * Applies substitutions to ensure placeholders are replaced.
  * 
  * @param powerPath - Destination power directory (e.g., 'powers/kiro-protocols')
+ * @param substitutions - Substitution functions to apply
  * 
  * @example
  * ```typescript
- * copyKiroProtocols('powers/kiro-protocols');
- * // Copies src/kiro/steering/protocols/*.md → powers/kiro-protocols/steering/*.md
+ * await copyKiroProtocols('powers/kiro-protocols', substitutions);
+ * // Reads, processes, and writes Kiro-specific protocols with substitutions
  * ```
  */
-function copyKiroProtocols(powerPath: string): void {
+async function copyKiroProtocols(
+  powerPath: string,
+  substitutions: Substitutions
+): Promise<void> {
   const kiroProtocolsDir = "src/kiro/steering/protocols";
   const steeringDir = join(powerPath, "steering");
   
@@ -275,34 +396,52 @@ function copyKiroProtocols(powerPath: string): void {
       continue;
     }
     
-    copyFileSync(srcPath, destPath);
-    console.log(`  ✅ Copied: ${protocol}.md (Kiro-specific)`);
+    // Read source file
+    const content = readFileSync(srcPath, "utf-8");
+    
+    // Apply substitutions
+    const processed = await applySubstitutions(content, substitutions, { target: 'power' });
+    
+    // Write processed content
+    writeFileSync(destPath, processed, "utf-8");
+    
+    console.log(`  ✅ Processed: ${protocol}.md (Kiro-specific)`);
   }
 }
 
 /**
- * Builds a single power from configuration with validation.
+ * Builds a single power from configuration with validation and substitution processing.
  * 
  * Orchestrates the complete build process for one power: validates POWER.md,
- * copies protocols, adds Kiro-specific protocols if applicable, and generates
- * icon placeholder. Throws error if POWER.md validation fails.
+ * copies and processes protocols with substitutions, adds Kiro-specific protocols
+ * if applicable, and generates icon placeholder. Throws error if POWER.md validation fails.
+ * 
+ * **Build Steps:**
+ * 1. Validates POWER.md exists with required frontmatter
+ * 2. Copies and processes protocols with substitutions applied
+ * 3. Adds Kiro-specific protocols for kiro-protocols power
+ * 4. Generates icon placeholder if needed
  * 
  * @param config - Power configuration defining protocols and build behavior
+ * @param substitutions - Substitution functions to apply during protocol processing
  * @throws Error if POWER.md validation fails
  * 
  * @example
  * ```typescript
- * buildPower({
+ * await buildPower({
  *   name: 'kiro-protocols',
  *   displayName: 'Kiro Protocols',
  *   sourceDir: 'src/core/protocols',
  *   protocols: ['agent-activation', 'agent-management'],
  *   generateIcon: true
- * });
- * // Validates, copies protocols, generates icon for kiro-protocols power
+ * }, config.substitutions);
+ * // Validates, copies protocols with substitutions, generates icon
  * ```
+ * 
+ * @see copyProtocols - Copies and processes protocol files with substitutions
+ * @see copyKiroProtocols - Adds Kiro-specific protocols for kiro-protocols power
  */
-function buildPower(config: PowerConfig): void {
+async function buildPower(config: PowerConfig, substitutions: Substitutions): Promise<void> {
   console.log(`\n🔨 Building power: ${config.displayName}`);
   
   const powerPath = join("powers", config.name);
@@ -312,13 +451,13 @@ function buildPower(config: PowerConfig): void {
     throw new Error(`Invalid POWER.md for ${config.name}`);
   }
   
-  // Copy protocols
-  console.log(`📋 Copying protocols...`);
-  copyProtocols(config, powerPath);
+  // Copy and process protocols
+  console.log(`📋 Processing protocols...`);
+  await copyProtocols(config, powerPath, substitutions);
   
-  // Copy Kiro-specific protocols if this is kiro-protocols power
+  // Copy and process Kiro-specific protocols if this is kiro-protocols power
   if (config.name === "kiro-protocols") {
-    copyKiroProtocols(powerPath);
+    await copyKiroProtocols(powerPath, substitutions);
   }
   
   // Generate icon placeholder if needed
@@ -330,27 +469,42 @@ function buildPower(config: PowerConfig): void {
 }
 
 /**
- * Builds all configured powers or a specific power by name.
+ * Builds all configured powers or a specific power by name with substitution processing.
  * 
- * Main entry point for power build system. Filters POWER_CONFIGS by name if
- * specificPower provided, otherwise builds all. Exits with code 1 on any failure.
+ * Main entry point for power build system. Loads Kiro configuration with substitutions,
+ * filters POWER_CONFIGS by name if specificPower provided, then builds each power with
+ * substitution processing. Exits with code 1 on any failure.
+ * 
+ * **Build Process:**
+ * 1. Loads Kiro config with substitution functions
+ * 2. Filters power configurations (all or specific)
+ * 3. Builds each power with substitutions applied
+ * 4. Validates and reports results
  * 
  * @param specificPower - Optional power name to build only that power (e.g., 'kiro-protocols')
  * 
  * @example Build all powers
  * ```typescript
- * buildAllPowers();
- * // Builds all powers in POWER_CONFIGS array
+ * await buildAllPowers();
+ * // Loads config, builds all powers in POWER_CONFIGS array
  * ```
  * 
  * @example Build specific power
  * ```typescript
- * buildAllPowers('kiro-protocols');
- * // Builds only kiro-protocols power
+ * await buildAllPowers('kiro-protocols');
+ * // Loads config, builds only kiro-protocols power
  * ```
+ * 
+ * @see loadConfig - Loads Kiro-specific substitution configuration
+ * @see buildPower - Builds individual power with substitutions
  */
-function buildAllPowers(specificPower?: string): void {
+async function buildAllPowers(specificPower?: string): Promise<void> {
   console.log("🚀 Starting Kiro Powers build...\n");
+  
+  // Load configuration with substitutions
+  console.log("📝 Loading configuration...");
+  const config = await loadConfig();
+  console.log(`✅ Loaded ${Object.keys(config.substitutions).length} substitutions\n`);
   
   const configs = specificPower
     ? POWER_CONFIGS.filter(c => c.name === specificPower)
@@ -361,11 +515,11 @@ function buildAllPowers(specificPower?: string): void {
     process.exit(1);
   }
   
-  for (const config of configs) {
+  for (const powerConfig of configs) {
     try {
-      buildPower(config);
+      await buildPower(powerConfig, config.substitutions);
     } catch (error) {
-      console.error(`❌ Failed to build ${config.name}:`, error);
+      console.error(`❌ Failed to build ${powerConfig.name}:`, error);
       process.exit(1);
     }
   }
