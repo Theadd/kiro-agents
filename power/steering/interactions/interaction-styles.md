@@ -16,7 +16,7 @@ inclusion: manual
 - Visual formatting (bold, code blocks)
 - Context recovery system
 
-**Example agents**: kiro-manager
+**Example agents**: project-manager
  
 **When to use**:
 
@@ -103,7 +103,7 @@ inclusion: manual
 - Simple tasks → Direct execution
 - Complex tasks → Chit-chat or consultative
 
-**Example agents**: kiro-manager-hybrid
+**Example agents**: project-manager-hybrid
  
 **When to use**:
 

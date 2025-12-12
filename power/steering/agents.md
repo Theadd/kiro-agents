@@ -37,7 +37,7 @@ Begin with a diff block showing:
 Execute `listDirectory` on `.kiro/agents/`:
 
 **If directory doesn't exist OR directory is empty:**
-1. **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent creation protocol
+1. **Read `~/.kiro/powers/installed/kiro-agents/steering/protocols/agent-creation.mdx` into context** - Load agent creation protocol
 2. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
 3. Follow the agent definition structure from agent-creation.mdx protocol
 4. Show diff block indicating setup completion
@@ -89,7 +89,7 @@ Based on user selection:
 
 #### Option 2 - Create New Agent
 
-- **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent creation protocol
+- **Read `~/.kiro/powers/installed/kiro-agents/steering/protocols/agent-creation.mdx` into context** - Load agent creation protocol
 - Follow all steps from the "Agent Creation Steps" section in agent-creation.mdx
 - Start agent creation workflow with interactive wizard
 - Ask for agent type (code-focused, documentation, testing, etc.)
@@ -100,7 +100,7 @@ Based on user selection:
 
 #### Option 3 - Manage Existing Agent
 
-- **Read `{{{PROTOCOLS_PATH}}}/agent-creation.mdx` into context** - Load agent structure reference
+- **Read `~/.kiro/powers/installed/kiro-agents/steering/protocols/agent-creation.mdx` into context** - Load agent structure reference
 - Show numbered list of available agents
 - User selects agent to manage
 - Offer management options:
@@ -133,7 +133,11 @@ AGENT COMMANDS
   /agents {name}    Activate specific agent
   /agents           Interactive agent management
 
-{{{MODE_COMMANDS}}}
+MODE COMMANDS (see modes-system.md)
+  /modes {name}     Switch Kiro mode (vibe/spec)
+  /modes            Interactive mode management
+  /strict {state}   Control strict mode (on/off)
+  /strict           Interactive strict mode control
 
 Note: Commands are defined in steering documents.
 New commands can be added via Instruction Alias pattern.
@@ -151,7 +155,7 @@ Explain agent system:
 #### Option 7 - Exit
 
 - Confirm exit from agent management mode
-- Return to normal Kiro interaction
+- Return to normal interaction
 - Preserve any changes made
 
 ### Step 5: Maintain Chit-Chat Mode
@@ -185,4 +189,16 @@ This description is used when creating `.kiro/agents/kiro-master.md` during auto
 
 ---
 
-**Begin agent management mode now.**
+**Quick Commands:**
+
+```
+/agents           Interactive agent management
+
+MODE COMMANDS (see modes-system.md)
+  /modes {name}     Switch Kiro mode (vibe/spec)
+  /modes            Interactive mode management
+  /strict {state}   Control strict mode (on/off)
+  /strict           Interactive strict mode control
+```
+
+Note: Commands are defined in steering documents.
