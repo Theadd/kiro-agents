@@ -120,7 +120,7 @@ function validatePowerMd(powerPath: string): { errors: string[]; warnings: strin
   const nameMatch = frontmatter.match(/name:\s*"([^"]+)"/);
   if (nameMatch) {
     const name = nameMatch[1];
-    if (!/^[a-z0-9-]+$/.test(name)) {
+    if (!/^[a-z0-9-]+$/.test(name ?? "")) {
       errors.push(`Invalid name format: "${name}" (must be lowercase kebab-case)`);
     }
   }
