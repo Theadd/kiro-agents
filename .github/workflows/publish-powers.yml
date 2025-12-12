@@ -80,8 +80,8 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # Add generated steering files
-          git add powers/*/steering/
+          # Add generated steering files (force add to override .gitignore)
+          git add -f powers/*/steering/
           
           # Check if there are changes to commit
           if git diff --staged --quiet; then
