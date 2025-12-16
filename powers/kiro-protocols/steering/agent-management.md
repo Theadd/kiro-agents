@@ -88,11 +88,15 @@ Based on user selection:
 - **Load agent creation protocol**:
   - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
   - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
-- Follow all steps from the "Agent Creation Steps" section in agent-creation.md
-- Start agent creation workflow with interactive wizard
-- Ask for agent type (code-focused, documentation, testing, etc.)
-- Collect agent name, description, capabilities
-- Generate `.md` file with all agent definition following protocol structure
+- Follow all steps from the "Method Selection" section in agent-creation.md
+- Present 5 creation methods to user:
+  1. Quick Start (predefined templates)
+  2. Project-Specific (AI analysis)
+  3. Explore Roles (domain browser)
+  4. Guided Wizard (step-by-step)
+  5. Natural Language (describe in plain English)
+- Execute selected method following protocol
+- Generate `.md` file with complete agent definition
 - Validate agent definition per protocol
 - Offer to activate new agent
 
