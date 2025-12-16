@@ -53,7 +53,9 @@ type BuildTarget = "npm" | "npm-no-clean" | "dev";
  * File mappings for npm distribution.
  * 
  * Maps source files to npm package structure (installed to `~/.kiro/steering/kiro-agents/`).
- * Core system files are always loaded by Kiro IDE.
+ * These are core system files that provide foundational kiro-agents functionality including
+ * instruction aliases, agent management, mode switching, strict mode control, and interaction
+ * patterns. Files are always loaded by Kiro IDE.
  * 
  * **Key exclusion:** `agent-system.md` is NOT included - npm distribution relies on `aliases.md`
  * which contains the agent activation alias. The full `agent-system.md` context is only
@@ -67,6 +69,7 @@ type BuildTarget = "npm" | "npm-no-clean" | "dev";
  * - Mode definitions: kiro-spec-mode.md, kiro-vibe-mode.md
  * 
  * @see NPM_POWER_FILES - Power files copied from powers/kiro-protocols/ during npm build
+ * @see bin/cli.ts - STEERING_FILES constant that installs these files
  */
 const NPM_FILE_MAPPINGS = [
   // Core system files (always loaded)
