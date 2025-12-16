@@ -1,5 +1,51 @@
 # Changelog
 
+## 1.8.0
+
+### Minor Changes
+
+- a006d66: # Multi-method agent creation system
+
+  Redesigned agent creation to support five different creation methods, making agent creation accessible to users of all experience levels. The system now offers Quick Start templates, Project-Specific AI analysis, domain-based role exploration, the existing guided wizard, and natural language descriptions.
+
+  ## Added
+
+  - Quick Start method with 12 predefined agent templates embedded in protocol
+  - Project-Specific method that analyzes workspace files and suggests relevant agents
+  - Explore Roles method with roles organized across 8 domains
+  - Natural Language method allowing users to describe agents in plain English
+  - Method selection menu presenting all 5 creation approaches with guidance
+
+  ## Changed
+
+  - Agent creation protocol restructured from single wizard to multi-method system
+  - Agent management protocol updated to present method selection menu
+  - Existing wizard preserved as Guided Wizard method for full control
+
+- 25aea1d: # Dual installation system for steering files and power dependency
+
+  Implemented dual installation architecture where npm package installs both steering files and kiro-protocols power simultaneously. Users now get single-command installation with discoverable protocols via Kiro Powers UI.
+
+  ## Added
+
+  - Dual installation system in CLI installs steering files and kiro-protocols power simultaneously
+  - Comprehensive documentation of dual installation architecture
+  - Power file copying function in build system
+  - Power files now included in published npm package
+
+  ## Changed
+
+  - CLI installation function accepts flexible source and destination paths
+  - CLI installs to both steering and powers directories
+  - Build system includes power file copying step
+  - GitHub workflow validates test powers not committed
+
+  ## Removed
+
+  - Old build:power script replaced by build:powers for multi-power architecture
+  - Old power build implementation replaced by dedicated build-powers script
+  - Obsolete analysis and planning documents
+
 ## 1.7.1
 
 ### Patch Changes
