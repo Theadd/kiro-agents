@@ -25,21 +25,28 @@ Run when feature is complete:
 /finalize
 ```
 
-AI analyzes snapshots vs final commit, generates changeset, prompts for commit:
+**Two-phase workflow:**
 
-```
-✅ Changeset created successfully! What would you like to do?
+**Phase 1: Analysis**
+- Loads session snapshots
+- Shows git diff (source of truth)
+- Creates changeset template with TODOs
 
-  1. ✅ Commit changeset now
-  2. 📝 Review changeset first
-  3. ❌ Cancel (keep changeset, don't commit)
-```
+**Phase 2: AI Updates Changeset**
+- AI analyzes diff vs snapshots
+- Replaces all TODO placeholders
+- Validates against actual file changes
 
-Then squash commits and push:
+**Phase 3: Commit**
+- Validates changeset (no TODOs, no phantom files)
+- Commits changeset
+- **Automatically squashes all commits into one**
+- Suggests push command
+
+Then push:
 
 ```bash
-git rebase -i main
-git push origin feature/awesome
+git push origin feature/awesome --force-with-lease
 ```
 
 ### `/release` - Publish (Maintainer)
@@ -61,8 +68,8 @@ Consumes changesets, bumps version, updates CHANGELOG, publishes to npm, creates
 git checkout -b feature/simple
 # ... work ...
 /snapshot
-/finalize
-git rebase -i main && git push
+/finalize  # Auto-squashes commits
+git push origin feature/simple --force-with-lease
 ```
 
 **Multi-session (AI filters failed experiments):**
@@ -75,13 +82,14 @@ git rebase -i main && git push
 /snapshot
 # Session 4 (final solution)
 /snapshot
-/finalize  # AI includes only what made it to final commit
+/finalize  # AI includes only what made it to final commit, auto-squashes
+git push origin feature/multi --force-with-lease
 ```
 
 **Collaborative (no merge conflicts):**
 ```bash
-# Dev A: /snapshot → /finalize → push
-# Dev B: /snapshot → /finalize → push
+# Dev A: /snapshot → /finalize → push --force-with-lease
+# Dev B: /snapshot → /finalize → push --force-with-lease
 # Maintainer: merge both → /release
 ```
 
