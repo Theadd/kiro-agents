@@ -308,7 +308,7 @@ async function registerPowerInRegistry(): Promise<void> {
   registry.lastUpdated = new Date().toISOString();
   
   // Save registry
-  await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2), "utf-8");
+  // await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2), "utf-8");
   
   console.log("✅ Registered power in Kiro registry");
 }
