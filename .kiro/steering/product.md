@@ -37,7 +37,7 @@ When working on this codebase, follow these principles:
 - Parameter aliases substitute values from user input
 - Literal response aliases output exact text (for triggering native IDE features)
 - Aliases processed before other instructions
-- Can be defined in any steering document with `inclusion: always` frontmatter
+- Can be defined in any steering document
 
 ### 1. Agent System
 

@@ -70,9 +70,10 @@ kiro-agents/
     ├── agents/                   # Custom agents
     ├── session-snapshots/        # Session snapshots (gitignored)
     ├── hooks/                    # Kiro slash commands
-    │   ├── snapshot.json         # /snapshot command
-    │   ├── finalize.json         # /finalize command
-    │   └── release.json          # /release command
+    │   ├── snapshot.kiro.hook    # /snapshot command
+    │   ├── finalize.kiro.hook    # /finalize command
+    │   ├── release.kiro.hook     # /release command
+    │   └── ts-jsdoc-updater.kiro.hook  # JSDoc updater utility
     └── steering/                 # Workspace steering
         ├── debug.md              # Debug mode (not distributed)
         ├── product.md
