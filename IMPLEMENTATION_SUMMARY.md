@@ -1,5 +1,7 @@
 # Implementation Summary: Multi-Power System
 
+> **Note:** This document describes the original Phase 1 implementation. For the final clean state after removing obsolete systems and test powers, see [PHASE_1_FINAL.md](PHASE_1_FINAL.md).
+
 ## ✅ Completed - Phase 1: Structure Base
 
 ### Created Files

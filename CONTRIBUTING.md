@@ -39,36 +39,37 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 7. **Open a Pull Request** to `main`
 
-## Important: DO NOT Modify power/ Directory
+## Important: DO NOT Modify powers/*/steering/ Directories
 
-**⚠️  The `power/` directory is auto-generated and should NOT be modified in PRs.**
+**⚠️  The `powers/*/steering/` directories are auto-generated and should NOT be modified in PRs.**
 
 ### Why?
 
-- `power/` is the Kiro Power distribution built from `src/`
-- It's regenerated during release to stay in sync with npm package
+- Steering files in `powers/*/steering/` are built from `src/` during release
+- They're regenerated to stay in sync with source protocols
 - Manual changes will be overwritten and cause inconsistencies
 
-### Testing Power Locally
+### Testing Powers Locally
 
-If you need to test Power distribution:
+If you need to test power distribution:
 
 ```bash
-# Generate power/ locally
-bun run build:power
+# Build powers locally
+bun run build:powers
 
 # Install from local directory in Kiro IDE
-# (Use local path in Powers panel)
+# Powers panel → Add Repository → Local Directory
+# Select powers/kiro-protocols/
 
-# DO NOT commit the generated files
-git restore power/
+# DO NOT commit the generated steering files
+git restore powers/*/steering/
 ```
 
 ### CI Protection
 
-- PRs that modify `power/` will **fail CI automatically**
-- Maintainers will regenerate `power/` after merging your PR
-- This ensures npm and Power distributions stay synchronized
+- PRs that modify `powers/*/steering/` will **fail CI automatically**
+- Maintainers will regenerate powers after merging your PR
+- This ensures source and distribution stay synchronized
 
 ## Build Commands
 
@@ -76,8 +77,14 @@ git restore power/
 # Run all tests
 bun run test
 
-# Build Power distribution (for local testing only)
-bun run build:power
+# Build all powers (for local testing only)
+bun run build:powers
+
+# Build specific power
+bun run build:powers kiro-protocols
+
+# Validate powers
+bun run validate:powers
 
 # Build npm distribution
 bun run build
@@ -99,7 +106,11 @@ kiro-agents/
 │   ├── utils/         # Build utilities
 │   └── config.ts      # Base config (reference pattern)
 ├── scripts/           # Build and release scripts
-├── power/             # ⚠️  AUTO-GENERATED - DO NOT EDIT
+├── powers/            # Kiro Powers (steering/ auto-generated)
+│   └── kiro-protocols/
+│       ├── POWER.md   # Committed
+│       ├── icon.png   # Committed
+│       └── steering/  # ⚠️  AUTO-GENERATED - DO NOT EDIT
 ├── build/             # Temporary artifacts (gitignored)
 └── docs/              # Documentation
 ```

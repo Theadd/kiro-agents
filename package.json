@@ -16,11 +16,11 @@
   },
   "files": [
     "build/npm/bin",
-    "build/npm/dist"
+    "build/npm/dist",
+    "build/npm/power"
   ],
   "scripts": {
     "build": "bun run scripts/build.ts npm",
-    "build:power": "bun run scripts/build.ts power",
     "build:powers": "bun run scripts/build-powers.ts",
     "validate:powers": "bun run scripts/validate-powers.ts",
     "dev": "bun run scripts/build.ts dev",
