@@ -122,6 +122,9 @@ npx kiro-agents  # or bunx kiro-agents
 - **Dual installation**: Installs both steering files AND kiro-protocols power
 - Steering files → `~/.kiro/steering/kiro-agents/`
 - Power dependency → `~/.kiro/powers/kiro-protocols/`
+- Symbolic links → `~/.kiro/powers/installed/kiro-protocols/`
+- Automatic power registration in `~/.kiro/powers/registry.json`
+- Power appears immediately as "installed" in Kiro Powers UI
 - Removes old installations before installing new
 - Sets files to read-only after installation
 - Cross-platform (Windows, macOS, Linux)
@@ -131,12 +134,14 @@ npx kiro-agents  # or bunx kiro-agents
 1. Build powers: `bun run build:powers` (processes protocols to `powers/kiro-protocols/`)
 2. Build npm: `bun run build` (compiles CLI, processes steering, copies power files)
 3. CLI installs both steering and power during `npx kiro-agents`
+4. CLI creates symbolic links and registers power automatically
 
 **Why Dual Installation**:
 - Protocols discoverable in Kiro Powers UI
 - Stable reference paths for protocol files
 - Reusable protocols across projects
 - Better Kiro ecosystem integration
+- Automatic registration for seamless user experience
 
 ### Kiro Power (Alternative)
 

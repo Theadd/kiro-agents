@@ -14,6 +14,7 @@ This document describes the implementation of automatic power registration in th
 
 **After this implementation:**
 - ✅ CLI copies power files to `~/.kiro/powers/kiro-protocols/`
+- ✅ CLI creates symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
 - ✅ CLI registers power in `~/.kiro/powers/registry.json`
 - ✅ Power appears immediately in Kiro Powers UI with "Installed" badge
 - ✅ Seamless user experience (one command, everything works)
@@ -22,7 +23,7 @@ This document describes the implementation of automatic power registration in th
 
 ### 1. Registry Structure
 
-The implementation adds entries to Kiro's `registry.json` file:
+The implementation adds entries to Kiro's `registry.json` file following the exact pattern used by Kiro IDE:
 
 ```json
 {
@@ -37,18 +38,18 @@ The implementation adds entries to Kiro's `registry.json` file:
       "keywords": ["protocols", "workflows", ...],
       "installed": true,
       "installedAt": "2025-12-16T...",
-      "installPath": "C:\\Users\\...\\kiro-protocols",
+      "installPath": "C:\\Users\\...\\installed\\kiro-protocols",
       "source": {
-        "type": "local",
-        "repoId": "npx-kiro-agents-1734336000000",
-        "repoName": "npx kiro-agents"
+        "type": "repo",
+        "repoId": "local-kiro-protocols",
+        "repoName": "C:\\Users\\...\\kiro-protocols"
       },
       "sourcePath": "C:\\Users\\...\\kiro-protocols"
     }
   },
   "repoSources": {
-    "npx-kiro-agents-1734336000000": {
-      "name": "npx kiro-agents",
+    "local-kiro-protocols": {
+      "name": "C:\\Users\\...\\kiro-protocols",
       "type": "local",
       "enabled": true,
       "addedAt": "2025-12-16T...",
@@ -60,6 +61,13 @@ The implementation adds entries to Kiro's `registry.json` file:
   "lastUpdated": "2025-12-16T..."
 }
 ```
+
+**Key differences from initial implementation:**
+- `installPath` points to `installed/kiro-protocols` (with symlinks)
+- `sourcePath` points to actual `kiro-protocols` directory
+- `source.type` is `"repo"` (not `"local"`)
+- `source.repoId` is stable `"local-kiro-protocols"` (no timestamp)
+- `source.repoName` contains full path to power directory
 
 ### 2. New Functions in `bin/cli.ts`
 
@@ -83,13 +91,33 @@ const metadata = await extractPowerMetadata('/path/to/POWER.md');
 // }
 ```
 
+#### `createSymbolicLinks(): Promise<void>`
+
+Creates symbolic links in `installed/` directory:
+1. Removes existing `installed/kiro-protocols/` if present
+2. Creates new `installed/kiro-protocols/` directory
+3. Reads all entries from `kiro-protocols/` directory
+4. Creates symbolic links for each file and directory
+
+**Platform-specific behavior:**
+- Windows: Uses `junction` for directories, `symlink` for files
+- Unix: Uses `symlink` for both files and directories
+
+**Example:**
+```typescript
+await createSymbolicLinks();
+// Creates:
+// ~/.kiro/powers/installed/kiro-protocols/POWER.md -> ../../kiro-protocols/POWER.md
+// ~/.kiro/powers/installed/kiro-protocols/steering/ -> ../../kiro-protocols/steering/
+```
+
 #### `registerPowerInRegistry(): Promise<void>`
 
-Registers the power in Kiro's registry:
+Registers the power in Kiro's registry following the exact pattern used by Kiro IDE:
 1. Reads existing registry or creates new one
 2. Extracts metadata from POWER.md
-3. Creates unique repo source ID with timestamp
-4. Adds/updates power entry with installation info
+3. Uses stable repo ID `"local-kiro-protocols"` (no timestamp)
+4. Adds/updates power entry with correct paths
 5. Adds/updates repo source entry
 6. Updates lastUpdated timestamp
 7. Saves registry back to disk
@@ -98,27 +126,34 @@ Registers the power in Kiro's registry:
 - ✅ Creates registry if it doesn't exist
 - ✅ Updates existing entries if power already registered
 - ✅ Handles JSON parsing errors gracefully
-- ✅ Uses timestamp-based unique IDs to avoid conflicts
+- ✅ Uses stable repo ID (no timestamp conflicts)
+- ✅ Follows Kiro's exact registry pattern
 
 ### 3. Updated Installation Flow
 
-The `install()` function now includes registry registration:
+The `install()` function now includes symbolic link creation and registry registration:
 
 ```typescript
 async function install(): Promise<void> {
   // 1. Install steering files
   // 2. Install power files
   
-  // 3. Register power in registry (NEW)
+  // 3. Create symbolic links (NEW)
+  try {
+    await createSymbolicLinks();
+  } catch (error) {
+    console.warn("⚠️  Warning: Could not create symbolic links...");
+  }
+  
+  // 4. Register power in registry (NEW)
   try {
     await registerPowerInRegistry();
   } catch (error) {
-    // Show warning but continue (files are still installed)
     console.warn("⚠️  Warning: Could not register power...");
     console.warn("   You can manually add via Powers panel");
   }
   
-  // 4. Show success message
+  // 5. Show success message
 }
 ```
 
