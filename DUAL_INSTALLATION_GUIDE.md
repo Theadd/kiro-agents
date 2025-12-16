@@ -125,12 +125,34 @@ When user runs `npx kiro-agents`:
    - Write to `~/.kiro/powers/kiro-protocols/`
    - Set read-only permissions
 
-4. **Success message**
+4. **Register power in Kiro registry**
+   - Read/create `~/.kiro/powers/registry.json`
+   - Extract metadata from POWER.md frontmatter
+   - Add/update power entry with installation info
+   - Add/update repo source entry
+   - Save updated registry
+   - Power now appears as "installed" in Kiro Powers UI
+   - **Graceful failure**: If registration fails, power files are still installed and user receives manual activation instructions
+
+5. **Success message**
    ```
    ✨ Installation completed successfully!
    
    📁 Steering files: ~/.kiro/steering/kiro-agents/
    📁 Power files: ~/.kiro/powers/kiro-protocols/
+   
+   💡 The kiro-protocols power should now appear as installed in Kiro Powers UI.
+   💡 Files are set to read-only. To modify them, change permissions first.
+   
+   🔄 To update, simply run 'npx kiro-agents' again.
+   ```
+   
+   **If registry registration fails:**
+   ```
+   ⚠️  Warning: Could not register power in registry: [error message]
+      The power files are installed but may not appear in Kiro Powers UI.
+      You can manually add the power via: Powers panel → Add Repository → Local Directory
+      Path: ~/.kiro/powers/kiro-protocols/
    ```
 
 ## Package Structure
@@ -173,14 +195,38 @@ From the user's perspective:
 2. **Get everything**:
    - Core steering files for agent system
    - kiro-protocols power with reusable protocols
-3. **Update easily**: Run `npx kiro-agents` again
-4. **Discover protocols**: Via Kiro Powers UI
+   - **Automatic power registration** (appears in Powers UI immediately)
+3. **No manual steps**: Power is automatically registered and ready to use
+4. **Update easily**: Run `npx kiro-agents` again
+5. **Discover protocols**: Via Kiro Powers UI
+
+### Automatic Registry Registration
+
+The CLI automatically registers the kiro-protocols power in `~/.kiro/powers/registry.json`:
+
+**What gets registered:**
+- Power metadata (name, displayName, description, keywords, author)
+- Installation info (installed: true, installedAt, installPath)
+- Source info (type: "local", repoName: "npx kiro-agents")
+
+**Benefits:**
+- ✅ Power appears immediately in Kiro Powers UI
+- ✅ No manual "Add Repository" or "Install" steps needed
+- ✅ Seamless integration with Kiro's power management
+- ✅ Automatic discovery on Kiro IDE startup
+
+**Fallback behavior:**
+If registry registration fails (rare), the CLI:
+- ⚠️ Shows warning message
+- ✅ Files are still installed correctly
+- 💡 Provides manual activation instructions
 
 ## Benefits
 
 ### For Users
 - ✅ Single command installs everything
-- ✅ No manual power installation needed
+- ✅ **Automatic power registration** - No manual activation needed
+- ✅ Power appears immediately in Kiro Powers UI
 - ✅ Protocols discoverable in Powers UI
 - ✅ Easy updates (just run npx again)
 
@@ -198,7 +244,7 @@ From the user's perspective:
 
 ## Testing
 
-To test the dual installation:
+To test the dual installation with automatic registration:
 
 ```bash
 # Step 1: Build kiro-protocols power
@@ -214,13 +260,18 @@ bun run test
 bun link
 kiro-agents
 
-# Step 5: Verify installations
+# Step 5: Verify file installations
 ls ~/.kiro/steering/kiro-agents/
 ls ~/.kiro/powers/kiro-protocols/
 
-# Step 6: Check in Kiro IDE
+# Step 6: Verify registry registration
+cat ~/.kiro/powers/registry.json | grep -A 10 "kiro-protocols"
+# Should show: "installed": true, "installedAt": "...", etc.
+
+# Step 7: Check in Kiro IDE
 # - Open Powers panel
-# - Should see "kiro-protocols" power installed
+# - Should see "kiro-protocols" power with green "Installed" badge
+# - No manual activation required
 # - Can read protocol files via Powers UI
 ```
 
