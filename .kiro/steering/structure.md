@@ -40,6 +40,7 @@ kiro-agents/
 ├── scripts/                      # Build scripts
 │   ├── build.ts                  # npm package build pipeline
 │   ├── build-powers.ts           # Multi-power build system
+│   ├── dev-powers.ts             # Dev mode for powers (watch)
 │   ├── validate-powers.ts        # Power validation
 │   ├── test.ts                   # Validation script
 │   ├── clean.ts                  # Clean script
@@ -106,6 +107,13 @@ kiro-agents/
 - Creates kiro-protocols power
 - Must run BEFORE npm build
 
+**Power Dev Pipeline** (`scripts/dev-powers.ts`):
+- Builds directly to `~/.kiro/powers/kiro-protocols/` for rapid iteration
+- Watch mode for protocol file changes in `src/`
+- Handles readonly files automatically (writable during build, readonly after)
+- Fast iteration for protocol development and testing
+- Uses same substitution system as production builds
+
 **npm Build Pipeline** (`scripts/build.ts`):
 - Two build targets: `npm`, `dev`
 - Compiles CLI to JavaScript (npm only)
@@ -146,16 +154,38 @@ kiro-agents/
 - No CLI compilation needed
 - Fast iteration cycle
 
+**Dev:Powers Mode** (`~/.kiro/powers/kiro-protocols/`):
+- Direct build to user's power directory
+- Watch mode for protocol development
+- Handles readonly files automatically
+- Fast iteration for protocol changes
+
 ## File Mapping
 
-### Powers Build
+### Powers Build (via `build-powers.ts`)
 
 ```
+src/core/protocols/strict-mode.md      → powers/kiro-protocols/steering/strict-mode.md
 src/core/protocols/agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
 src/core/protocols/agent-management.md → powers/kiro-protocols/steering/agent-management.md
 src/core/protocols/agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
 src/kiro/steering/protocols/mode-switching.md  → powers/kiro-protocols/steering/mode-switching.md
 src/kiro/steering/protocols/mode-management.md → powers/kiro-protocols/steering/mode-management.md
+```
+
+### Dev:Powers Build (via `dev-powers.ts`)
+
+```
+# Dev mode builds directly to user's Kiro directory for rapid iteration
+src/core/protocols/strict-mode.md      → ~/.kiro/powers/kiro-protocols/steering/strict-mode.md
+src/core/protocols/agent-activation.md → ~/.kiro/powers/kiro-protocols/steering/agent-activation.md
+src/core/protocols/agent-management.md → ~/.kiro/powers/kiro-protocols/steering/agent-management.md
+src/core/protocols/agent-creation.md   → ~/.kiro/powers/kiro-protocols/steering/agent-creation.md
+src/kiro/steering/protocols/mode-switching.md  → ~/.kiro/powers/kiro-protocols/steering/mode-switching.md
+src/kiro/steering/protocols/mode-management.md → ~/.kiro/powers/kiro-protocols/steering/mode-management.md
+
+# Note: Same substitutions as production, different destination for testing
+# Handles readonly files: writable during build, readonly after
 ```
 
 ### npm Build
@@ -165,7 +195,6 @@ src/kiro/steering/protocols/mode-management.md → powers/kiro-protocols/steerin
 src/core/aliases.md                → build/npm/dist/aliases.md
 src/core/agents.md                 → build/npm/dist/agents.md
 src/kiro/steering/modes.md         → build/npm/dist/modes.md
-src/core/strict-mode.md            → build/npm/dist/strict-mode.md
 src/core/strict.md                 → build/npm/dist/strict.md
 
 # Power files (copied from powers/)
@@ -173,6 +202,7 @@ powers/kiro-protocols/POWER.md     → build/npm/power/POWER.md
 powers/kiro-protocols/mcp.json     → build/npm/power/mcp.json
 powers/kiro-protocols/icon.png     → build/npm/power/icon.png
 powers/kiro-protocols/steering/*   → build/npm/power/steering/*
+src/core/protocols/strict-mode.md  → build/npm/dist/protocols/strict-mode.md
 src/core/protocols/agent-activation.md → build/npm/dist/protocols/agent-activation.md
 src/core/protocols/agent-management.md → build/npm/dist/protocols/agent-management.md
 src/core/protocols/agent-creation.md   → build/npm/dist/protocols/agent-creation.md
@@ -182,18 +212,6 @@ src/core/interactions/chit-chat.md → build/npm/dist/interactions/chit-chat.md
 src/core/.../interaction-styles.md → build/npm/dist/interactions/interaction-styles.md
 src/kiro/.../kiro-spec-mode.md     → build/npm/dist/modes/kiro-spec-mode.md
 src/kiro/.../kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
-```
-
-### Powers Build (via `build-powers.ts`)
-
-```
-src/core/protocols/agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
-src/core/protocols/agent-management.md → powers/kiro-protocols/steering/agent-management.md
-src/core/protocols/agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
-src/kiro/steering/protocols/mode-switching.md  → powers/kiro-protocols/steering/mode-switching.md
-src/kiro/steering/protocols/mode-management.md → powers/kiro-protocols/steering/mode-management.md
-
-# Note: POWER.md, mcp.json, icon.png are committed and not generated
 ```
 
 ## Conventions

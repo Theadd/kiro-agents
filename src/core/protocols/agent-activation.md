@@ -17,7 +17,8 @@ This file contains:
 - Examples and best practices
 - Integration requirements
 
-**Also load `strict-mode.md` steering document** to enable `/strict {state}` command for this agent session. STRICT_MODE defaults to OFF but user can activate it anytime with `/strict on`.
+This enables `/strict {state}` command for this agent session. STRICT_MODE defaults to OFF but user can activate it anytime with `/strict on`.
+/protocols strict-mode.md
 
 ### Step 2: Assume Agent Role
 

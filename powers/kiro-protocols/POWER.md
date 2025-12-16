@@ -28,6 +28,14 @@ Protocols are detailed, step-by-step instruction documents that guide AI through
 
 This power provides the following protocols as steering files:
 
+### Core Protocols
+
+- **strict-mode** - Precision mode for experimental/cutting-edge development
+  - Blocks execution on ambiguous input
+  - Mandatory clarification before proceeding
+  - Prevents assumption propagation
+  - Opt-in via `/strict on` command
+
 ### Agent System Protocols
 
 - **agent-activation** - Protocol for activating and assuming agent roles

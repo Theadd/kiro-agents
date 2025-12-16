@@ -75,8 +75,11 @@ bun run build:powers
 # Build npm package (compiles CLI, processes files, cleans after)
 bun run build
 
-# Dev mode (watch, builds to user directory)
+# Dev mode (watch, builds steering to user directory)
 bun run dev
+
+# Dev mode for powers (watch, builds to ~/.kiro/powers/kiro-protocols/)
+bun run dev:powers
 
 # Validate build
 bun run test
@@ -222,12 +225,25 @@ export const substitutions = {
 
 ## Development Workflow
 
-1. **Make changes** to source files in `src/`
+### Steering Files Development
+
+1. **Make changes** to source files in `src/core/` or `src/kiro/steering/`
 2. **Run dev mode** with `bun run dev` (watch mode)
 3. **Test locally** - Files in `~/.kiro/steering/kiro-agents/`
 4. **Build for distribution**:
    - Powers: `bun run build:powers` (first)
    - npm: `bun run build` (after powers)
+5. **Validate** with `bun run test`
+6. **Publish** when ready
+
+### Protocol Files Development
+
+1. **Make changes** to protocol files in `src/core/protocols/` or `src/kiro/steering/protocols/`
+2. **Run dev:powers mode** with `bun run dev:powers` (watch mode)
+3. **Test locally** - Files in `~/.kiro/powers/kiro-protocols/steering/`
+4. **Build for distribution**:
+   - Powers: `bun run build:powers` (regenerates `powers/kiro-protocols/steering/`)
+   - npm: `bun run build` (includes power files)
 5. **Validate** with `bun run test`
 6. **Publish** when ready
 
@@ -284,14 +300,35 @@ export const substitutions = {
 
 ## Dev Mode Benefits
 
+### dev (Steering Files)
+
 **Fast Iteration**:
 - No CLI compilation needed
-- Direct build to user directory
+- Direct build to user directory (`~/.kiro/steering/kiro-agents/`)
 - Watch mode for automatic rebuilds
 - Immediate testing in Kiro IDE
 
 **Use Cases**:
-- Developing new features
-- Testing steering file changes
+- Developing new steering files
+- Testing aliases and interactive interfaces
 - Debugging substitutions
 - Rapid prototyping
+
+### dev:powers (Protocol Files)
+
+**Fast Iteration**:
+- Direct build to power directory (`~/.kiro/powers/kiro-protocols/`)
+- Watch mode for automatic rebuilds
+- Handles readonly files automatically
+- Immediate testing in Kiro IDE
+
+**Readonly Handling**:
+- Detects readonly files in target directory
+- Temporarily makes them writable for build
+- Restores readonly status after build
+
+**Use Cases**:
+- Developing protocol files
+- Testing protocol changes
+- Debugging protocol substitutions
+- Rapid protocol iteration

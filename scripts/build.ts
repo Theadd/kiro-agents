@@ -62,8 +62,8 @@ type BuildTarget = "npm" | "npm-no-clean" | "dev";
  * included in Power distribution for better Kiro ecosystem integration.
  * 
  * **File categories:**
- * - Core system files (always loaded): aliases.md, strict-mode.md
- * - Protocol files (auxiliary): agent-activation.md, agent-management.md, agent-creation.md, mode-switching.md, mode-management.md
+ * - Core system files (always loaded): aliases.md
+ * - Protocol files (auxiliary): strict-mode.md, agent-activation.md, agent-management.md, agent-creation.md, mode-switching.md, mode-management.md
  * - Interactive interfaces (manual): agents.md, modes.md, strict.md
  * - Interaction patterns: chit-chat.md, interaction-styles.md
  * - Mode definitions: kiro-spec-mode.md, kiro-vibe-mode.md
@@ -74,9 +74,9 @@ type BuildTarget = "npm" | "npm-no-clean" | "dev";
 const NPM_FILE_MAPPINGS = [
   // Core system files (always loaded)
   { src: "src/core/aliases.md", dest: "build/npm/dist/aliases.md" },
-  { src: "src/core/strict-mode.md", dest: "build/npm/dist/strict-mode.md" },
   
   // Protocol files (auxiliary, not in steering list)
+  { src: "src/core/protocols/strict-mode.md", dest: "build/npm/dist/protocols/strict-mode.md" },
   { src: "src/core/protocols/agent-activation.md", dest: "build/npm/dist/protocols/agent-activation.md" },
   { src: "src/core/protocols/agent-management.md", dest: "build/npm/dist/protocols/agent-management.md" },
   { src: "src/core/protocols/agent-creation.md", dest: "build/npm/dist/protocols/agent-creation.md" },
@@ -108,6 +108,14 @@ const NPM_FILE_MAPPINGS = [
  * **Source:** Pre-built kiro-protocols power from multi-power system
  * **Destination:** npm package for dual installation (steering + power)
  * 
+ * **Protocol Files:**
+ * - `strict-mode` - Precision mode that blocks execution on ambiguous input
+ * - `agent-activation` - Agent activation workflow
+ * - `agent-creation` - Agent creation wizard with multiple methods
+ * - `agent-management` - Interactive agent management interface
+ * - `mode-management` - Interactive mode management interface
+ * - `mode-switching` - Mode switching workflow
+ * 
  * @see bin/cli.ts - CLI that installs these files and registers power in registry.json
  * @see powers/kiro-protocols/ - Source power directory
  */
@@ -115,6 +123,7 @@ const NPM_POWER_FILES = [
   { src: "powers/kiro-protocols/POWER.md", dest: "build/npm/power/POWER.md" },
   { src: "powers/kiro-protocols/mcp.json", dest: "build/npm/power/mcp.json" },
   { src: "powers/kiro-protocols/icon.png", dest: "build/npm/power/icon.png" },
+  { src: "powers/kiro-protocols/steering/strict-mode.md", dest: "build/npm/power/steering/strict-mode.md" },
   { src: "powers/kiro-protocols/steering/agent-activation.md", dest: "build/npm/power/steering/agent-activation.md" },
   { src: "powers/kiro-protocols/steering/agent-creation.md", dest: "build/npm/power/steering/agent-creation.md" },
   { src: "powers/kiro-protocols/steering/agent-management.md", dest: "build/npm/power/steering/agent-management.md" },

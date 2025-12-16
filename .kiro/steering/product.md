@@ -79,7 +79,7 @@ When working on this codebase, follow these principles:
 **Purpose**: Precision mode that blocks execution on ambiguous input
 
 **Implementation**:
-- Defined in `src/core/strict-mode.md`
+- Defined in `src/core/protocols/strict-mode.md`
 - Controlled via `/strict {state}` command
 - Interactive control via `/strict` command
 - Loaded automatically when agents/modes activate
