@@ -122,6 +122,8 @@ kiro-agents/
 **CLI Tool** (`bin/cli.ts`):
 - Dual installation to steering + power directories
 - Installs to `~/.kiro/steering/kiro-agents/` and `~/.kiro/powers/kiro-protocols/`
+- Creates symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
+- Automatic power registration in `~/.kiro/powers/registry.json`
 - Removes old installations before installing new
 - Manages file permissions
 - Cross-platform compatible

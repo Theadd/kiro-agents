@@ -125,26 +125,42 @@ When user runs `npx kiro-agents`:
    - Write to `~/.kiro/powers/kiro-protocols/`
    - Set read-only permissions
 
-4. **Register power in Kiro registry**
+4. **Create symbolic links**
+   - Remove existing `~/.kiro/powers/installed/kiro-protocols/`
+   - Create new `installed/kiro-protocols/` directory
+   - Create symbolic links for each file and directory
+   - Windows: Uses junction for directories, symlink for files
+   - Unix: Uses symlink for both
+   - **Graceful failure**: If symlink creation fails, shows warning but continues
+
+5. **Register power in Kiro registry**
    - Read/create `~/.kiro/powers/registry.json`
    - Extract metadata from POWER.md frontmatter
-   - Add/update power entry with installation info
+   - Use stable repo ID `"local-kiro-protocols"` (no timestamp)
+   - Add/update power entry with correct paths
    - Add/update repo source entry
    - Save updated registry
    - Power now appears as "installed" in Kiro Powers UI
    - **Graceful failure**: If registration fails, power files are still installed and user receives manual activation instructions
 
-5. **Success message**
+6. **Success message**
    ```
    ✨ Installation completed successfully!
    
    📁 Steering files: ~/.kiro/steering/kiro-agents/
    📁 Power files: ~/.kiro/powers/kiro-protocols/
+   📁 Installed links: ~/.kiro/powers/installed/kiro-protocols/
    
    💡 The kiro-protocols power should now appear as installed in Kiro Powers UI.
    💡 Files are set to read-only. To modify them, change permissions first.
    
    🔄 To update, simply run 'npx kiro-agents' again.
+   ```
+   
+   **If symlink creation fails:**
+   ```
+   ⚠️  Warning: Could not create symbolic links: [error message]
+      Power may not appear correctly in Kiro Powers UI.
    ```
    
    **If registry registration fails:**
