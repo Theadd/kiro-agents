@@ -5,15 +5,17 @@
  * Dual-installation system that installs both steering documents and kiro-protocols power
  * to user's home directory. Removes old installations before installing new versions.
  * 
+ * **IMPORTANT:** Registry registration is currently DISABLED. Power files are installed
+ * but users must manually activate via Kiro Powers UI.
+ * 
  * Installation targets:
  * - Steering: ~/.kiro/steering/kiro-agents/ (core system files)
  * - Power: ~/.kiro/powers/kiro-protocols/ (protocol library power)
- * - Registry: ~/.kiro/powers/registry.json (power registration for UI integration)
+ * - ~~Registry: ~/.kiro/powers/registry.json~~ (DISABLED - manual activation required)
  * 
- * The CLI registers the kiro-protocols power in Kiro's registry.json so it appears
- * as installed in the Powers UI without requiring manual activation. If registration
- * fails, the power files are still installed and users receive instructions for manual
- * activation via the Powers panel.
+ * The CLI installs power files to ~/.kiro/powers/kiro-protocols/ but does NOT register
+ * them in registry.json. Users must manually add the power via:
+ * Powers panel → Add Repository → Local Directory → Select power path
  * 
  * @example
  * ```bash
@@ -22,6 +24,12 @@
  * 
  * # Install via bunx
  * bunx kiro-agents
+ * 
+ * # Then manually activate power in Kiro IDE:
+ * # 1. Open Powers panel
+ * # 2. Add Repository → Local Directory
+ * # 3. Select: ~/.kiro/powers/kiro-protocols/
+ * # 4. Install the power
  * ```
  */
 import { join, dirname } from "path";
@@ -225,25 +233,28 @@ async function extractPowerMetadata(powerMdPath: string): Promise<PowerMetadata>
 /**
  * Registers the kiro-protocols power in Kiro's registry.json.
  * 
+ * **IMPORTANT:** Registry write operation is currently DISABLED (commented out).
+ * This function prepares the registry data but does NOT save it to disk.
+ * 
  * Process:
  * 1. Ensures registry directory exists (~/.kiro/powers/)
  * 2. Reads existing registry or creates new one
  * 3. Extracts power metadata from POWER.md frontmatter
  * 4. Creates/updates power entry with installation info
  * 5. Creates/updates local repo source entry
- * 6. Saves updated registry with timestamp
+ * 6. ~~Saves updated registry with timestamp~~ (DISABLED - write operation commented out)
  * 
- * This makes the power appear as "installed" in Kiro's Powers UI
- * without requiring manual activation. The power is registered as
- * a local source with type "npx kiro-agents" for tracking.
+ * When enabled, this would make the power appear as "installed" in Kiro's Powers UI
+ * without requiring manual activation. The power would be registered as a local source
+ * with type "npx kiro-agents" for tracking.
  * 
  * @throws {Error} If POWER.md is missing or has invalid frontmatter
  * 
  * @example
  * ```typescript
  * await registerPowerInRegistry();
- * // Power now appears as installed in Kiro UI
- * // Registry updated with power entry and repo source
+ * // Registry data prepared but NOT saved (write operation disabled)
+ * // User must manually activate power via Powers panel
  * ```
  */
 async function registerPowerInRegistry(): Promise<void> {
@@ -307,10 +318,10 @@ async function registerPowerInRegistry(): Promise<void> {
   // Update lastUpdated timestamp
   registry.lastUpdated = new Date().toISOString();
   
-  // Save registry
+  // Save registry (DISABLED - write operation commented out)
   // await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2), "utf-8");
   
-  console.log("✅ Registered power in Kiro registry");
+  console.log("ℹ️  Registry data prepared (write disabled - manual activation required)");
 }
 
 /**
@@ -365,14 +376,17 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
 }
 
 /**
- * Main installation function that performs dual installation with registry registration.
+ * Main installation function that performs dual installation.
+ * 
+ * **IMPORTANT:** Registry registration is currently DISABLED. Power files are installed
+ * but users must manually activate the power via Kiro Powers UI.
  * 
  * Installation process:
  * 1. Removes existing steering installation if present
  * 2. Installs steering files to ~/.kiro/steering/kiro-agents/
  * 3. Removes existing power installation if present
  * 4. Installs power files to ~/.kiro/powers/kiro-protocols/
- * 5. Registers kiro-protocols in ~/.kiro/powers/registry.json (appears as installed in Powers UI)
+ * 5. ~~Registers kiro-protocols in ~/.kiro/powers/registry.json~~ (DISABLED)
  * 6. Sets all files to read-only
  * 
  * Steering files include:
@@ -384,19 +398,18 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
  * - Power metadata (POWER.md, mcp.json, icon.png)
  * - Protocol files (agent-activation.md, agent-creation.md, etc.)
  * 
- * Registry registration ensures:
- * - Power appears in Kiro Powers UI without manual activation
- * - Seamless integration with Kiro's power management system
- * - Automatic discovery by Kiro IDE on startup
- * - Gracefully handles registration failures with fallback instructions
+ * **Manual activation required:**
+ * - Power files installed to ~/.kiro/powers/kiro-protocols/
+ * - User must add via: Powers panel → Add Repository → Local Directory
+ * - Path: ~/.kiro/powers/kiro-protocols/
  * 
  * @throws {Error} If installation fails (caught by main execution handler)
  * 
  * @example
  * ```typescript
  * await install();
- * // Both steering and power installed, registry updated
- * // If registry registration fails, user gets manual installation instructions
+ * // Both steering and power files installed
+ * // User must manually activate power via Powers UI
  * ```
  */
 async function install(): Promise<void> {
@@ -426,8 +439,8 @@ async function install(): Promise<void> {
     await installFile(file, POWER_INSTALL_DIR, "power");
   }
   
-  // Register power in Kiro registry
-  console.log("\n📝 Registering power in Kiro registry...");
+  // Register power in Kiro registry (DISABLED)
+  console.log("\n📝 Registry registration (currently disabled)...");
   try {
     await registerPowerInRegistry();
   } catch (error) {
@@ -440,8 +453,12 @@ async function install(): Promise<void> {
   console.log("\n✨ Installation completed successfully!");
   console.log(`\n📁 Steering files: ${STEERING_INSTALL_DIR}`);
   console.log(`📁 Power files: ${POWER_INSTALL_DIR}`);
-  console.log("\n💡 The kiro-protocols power should now appear as installed in Kiro Powers UI.");
-  console.log("💡 Files are set to read-only. To modify them, change permissions first.");
+  console.log("\n💡 To activate the kiro-protocols power:");
+  console.log("   1. Open Kiro IDE Powers panel");
+  console.log("   2. Add Repository → Local Directory");
+  console.log(`   3. Select: ${POWER_INSTALL_DIR}`);
+  console.log("   4. Install the power");
+  console.log("\n💡 Files are set to read-only. To modify them, change permissions first.");
   console.log("\n🔄 To update, simply run 'npx kiro-agents' again.");
 }
 
