@@ -23,7 +23,7 @@
 - File mapping and transformation
 - Three build modes: npm, power, dev
 
-**Build Modes**:
+**Build Targets**:
 
 1. **npm** (`bun run build`)
    - Compiles CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
@@ -32,17 +32,19 @@
    - Maps to `build/npm/dist/` and `build/npm/power/`
    - Cleans `build/npm/` after build
 
-2. **powers** (`bun run build:powers`)
-   - Processes protocol files with substitutions
-   - Builds standalone powers to `powers/` directory
-   - Creates kiro-protocols power with protocols
-   - Must run BEFORE npm build
-
-3. **dev** (`bun run dev`)
+2. **dev** (`bun run dev`)
    - Builds directly to `~/.kiro/steering/kiro-agents/`
    - Watch mode for file changes
    - No CLI compilation
    - Fast iteration cycle
+
+**Powers Build** (separate script):
+
+- **powers** (`bun run build:powers`)
+  - Processes protocol files with substitutions
+  - Builds to `powers/*/steering/` directories
+  - Creates kiro-protocols power with protocols
+  - Must run BEFORE npm build
 
 ## Distribution
 
@@ -57,11 +59,12 @@
 - Cross-platform CLI tool
 - Removes old installation before installing new
 
-**Kiro Power** - Workspace distribution
-- Installed via Kiro IDE Powers panel
-- Source: GitHub repository
-- Installs to: `.kiro/powers/kiro-agents/`
-- Auto-updates from GitHub
+**Powers System** - Multi-power architecture
+- Built via `bun run build:powers` script
+- Source protocols in `src/core/protocols/` and `src/kiro/steering/protocols/`
+- Output to `powers/*/steering/` directories (auto-generated)
+- Copied to npm package during build
+- Installed by CLI to `~/.kiro/powers/kiro-protocols/`
 
 ## Build Commands
 
@@ -223,8 +226,8 @@ export const substitutions = {
 2. **Run dev mode** with `bun run dev` (watch mode)
 3. **Test locally** - Files in `~/.kiro/steering/kiro-agents/`
 4. **Build for distribution**:
-   - npm: `bun run build`
-   - Power: `bun run build:power`
+   - Powers: `bun run build:powers` (first)
+   - npm: `bun run build` (after powers)
 5. **Validate** with `bun run test`
 6. **Publish** when ready
 
@@ -254,13 +257,13 @@ export const substitutions = {
 5. Publish with `npm publish`
 6. Verify with `npx kiro-agents`
 
-### Power Distribution
+### Powers Distribution
 
-1. Run `bun run build:power`
+1. Run `bun run build:powers` to regenerate `powers/*/steering/`
 2. Run `bun run test` to validate
-3. Commit `power/` directory to GitHub
+3. Commit regenerated steering files to GitHub
 4. Push to repository
-5. Users install via Kiro IDE Powers panel
+5. npm package includes pre-built power files
 
 ## Cross-Platform Considerations
 

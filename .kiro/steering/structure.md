@@ -53,20 +53,13 @@ kiro-agents/
 │       ├── bin/cli.js            # Compiled CLI
 │       ├── dist/                 # Processed steering files
 │       └── power/                # Copied power files
-├── powers/                       # Standalone powers (in GitHub)
+├── powers/                       # Multi-power system (in GitHub)
 │   ├── kiro-protocols/           # Reusable protocol library
-│   │   ├── POWER.md              # Power metadata
-│   │   ├── mcp.json              # MCP config
-│   │   ├── icon.png              # Power icon
-│   │   └── steering/             # Protocol files (auto-generated)
+│   │   ├── POWER.md              # Power metadata (committed)
+│   │   ├── mcp.json              # MCP config (committed)
+│   │   ├── icon.png              # Power icon (committed)
+│   │   └── steering/             # Protocol files (auto-generated, not committed)
 │   └── README.md                 # Powers documentation
-│       ├── bin/cli.js            # Compiled CLI
-│       └── dist/                 # Processed steering files
-├── power/                        # Power distribution (in GitHub)
-│   ├── POWER.md                  # Power metadata
-│   ├── mcp.json                  # MCP config
-│   └── steering/                 # Organized steering files
-│       └── protocols/            # Protocol files (.md, not in UI)
 ├── docs/                         # Documentation
 │   └── VERSIONING.md             # Versioning system guide
 ├── .changeset/                   # Changesets
@@ -81,6 +74,7 @@ kiro-agents/
     │   ├── finalize.json         # /finalize command
     │   └── release.json          # /release command
     └── steering/                 # Workspace steering
+        ├── debug.md              # Debug mode (not distributed)
         ├── product.md
         ├── structure.md
         └── tech.md
@@ -112,11 +106,11 @@ kiro-agents/
 - Must run BEFORE npm build
 
 **npm Build Pipeline** (`scripts/build.ts`):
-- Two build modes: `npm`, `dev`
+- Two build targets: `npm`, `dev`
 - Compiles CLI to JavaScript (npm only)
 - Loads configuration with substitutions
 - Processes markdown files
-- Copies pre-built power files
+- Copies pre-built power files from `powers/kiro-protocols/`
 - Maps files to target structure
 
 **CLI Tool** (`bin/cli.ts`):
@@ -139,9 +133,10 @@ kiro-agents/
 
 **Powers Distribution** (`powers/`):
 - In GitHub repository
-- Standalone powers with POWER.md metadata
+- Multi-power system with individual power directories
 - kiro-protocols power with reusable protocols
-- Ready for npm inclusion or direct installation
+- steering/ subdirectories auto-generated from source
+- Ready for npm inclusion (copied to `build/npm/power/`)
 
 **Dev Mode** (`~/.kiro/steering/kiro-agents/`):
 - Direct build to user directory
@@ -187,25 +182,16 @@ src/kiro/.../kiro-spec-mode.md     → build/npm/dist/modes/kiro-spec-mode.md
 src/kiro/.../kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
 ```
 
-### Power Build
+### Powers Build (via `build-powers.ts`)
 
 ```
-src/kiro/POWER.md                  → power/POWER.md
-src/kiro/mcp.json                  → power/mcp.json
-src/core/aliases.md                → power/steering/aliases.md
-src/core/agents.md                 → power/steering/agents.md
-src/kiro/steering/modes.md         → power/steering/modes.md
-src/core/strict-mode.md            → power/steering/strict-mode.md
-src/core/strict.md                 → power/steering/strict.md
-src/core/protocols/agent-activation.md → power/steering/protocols/agent-activation.md
-src/core/protocols/agent-management.md → power/steering/protocols/agent-management.md
-src/core/protocols/agent-creation.md   → power/steering/protocols/agent-creation.md
-src/kiro/steering/protocols/mode-switching.md  → power/steering/protocols/mode-switching.md
-src/kiro/steering/protocols/mode-management.md → power/steering/protocols/mode-management.md
-src/core/interactions/chit-chat.md → power/steering/interactions/chit-chat.md
-src/core/.../interaction-styles.md → power/steering/interactions/interaction-styles.md
-src/kiro/.../kiro-spec-mode.md     → power/steering/modes/kiro-spec-mode.md
-src/kiro/.../kiro-vibe-mode.md     → power/steering/modes/kiro-vibe-mode.md
+src/core/protocols/agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
+src/core/protocols/agent-management.md → powers/kiro-protocols/steering/agent-management.md
+src/core/protocols/agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
+src/kiro/steering/protocols/mode-switching.md  → powers/kiro-protocols/steering/mode-switching.md
+src/kiro/steering/protocols/mode-management.md → powers/kiro-protocols/steering/mode-management.md
+
+# Note: POWER.md, mcp.json, icon.png are committed and not generated
 ```
 
 ## Conventions
@@ -220,13 +206,14 @@ src/kiro/.../kiro-vibe-mode.md     → power/steering/modes/kiro-vibe-mode.md
 **Build Process**:
 - Deterministic builds (same input = same output)
 - Dynamic substitutions applied at build time
-- Three build modes: npm, power, dev
+- Two build targets: npm, dev
+- Powers built separately via `build:powers` script
 - npm build cleans after completion
 - Dev mode watches for changes
 
 **Distribution**:
 - npm: `build/npm/` included in package, then cleaned
-- Power: `power/` committed to GitHub
+- Powers: `powers/` committed to GitHub (steering/ auto-generated)
 - Dev: `~/.kiro/steering/kiro-agents/` for local development
 - Files set to read-only after npm installation
 
@@ -235,3 +222,4 @@ src/kiro/.../kiro-vibe-mode.md     → power/steering/modes/kiro-vibe-mode.md
 - Final changesets in `.changeset/*.md` (committed)
 - Kiro hooks in `.kiro/hooks/` for slash commands
 - Documentation in `docs/VERSIONING.md`
+- Kiro hooks in `.kiro/hooks/` for slash commands

@@ -4,10 +4,10 @@ kiro-agents is a steering document system for Kiro IDE that provides an agent fr
 
 ## What This Project Is
 
-A **dual-distribution package** that installs steering documents (markdown files with AI instructions) into Kiro IDE:
+An **npm package** that installs steering documents (markdown files with AI instructions) into Kiro IDE:
 
 - **Core System**: Agent activation, mode switching, strict mode control via instruction aliases
-- **Distribution**: npm package (global) OR Kiro Power (workspace-specific)
+- **Distribution**: npm package with dual installation (steering files + kiro-protocols power)
 - **No Runtime Code**: Pure markdown steering documents, TypeScript only for build pipeline
 - **Progressive Enhancement**: Minimal initial footprint, users create agents as needed
 
@@ -37,7 +37,7 @@ When working on this codebase, follow these principles:
 - Parameter aliases substitute values from user input
 - Literal response aliases output exact text (for triggering native IDE features)
 - Aliases processed before other instructions
-- Can be defined in any steering document with `inclusion: always`
+- Can be defined in any steering document with `inclusion: always` frontmatter
 
 ### 1. Agent System
 
@@ -95,10 +95,10 @@ When working on this codebase, follow these principles:
 **Purpose**: Development mode that provides detailed tool execution information on errors
 
 **Implementation**:
-- Defined in `src/core/debug.md`
+- Defined in `.kiro/steering/debug.md` (workspace steering, not distributed)
 - Controlled via `/debug {state}` command
 - Interactive control via `/debug` command
-- Manual inclusion for development/testing
+- Manual inclusion for kiro-agents development/testing
 
 **Key Behaviors**:
 - Defaults to OFF, activated for development/testing
@@ -111,28 +111,27 @@ When working on this codebase, follow these principles:
 
 ### npm Package (`kiro-agents`)
 
-**Target**: Users who want global installation across all workspaces
-
 **Installation**:
 ```bash
 npx kiro-agents  # or bunx kiro-agents
 ```
 
-**Behavior**:
-- **Dual installation**: Installs both steering files AND kiro-protocols power
-- Steering files → `~/.kiro/steering/kiro-agents/`
-- Power dependency → `~/.kiro/powers/kiro-protocols/`
-- Symbolic links → `~/.kiro/powers/installed/kiro-protocols/`
-- Automatic power registration in `~/.kiro/powers/registry.json`
-- Power appears immediately as "installed" in Kiro Powers UI
-- Removes old installations before installing new
-- Sets files to read-only after installation
-- Cross-platform (Windows, macOS, Linux)
-- Single command installs everything
+**Dual Installation Behavior**:
+- **Steering files** → `~/.kiro/steering/kiro-agents/`
+  - Core system files (aliases.md, strict-mode.md)
+  - Interactive interfaces (agents.md, modes.md, strict.md)
+  - Protocol files (agent-activation.md, agent-management.md, etc.)
+  - Interaction patterns and mode definitions
+- **kiro-protocols power** → `~/.kiro/powers/kiro-protocols/`
+  - Power metadata (POWER.md, mcp.json, icon.png)
+  - Protocol files in steering/ subdirectory
+  - Symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
+  - Automatic registration in `~/.kiro/powers/registry.json`
+  - Appears immediately as "installed" in Kiro Powers UI
 
 **Build Process**:
 1. Build powers: `bun run build:powers` (processes protocols to `powers/kiro-protocols/`)
-2. Build npm: `bun run build` (compiles CLI, processes steering, copies power files)
+2. Build npm: `bun run build` (compiles CLI, processes steering, copies power files from `powers/`)
 3. CLI installs both steering and power during `npx kiro-agents`
 4. CLI creates symbolic links and registers power automatically
 
@@ -142,26 +141,14 @@ npx kiro-agents  # or bunx kiro-agents
 - Reusable protocols across projects
 - Better Kiro ecosystem integration
 - Automatic registration for seamless user experience
-
-### Kiro Power (Alternative)
-
-**Target**: Users who want workspace-specific installation with auto-updates
-
-**Installation**: Via Kiro IDE Powers panel from GitHub
-
-**Behavior**:
-- Installs to `.kiro/powers/kiro-agents/`
-- Auto-updates from GitHub
-- Keyword-based automatic loading
-- Workspace-specific (not global)
-
-**Note**: Most users should use npm package for global installation with dual setup
+- Single command installs everything
+- Cross-platform (Windows, macOS, Linux)
 
 ## User Workflows
 
 ### Initial Setup
 
-1. User installs via npm or Kiro Power
+1. User installs via npm (`npx kiro-agents`)
 2. Core system files installed (aliases.md with injected mode aliases, etc.)
 3. User can immediately use `/agents`, `/modes`, `/strict` commands
 4. No agents exist initially (minimal overhead)
@@ -196,7 +183,7 @@ npx kiro-agents  # or bunx kiro-agents
 
 - **Source of Truth**: `src/` directory contains all source files
 - **Core vs Kiro**: Core files in `src/core/`, Kiro-specific in `src/kiro/`
-- **Build Artifacts**: `build/` (gitignored), `power/` (committed)
+- **Build Artifacts**: `build/` (gitignored), `powers/` (committed)
 - **Configuration**: `src/config.ts` (core), `src/kiro/config.ts` (Kiro-specific)
 
 ### Steering Document Rules
@@ -230,30 +217,31 @@ npx kiro-agents  # or bunx kiro-agents
 
 ### Build System Rules
 
-1. **Three Build Modes**: npm, power, dev
+1. **Two Build Targets**: npm, dev (powers built separately via `build:powers`)
 2. **Deterministic Builds**: Same input = same output
 3. **Dynamic Substitutions**: Applied at build time via config functions
 4. **File Mapping**: Explicit mapping from `src/` to target directories
 
-### Power Distribution Protection
+### Powers Distribution Protection
 
-**Problem**: `power/` is committed to git but should only be modified by maintainers during release to prevent desynchronization between npm and Power distributions.
+**Problem**: `powers/*/steering/` directories are auto-generated from source files and should not be modified directly.
 
 **Solution**: Multi-layer protection
-1. **CI/CD Check**: GitHub Action (`.github/workflows/validate-pr.yml`) fails PRs that modify `power/`
-2. **Documentation**: `CONTRIBUTING.md` explains why and how to test Power locally
-3. **Warning Comments**: `power/POWER.md` has clear warning at top about auto-generation
+1. **CI/CD Check**: GitHub Action (`.github/workflows/validate-pr.yml`) fails PRs that modify `powers/*/steering/`
+2. **Documentation**: `powers/README.md` explains why and how to modify source files instead
+3. **Build System**: `bun run build:powers` regenerates steering files from `src/` protocols
 
 **Workflow**:
-- **Contributors**: Modify `src/` only, CI prevents `power/` changes in PRs
-- **Maintainers**: After merging PR, run `bun run build:power && git commit` to update `power/`
-- **Release**: `bun run release` publishes both npm and regenerates `power/` with matching version
+- **Contributors**: Modify `src/core/protocols/` or `src/kiro/steering/protocols/` only
+- **Build System**: Run `bun run build:powers` to regenerate `powers/*/steering/`
+- **Maintainers**: Commit regenerated steering files after validating changes
+- **Release**: `bun run release` publishes npm package with pre-built power files
 
 **Benefits**:
-- Prevents accidental desynchronization between distribution channels
-- Contributors can test Power locally without committing changes
-- Clear error messages guide contributors to correct workflow
-- Maintainers control when Power distribution is updated
+- Single source of truth for protocol content
+- Prevents manual edits to generated files
+- Clear separation between source and distribution
+- Maintainers control when powers are regenerated
 
 ### Versioning Rules
 
