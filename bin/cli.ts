@@ -58,9 +58,17 @@ const REGISTRY_PATH = join(homedir(), ".kiro", "powers", "registry.json");
 
 /**
  * Steering files to install from dist/ directory in package.
- * These are core system files (agents, modes, strict mode, interactions).
+ * 
+ * Core system files that provide foundational kiro-agents functionality including
+ * instruction aliases, agent management, mode switching, strict mode control, and
+ * interaction patterns. Installed to `~/.kiro/steering/kiro-agents/` and loaded
+ * automatically by Kiro IDE.
+ * 
+ * @see POWER_FILES - Protocol files installed separately as kiro-protocols power
+ * @see scripts/build.ts - NPM_FILE_MAPPINGS that processes these files during build
  */
 const STEERING_FILES = [
+  "aliases.md",
   "strict-mode.md",
   "agents.md",
   "modes.md",
@@ -73,10 +81,13 @@ const STEERING_FILES = [
 
 /**
  * Power files to install from power/ directory in package.
- * These are kiro-protocols power files (metadata, protocols, icon) copied from
- * `powers/kiro-protocols/` during build and packaged in npm distribution.
+ * 
+ * kiro-protocols power files including metadata, protocol library, and icon.
+ * These files are copied from `powers/kiro-protocols/` during build and packaged
+ * in npm distribution for dual installation alongside steering files.
  * 
  * @see scripts/build.ts - NPM_POWER_FILES constant that copies these during build
+ * @see STEERING_FILES - Core system files installed separately
  */
 const POWER_FILES = [
   "POWER.md",
@@ -465,8 +476,10 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
  * 6. Registers kiro-protocols in ~/.kiro/powers/registry.json
  * 7. Sets all files to read-only
  * 
- * Steering files include:
- * - Core system files (agents.md, modes.md, strict-mode.md, strict.md)
+ * Steering files include core system files that provide foundational kiro-agents
+ * functionality including instruction aliases, agent management, mode switching,
+ * strict mode control, and interaction patterns:
+ * - Core system files (aliases.md, agents.md, modes.md, strict-mode.md, strict.md)
  * - Interaction patterns (chit-chat.md, interaction-styles.md)
  * - Mode definitions (kiro-spec-mode.md, kiro-vibe-mode.md)
  * 

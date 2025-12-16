@@ -115,8 +115,9 @@ kiro-agents/
 - Maps files to target structure
 
 **CLI Tool** (`bin/cli.ts`):
-- Dual installation to steering + power directories
-- Installs to `~/.kiro/steering/kiro-agents/` and `~/.kiro/powers/kiro-protocols/`
+- Dual installation system for steering documents and kiro-protocols power
+- Installs core system files to `~/.kiro/steering/kiro-agents/`
+- Installs protocol library to `~/.kiro/powers/kiro-protocols/`
 - Creates symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
 - Automatic power registration in `~/.kiro/powers/registry.json`
 - Removes old installations before installing new

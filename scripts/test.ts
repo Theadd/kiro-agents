@@ -122,6 +122,7 @@ async function testNpmBuild() {
   
   // Check dist files exist
   const distFiles = [
+    "build/npm/dist/aliases.md",
     "build/npm/dist/strict-mode.md",
     "build/npm/dist/agents.md",
     "build/npm/dist/modes.md",
@@ -173,33 +174,32 @@ async function testNpmBuild() {
  * Validates Kiro Power distribution artifacts.
  * 
  * Checks Power-specific files including POWER.md frontmatter, mcp.json validity,
- * steering file structure, and frontmatter completeness. Assumes Power build
- * already exists (run `bun run build:power` first).
+ * and protocol files. Tests the npm build power/ directory which contains the
+ * kiro-protocols power files copied during build.
  * 
  * **Validation Steps:**
  * 1. Check POWER.md exists and has valid frontmatter
  * 2. Verify mcp.json is valid JSON
- * 3. Validate all steering files present
+ * 3. Validate protocol files present
  * 4. Check for unprocessed substitutions
- * 5. Verify frontmatter in all steering files
+ * 5. Verify frontmatter in protocol files
  * 
  * **Expected Structure:**
- * - `power/POWER.md` - Power metadata with frontmatter
- * - `power/mcp.json` - Valid JSON structure
- * - `power/steering/*.md` - Steering files with frontmatter
- * - `power/steering/protocols/*.md` - Protocol files
+ * - `build/npm/power/POWER.md` - Power metadata with frontmatter
+ * - `build/npm/power/mcp.json` - Valid JSON structure
+ * - `build/npm/power/steering/*.md` - Protocol files with frontmatter
  * 
  * @example
  * ```typescript
  * await testPowerBuild();
- * // Validates power/ directory structure and content
+ * // Validates build/npm/power/ directory structure and content
  * ```
  */
 async function testPowerBuild() {
   console.log("\n⚡ Testing Power build...\n");
   
   // Check POWER.md exists
-  const powerMdPath = "power/POWER.md";
+  const powerMdPath = "build/npm/power/POWER.md";
   test(
     "POWER.md exists",
     existsSync(powerMdPath),
@@ -207,7 +207,7 @@ async function testPowerBuild() {
   );
   
   // Check mcp.json exists and is valid JSON
-  const mcpJsonPath = "power/mcp.json";
+  const mcpJsonPath = "build/npm/power/mcp.json";
   let mcpValid = false;
   if (existsSync(mcpJsonPath)) {
     try {
@@ -225,20 +225,17 @@ async function testPowerBuild() {
     mcpValid ? "mcp.json is valid JSON" : "mcp.json invalid or missing"
   );
   
-  // Check steering files exist
-  const steeringFiles = [
-    "power/steering/agents.md",
-    "power/steering/modes.md",
-    "power/steering/strict-mode.md",
-    "power/steering/strict.md",
-    "power/steering/interactions/chit-chat.md",
-    "power/steering/interactions/interaction-styles.md",
-    "power/steering/modes/kiro-spec-mode.md",
-    "power/steering/modes/kiro-vibe-mode.md",
+  // Check protocol files exist (power contains protocols from kiro-protocols power)
+  const protocolFiles = [
+    "build/npm/power/steering/agent-activation.md",
+    "build/npm/power/steering/agent-creation.md",
+    "build/npm/power/steering/agent-management.md",
+    "build/npm/power/steering/mode-switching.md",
+    "build/npm/power/steering/mode-management.md",
   ];
   
   let missingFiles = 0;
-  for (const file of steeringFiles) {
+  for (const file of protocolFiles) {
     if (!existsSync(file)) {
       missingFiles++;
       console.log(`   ⚠️  Missing: ${file}`);
@@ -246,11 +243,11 @@ async function testPowerBuild() {
   }
   
   test(
-    "Power steering files",
+    "Power protocol files",
     missingFiles === 0,
     missingFiles === 0
-      ? `All ${steeringFiles.length} files present`
-      : `${missingFiles} files missing`
+      ? `All ${protocolFiles.length} protocol files present`
+      : `${missingFiles} protocol files missing`
   );
   
   // Check for unprocessed substitutions in POWER.md
@@ -268,7 +265,7 @@ async function testPowerBuild() {
     
     // Check POWER.md has required frontmatter
     const hasFrontmatter = content.startsWith("---");
-    const hasName = content.includes('name: "kiro-agents"');
+    const hasName = content.includes('name: "kiro-protocols"');
     const hasKeywords = content.includes("keywords:");
     
     test(
@@ -280,27 +277,24 @@ async function testPowerBuild() {
     );
   }
   
-  // Check frontmatter in steering files
-  let invalidFrontmatter = 0;
-  for (const file of steeringFiles) {
+  // Check for unprocessed substitutions in protocol files
+  let unprocessedCount = 0;
+  for (const file of protocolFiles) {
     if (existsSync(file)) {
       const content = await Bun.file(file).text();
-      if (!content.startsWith("---")) {
-        invalidFrontmatter++;
-        console.log(`   ⚠️  Missing frontmatter: ${file}`);
-      } else if (!content.includes("inclusion:")) {
-        invalidFrontmatter++;
-        console.log(`   ⚠️  Missing inclusion field: ${file}`);
+      if (content.includes("{{{") && content.includes("}}}")) {
+        unprocessedCount++;
+        console.log(`   ⚠️  Unprocessed substitutions in: ${file}`);
       }
     }
   }
   
   test(
-    "Steering frontmatter",
-    invalidFrontmatter === 0,
-    invalidFrontmatter === 0
-      ? "All steering files have valid frontmatter"
-      : `${invalidFrontmatter} files with invalid frontmatter`
+    "Protocol substitutions",
+    unprocessedCount === 0,
+    unprocessedCount === 0
+      ? "All protocol substitutions processed"
+      : `${unprocessedCount} protocol files with unprocessed substitutions`
   );
 }
 
