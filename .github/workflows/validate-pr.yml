@@ -35,23 +35,24 @@ jobs:
           
           echo "✅ No modifications to powers/*/steering/ directories detected"
       
-      - name: Check old power/ directory not used
+      - name: Check test powers not committed
         run: |
           # Get list of changed files in PR
           CHANGED_FILES=$(git diff --name-only origin/main...HEAD)
           
-          # Check if old power/ directory was modified
-          if echo "$CHANGED_FILES" | grep -q "^power/"; then
-            echo "⚠️  WARNING: The old power/ directory is obsolete"
+          # Check if test powers were added
+          if echo "$CHANGED_FILES" | grep -qE "^powers/(.*-test|test-.*)"; then
+            echo "❌ ERROR: Test powers should not be committed"
             echo ""
-            echo "ℹ️  Use the new powers/ multi-power structure instead"
-            echo "ℹ️  Old power/ directory will be removed in future release"
+            echo "ℹ️  Test powers are for local development only"
+            echo "ℹ️  They are automatically ignored by .gitignore"
             echo ""
-            echo "📝 Modified files in old power/:"
-            echo "$CHANGED_FILES" | grep "^power/"
+            echo "📝 Test power files detected:"
+            echo "$CHANGED_FILES" | grep -E "^powers/(.*-test|test-.*)"
             echo ""
-            echo "✅ To fix: Use powers/ directory for new powers"
+            echo "✅ To fix: Remove test power directories from your PR"
+            echo "✅ Test powers: powers/*-test/ or powers/test-*/"
             exit 1
           fi
           
-          echo "✅ No modifications to obsolete power/ directory"
+          echo "✅ No test powers committed"

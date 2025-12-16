@@ -4,6 +4,8 @@ This directory contains Kiro Powers that can be installed via Kiro IDE's Powers 
 
 ## Available Powers
 
+Currently, this repository provides **one production power**:
+
 ### kiro-protocols
 
 **Description:** Reusable protocol library for AI agents - Load step-by-step workflows on-demand for agent management, mode switching, and interactive patterns.
@@ -22,6 +24,8 @@ This directory contains Kiro Powers that can be installed via Kiro IDE's Powers 
 3. Add repository: https://github.com/Theadd/kiro-agents
 4. Install "Kiro Protocols" power
 ```
+
+**Note:** The multi-power infrastructure supports additional powers in the future. See "Creating a New Power" below to contribute.
 
 ## Power Structure
 

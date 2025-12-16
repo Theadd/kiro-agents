@@ -9,7 +9,6 @@
  * **Build Modes:**
  * - `npm` - Compiles CLI, processes steering files, cleans after publish
  * - `npm-no-clean` - Same as npm but preserves build artifacts for inspection
- * - `power` - Processes files to `power/` directory for GitHub distribution
  * - `dev` - Builds to `~/.kiro/steering/kiro-agents/` with watch mode
  * 
  * **Key Features:**
@@ -22,12 +21,6 @@
  * ```bash
  * bun run build
  * # Compiles CLI, processes files, publishes, cleans
- * ```
- * 
- * @example Build for Power
- * ```bash
- * bun run build:power
- * # Processes files to power/ directory
  * ```
  * 
  * @example Dev mode with watch
@@ -50,10 +43,11 @@ import { rmSync } from "fs";
  * 
  * @property npm - Build npm package, compile CLI, clean after build (for quick validation)
  * @property npm-no-clean - Build npm package but preserve artifacts (used by test.ts and release.ts for inspection/publish)
- * @property power - Build Kiro Power distribution to `power/` directory (committed to GitHub)
  * @property dev - Build to user directory (`~/.kiro/steering/kiro-agents/`) with watch mode for rapid iteration
+ * 
+ * @see scripts/build-powers.ts - Separate build system for powers/ directory
  */
-type BuildTarget = "npm" | "npm-no-clean" | "power" | "dev";
+type BuildTarget = "npm" | "npm-no-clean" | "dev";
 
 /**
  * File mappings for npm distribution.
@@ -72,7 +66,7 @@ type BuildTarget = "npm" | "npm-no-clean" | "power" | "dev";
  * - Interaction patterns: chit-chat.md, interaction-styles.md
  * - Mode definitions: kiro-spec-mode.md, kiro-vibe-mode.md
  * 
- * @see POWER_FILE_MAPPINGS - Power distribution (includes agent-system.md)
+ * @see NPM_POWER_FILES - Power files copied from powers/kiro-protocols/ during npm build
  */
 const NPM_FILE_MAPPINGS = [
   // Core system files (always loaded)
@@ -101,58 +95,30 @@ const NPM_FILE_MAPPINGS = [
 ] as const;
 
 /**
- * File mappings for Power distribution.
+ * Power files to copy to npm distribution.
  * 
- * Maps source files to Kiro Power structure (installed to `.kiro/powers/kiro-agents/`).
- * Power distribution is committed to GitHub and installed via Kiro IDE Powers panel.
+ * These files are copied from the `powers/kiro-protocols/` directory to `build/npm/power/`
+ * so they can be installed alongside steering files. The CLI will install these to
+ * `~/.kiro/powers/kiro-protocols/` during npm installation.
  * 
- * **Key differences from npm distribution:**
- * - Includes `agent-system.md` (provides full agent system context and documentation)
- * - Auto-updates from GitHub (npm requires manual reinstall)
- * - Keyword-based automatic loading (better Kiro integration)
- * - Workspace-specific installation (npm is global)
- * - Includes POWER.md and mcp.json for Power metadata
+ * **Source:** Pre-built kiro-protocols power from multi-power system
+ * **Destination:** npm package for dual installation (steering + power)
  * 
- * **File categories:**
- * - Power metadata: POWER.md, mcp.json
- * - Core system files: aliases.md, agent-system.md, modes-system.md, strict-mode.md
- * - Protocol files: agent-activation.md, agent-management.md, agent-creation.md, mode-switching.md, mode-management.md
- * - Interactive interfaces: agents.md, modes.md, strict.md
- * - Interaction patterns: chit-chat.md, interaction-styles.md
- * - Mode definitions: kiro-spec-mode.md, kiro-vibe-mode.md
- * 
- * @see NPM_FILE_MAPPINGS - npm package mappings (excludes agent-system.md)
+ * @see bin/cli.ts - CLI that installs these files to user directory
+ * @see powers/kiro-protocols/ - Source power directory
  */
-const POWER_FILE_MAPPINGS = [
-  // POWER.md and mcp.json
-  { src: "src/kiro/POWER.md", dest: "power/POWER.md" },
-  { src: "src/kiro/mcp.json", dest: "power/mcp.json" },
-  
-  // Core system files (always loaded) - Power includes agent-system.md, npm does not
-  { src: "src/core/aliases.md", dest: "power/steering/aliases.md" },
-  { src: "src/core/agent-system.md", dest: "power/steering/agent-system.md" },
-  { src: "src/core/strict-mode.md", dest: "power/steering/strict-mode.md" },
-  
-  // Protocol files (auxiliary, not in steering list)
-  { src: "src/core/protocols/agent-activation.md", dest: "power/steering/protocols/agent-activation.md" },
-  { src: "src/core/protocols/agent-management.md", dest: "power/steering/protocols/agent-management.md" },
-  { src: "src/core/protocols/agent-creation.md", dest: "power/steering/protocols/agent-creation.md" },
-  { src: "src/kiro/steering/protocols/mode-switching.md", dest: "power/steering/protocols/mode-switching.md" },
-  { src: "src/kiro/steering/protocols/mode-management.md", dest: "power/steering/protocols/mode-management.md" },
-  
-  // Interactive interfaces (manual inclusion)
-  { src: "src/core/agents.md", dest: "power/steering/agents.md" },
-  { src: "src/kiro/steering/modes.md", dest: "power/steering/modes.md" },
-  { src: "src/core/strict.md", dest: "power/steering/strict.md" },
-  
-  // Interaction patterns
-  { src: "src/core/interactions/chit-chat.md", dest: "power/steering/interactions/chit-chat.md" },
-  { src: "src/core/interactions/interaction-styles.md", dest: "power/steering/interactions/interaction-styles.md" },
-  
-  // Mode definitions
-  { src: "src/kiro/steering/agent-system/kiro-spec-mode.md", dest: "power/steering/modes/kiro-spec-mode.md" },
-  { src: "src/kiro/steering/agent-system/kiro-vibe-mode.md", dest: "power/steering/modes/kiro-vibe-mode.md" },
+const NPM_POWER_FILES = [
+  { src: "powers/kiro-protocols/POWER.md", dest: "build/npm/power/POWER.md" },
+  { src: "powers/kiro-protocols/mcp.json", dest: "build/npm/power/mcp.json" },
+  { src: "powers/kiro-protocols/icon.png", dest: "build/npm/power/icon.png" },
+  { src: "powers/kiro-protocols/steering/agent-activation.md", dest: "build/npm/power/steering/agent-activation.md" },
+  { src: "powers/kiro-protocols/steering/agent-creation.md", dest: "build/npm/power/steering/agent-creation.md" },
+  { src: "powers/kiro-protocols/steering/agent-management.md", dest: "build/npm/power/steering/agent-management.md" },
+  { src: "powers/kiro-protocols/steering/mode-management.md", dest: "build/npm/power/steering/mode-management.md" },
+  { src: "powers/kiro-protocols/steering/mode-switching.md", dest: "build/npm/power/steering/mode-switching.md" },
 ] as const;
+
+
 
 // File mappings for dev mode (user directory)
 const DEV_FILE_MAPPINGS = NPM_FILE_MAPPINGS.map(mapping => ({
@@ -397,7 +363,7 @@ async function buildFile(
  * Compiles CLI tool from TypeScript to JavaScript.
  * 
  * Uses Bun.build to compile `bin/cli.ts` to Node.js-compatible JavaScript.
- * Only runs during npm builds (not Power or dev builds).
+ * Only runs during npm builds (not dev builds).
  * 
  * **Build Configuration:**
  * - Target: Node.js runtime
@@ -431,28 +397,39 @@ async function buildCLI(): Promise<void> {
   console.log("✅ CLI built: build/npm/bin/cli.js\n");
 }
 
+
+
 /**
- * Creates empty MCP configuration file for Power distribution.
+ * Copies power files to npm distribution.
  * 
- * Generates `power/mcp.json` with empty mcpServers object. This file is
- * required by Kiro Powers but currently unused by kiro-agents.
+ * Copies pre-built power files from `powers/kiro-protocols/` directory to `build/npm/power/`
+ * so they can be included in the npm package and installed by the CLI. This enables dual
+ * installation where npm installs both steering files AND the kiro-protocols power dependency.
  * 
  * @example
  * ```typescript
- * await createMcpJson();
- * // Creates power/mcp.json with empty structure
+ * await copyPowerFiles();
+ * // Copies powers/kiro-protocols/POWER.md, mcp.json, icon.png, steering/*.md to build/npm/power/
  * ```
+ * 
+ * @see NPM_POWER_FILES - List of files to copy
+ * @see bin/cli.ts - CLI that installs these to ~/.kiro/powers/kiro-protocols/
  */
-async function createMcpJson(): Promise<void> {
-  const mcpContent = `{
-  "mcpServers": {
-    
-  }
-}
-`;
+async function copyPowerFiles(): Promise<void> {
+  console.log("\n⚡ Copying power files...\n");
   
-  await Bun.write("power/mcp.json", mcpContent, { createPath: true });
-  console.log("✅ Created: power/mcp.json (empty structure for future)");
+  for (const mapping of NPM_POWER_FILES) {
+    const srcFile = Bun.file(mapping.src);
+    
+    if (!await srcFile.exists()) {
+      console.warn(`⚠️  Power file not found: ${mapping.src}`);
+      continue;
+    }
+    
+    const content = await srcFile.arrayBuffer();
+    await Bun.write(mapping.dest, content, { createPath: true });
+    console.log(`✅ Copied: ${mapping.src} → ${mapping.dest}`);
+  }
 }
 
 /**
@@ -465,13 +442,14 @@ async function createMcpJson(): Promise<void> {
  * 1. Compile CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
  * 2. Process steering files with substitutions
  * 3. Map files to `build/npm/dist/` structure
+ * 4. Copy power files from `powers/kiro-protocols/` to `build/npm/power/`
  * 
  * @param config - Configuration with substitution functions
  * 
  * @example
  * ```typescript
  * await buildNpm(config);
- * // Creates build/npm/bin/cli.js and build/npm/dist/*.md
+ * // Creates build/npm/bin/cli.js, build/npm/dist/*.md, and build/npm/power/*
  * ```
  */
 async function buildNpm(config: Config): Promise<void> {
@@ -485,42 +463,13 @@ async function buildNpm(config: Config): Promise<void> {
     await buildFile(mapping.src, mapping.dest, config.substitutions, { target: "npm" });
   }
   
+  // Copy power files
+  await copyPowerFiles();
+  
   console.log("\n✅ npm distribution built in build/npm/");
 }
 
-/**
- * Builds Kiro Power distribution.
- * 
- * Processes POWER.md, creates mcp.json, and processes all steering files.
- * Output goes to `power/` directory which is committed to GitHub.
- * 
- * **Build Steps:**
- * 1. Create empty `power/mcp.json`
- * 2. Process `POWER.md` with substitutions
- * 3. Process steering files with substitutions
- * 4. Map files to `power/steering/` structure
- * 
- * @param config - Configuration with substitution functions
- * 
- * @example
- * ```typescript
- * await buildPower(config);
- * // Creates power/POWER.md, power/mcp.json, power/steering/*.md
- * ```
- */
-async function buildPower(config: Config): Promise<void> {
-  console.log("⚡ Building Power distribution...\n");
-  
-  // Create mcp.json
-  await createMcpJson();
-  
-  // Build all Power files
-  for (const mapping of POWER_FILE_MAPPINGS) {
-    await buildFile(mapping.src, mapping.dest, config.substitutions, { target: "power" });
-  }
-  
-  console.log("\n✅ Power distribution built in power/");
-}
+
 
 /**
  * Builds directly to user's Kiro directory for development.
@@ -559,20 +508,21 @@ async function buildDev(config: Config): Promise<void> {
  * Main build orchestrator for all distribution targets.
  * 
  * Loads Kiro configuration, executes target-specific build, and optionally cleans
- * artifacts. Handles npm, power, and dev builds with appropriate post-processing.
+ * artifacts. Handles npm and dev builds with appropriate post-processing.
  * 
  * **Build Flow:**
  * 1. Load Kiro config with substitution functions
- * 2. Execute target-specific build (npm/power/dev)
+ * 2. Execute target-specific build (npm/dev)
  * 3. Clean artifacts if target is 'npm' (not 'npm-no-clean')
  * 
  * **Target behaviors:**
  * - `npm` - Compiles CLI, processes files, cleans after (for quick validation)
  * - `npm-no-clean` - Same as npm but preserves artifacts (for release script)
- * - `power` - Processes files to power/ directory (for GitHub)
  * - `dev` - Builds to user directory with watch mode (for development)
  * 
- * @param target - Build target (npm/npm-no-clean/power/dev)
+ * **Note:** Powers are built separately via `scripts/build-powers.ts`
+ * 
+ * @param target - Build target (npm/npm-no-clean/dev)
  * 
  * @example npm build with cleanup
  * ```typescript
@@ -586,11 +536,7 @@ async function buildDev(config: Config): Promise<void> {
  * // Loads Kiro config, builds to build/npm/, preserves for npm publish
  * ```
  * 
- * @example Power build
- * ```typescript
- * await build('power');
- * // Loads Kiro config, processes files to power/ directory
- * ```
+ * @see scripts/build-powers.ts - Separate build system for powers/ directory
  */
 async function build(target: BuildTarget): Promise<void> {
   console.log(`🔨 Starting build: ${target}...\n`);
@@ -609,8 +555,6 @@ async function build(target: BuildTarget): Promise<void> {
       rmSync("build/npm", { recursive: true, force: true });
       console.log("✅ Build directory cleaned");
     }
-  } else if (target === "power") {
-    await buildPower(config);
   } else if (target === "dev") {
     await buildDev(config);
   }
@@ -619,8 +563,6 @@ async function build(target: BuildTarget): Promise<void> {
   
   if (target === "npm") {
     console.log("\n📁 Build output: build/npm/ (cleaned after build)");
-  } else if (target === "power") {
-    console.log("\n📁 Build output: power/ (in GitHub)");
   } else if (target === "dev") {
     console.log(`\n📁 Build output: ~/.kiro/steering/kiro-agents/`);
   }
@@ -685,9 +627,8 @@ if (command === "dev") {
   build("npm");
 } else if (command === "npm-no-clean") {
   build("npm-no-clean");
-} else if (command === "power") {
-  build("power");
 } else {
-  console.error("❌ Invalid command. Use: dev, npm, npm-no-clean, or power");
+  console.error("❌ Invalid command. Use: dev, npm, or npm-no-clean");
+  console.error("💡 To build powers, use: bun run build:powers");
   process.exit(1);
 }

@@ -170,3 +170,7 @@ powers/*/icon-placeholder.svg
 # Keep POWER.md and actual icons
 !powers/*/POWER.md
 !powers/*/icon.png
+
+# Test powers (created locally for testing, never committed)
+powers/*-test/
+powers/test-*/
