@@ -99,12 +99,13 @@ const NPM_FILE_MAPPINGS = [
  * 
  * These files are copied from the `powers/kiro-protocols/` directory to `build/npm/power/`
  * so they can be installed alongside steering files. The CLI will install these to
- * `~/.kiro/powers/kiro-protocols/` during npm installation.
+ * `~/.kiro/powers/kiro-protocols/` during npm installation and register the power
+ * in Kiro's registry.json for automatic UI integration.
  * 
  * **Source:** Pre-built kiro-protocols power from multi-power system
  * **Destination:** npm package for dual installation (steering + power)
  * 
- * @see bin/cli.ts - CLI that installs these files to user directory
+ * @see bin/cli.ts - CLI that installs these files and registers power in registry.json
  * @see powers/kiro-protocols/ - Source power directory
  */
 const NPM_POWER_FILES = [
@@ -404,7 +405,8 @@ async function buildCLI(): Promise<void> {
  * 
  * Copies pre-built power files from `powers/kiro-protocols/` directory to `build/npm/power/`
  * so they can be included in the npm package and installed by the CLI. This enables dual
- * installation where npm installs both steering files AND the kiro-protocols power dependency.
+ * installation where npm installs both steering files AND the kiro-protocols power dependency,
+ * with automatic registry registration for Powers UI integration.
  * 
  * @example
  * ```typescript
@@ -413,7 +415,7 @@ async function buildCLI(): Promise<void> {
  * ```
  * 
  * @see NPM_POWER_FILES - List of files to copy
- * @see bin/cli.ts - CLI that installs these to ~/.kiro/powers/kiro-protocols/
+ * @see bin/cli.ts - CLI that installs these to ~/.kiro/powers/kiro-protocols/ and updates registry.json
  */
 async function copyPowerFiles(): Promise<void> {
   console.log("\n⚡ Copying power files...\n");
@@ -437,6 +439,7 @@ async function copyPowerFiles(): Promise<void> {
  * 
  * Compiles CLI tool and processes all steering files with substitutions.
  * Output goes to `build/npm/` which is included in npm package then cleaned.
+ * The CLI handles power installation and registry.json registration during user installation.
  * 
  * **Build Steps:**
  * 1. Compile CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
