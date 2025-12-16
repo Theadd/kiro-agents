@@ -2,24 +2,288 @@
 
 This file contains the detailed instructions for creating new agents. It is referenced during agent creation workflow in agent management mode.
 
-## Agent Creation Steps
+## Creation Methods
 
-When creating a new agent:
+When creating a new agent, offer multiple methods based on user experience level:
 
-### Step 1: Initialize Creation Wizard
+1. **Quick Start** - Choose from predefined templates (fastest)
+2. **Project-Specific** - AI-suggested agents for current workspace
+3. **Explore Roles** - Browse agents by domain and role
+4. **Guided Wizard** - Step-by-step interactive creation (full control)
+5. **Natural Language** - Describe agent in plain English (most intuitive)
+
+## Method Selection
+
+When user initiates agent creation:
+
+### Step 1: Present Creation Methods
 
 Use chit-chat mode for the creation process:
 
 ```diff
-  👉 Agent creation wizard
-  ⏳ Gathering agent information
+  👉 Agent Creation
+  ⏳ Choose creation method
 ```
 
-**Current Focus**: Creating new agent
+**How would you like to create your agent?**
 
-### Step 2: Collect Agent Information
+1. **Quick Start** - Choose from predefined agent templates
+   → Fastest, no configuration needed
+   → Best for: Common use cases, getting started quickly
 
-Guide user through agent definition with numbered choices:
+2. **Project-Specific** - AI suggests agents for your workspace
+   → Analyzes your project and recommends relevant agents
+   → Best for: Project-specific needs, contextual recommendations
+
+3. **Explore Roles** - Browse agents by domain and role
+   → Discover what's possible, organized by industry/function
+   → Best for: Exploring options, learning about agent types
+
+4. **Guided Wizard** - Step-by-step interactive creation
+   → Full control, guided process
+   → Best for: Custom agents, specific requirements
+
+5. **Natural Language** - Describe what you need
+   → "I need an agent that helps with React performance"
+   → Best for: Quick creation, intuitive interface
+
+6. **Cancel** - Exit without creating agent
+
+**Choose a number (1-6):**
+
+### Step 2: Execute Selected Method
+
+Based on user choice, execute the appropriate creation method:
+
+---
+
+## Method 1: Quick Start (Predefined Templates)
+
+### Step 2.1: Load Template List
+
+Read predefined templates from embedded list:
+
+**Predefined Agent Templates:**
+
+1. **Full-Stack Developer**
+   "Expert in complete web development stack including frontend (React, Vue), backend (Node.js, Python), databases (PostgreSQL, MongoDB), and deployment (Docker, CI/CD)."
+
+2. **Code Reviewer**
+   "Specialized in code review with focus on code quality, security vulnerabilities, performance issues, best practices, and maintainability. Provides constructive feedback with actionable suggestions."
+
+3. **API Architect**
+   "Expert in designing and implementing RESTful and GraphQL APIs with focus on scalability, security, documentation (OpenAPI), versioning, and best practices."
+
+4. **Frontend Specialist**
+   "Specialized in modern frontend development with React, TypeScript, state management, CSS/styling, accessibility (WCAG), and performance optimization (Core Web Vitals)."
+
+5. **DevOps Engineer**
+   "Expert in containerization (Docker), orchestration (Kubernetes), CI/CD pipelines (GitHub Actions, GitLab CI), infrastructure as code (Terraform), and monitoring (Prometheus, Grafana)."
+
+6. **Testing Specialist**
+   "Specialized in comprehensive testing strategies including unit tests (Jest, pytest), integration tests, E2E tests (Playwright, Cypress), test-driven development (TDD), and test automation."
+
+7. **Database Expert**
+   "Expert in database design, optimization, migrations, query performance, indexing strategies, and working with both SQL (PostgreSQL, MySQL) and NoSQL (MongoDB, Redis) databases."
+
+8. **Security Auditor**
+   "Specialized in application security with focus on OWASP Top 10, vulnerability assessment, secure coding practices, authentication/authorization, and security testing (SAST, DAST)."
+
+9. **Technical Writer**
+   "Expert in creating clear technical documentation including API references, user guides, tutorials, README files, architecture documentation, and maintaining documentation systems."
+
+10. **Performance Optimizer**
+    "Specialized in application performance optimization including profiling, bottleneck identification, caching strategies, database optimization, and frontend performance (bundle size, loading times)."
+
+11. **UI/UX Designer**
+    "Expert in user interface and experience design with focus on user research, wireframing, prototyping (Figma), design systems, accessibility, and usability testing."
+
+12. **Data Analyst**
+    "Specialized in data analysis, visualization (charts, dashboards), SQL queries, statistical analysis, reporting, and deriving actionable insights from data."
+
+### Step 2.2: Present Templates
+
+```diff
+  👉 Agent Creation - Quick Start
+  ⏳ Choose template
+```
+
+**Choose from predefined agent templates:**
+
+[Display templates 1-12 with numbers]
+
+**Type number to select template, or 'back' to choose different method:**
+
+### Step 2.3: Confirm and Customize
+
+User selects template (e.g., "4" for Frontend Specialist).
+
+```diff
+  👉 Agent Creation - Quick Start
+  ⏳ Customize template
+```
+
+**Selected template:** Frontend Specialist
+
+**Default name:** `frontend-specialist`
+**Description:** "Specialized in modern frontend development with React, TypeScript, state management, CSS/styling, accessibility (WCAG), and performance optimization (Core Web Vitals)."
+
+**Customize? (optional)**
+
+1. **Use as-is** - Create agent with default settings
+2. **Change name** - Customize agent name
+3. **Edit description** - Modify description
+4. **Back** - Choose different template
+
+### Step 2.4: Generate Agent
+
+Use the template's description to generate complete agent definition following the standard agent structure (see Step 3 below).
+
+---
+
+## Method 2: Project-Specific (AI Analysis)
+
+### Step 2.1: Analyze Workspace
+
+```diff
+  👉 Agent Creation - Project Analysis
+  ⏳ Analyzing your workspace...
+```
+
+**Analyzing project structure and technologies...**
+
+Execute analysis:
+1. Read `package.json`, `requirements.txt`, `Cargo.toml`, etc.
+2. Scan directory structure (src/, tests/, docs/, etc.)
+3. Identify frameworks and libraries
+4. Read README.md and documentation
+5. Check for CI/CD configs, Docker files, etc.
+
+### Step 2.2: Generate Recommendations
+
+Based on analysis, generate 5-8 relevant agent suggestions.
+
+```diff
+  👉 Agent Creation - Project Analysis
+  ⏳ Recommendations
+```
+
+**Based on your project (React + TypeScript + Node.js + PostgreSQL):**
+
+**Recommended agents:**
+
+1. ⭐ **React TypeScript Specialist**
+   "Expert in React with TypeScript, hooks, component patterns, and type-safe development."
+
+2. ⭐ **API Developer**
+   "Specialized in Node.js backend development, RESTful APIs, Express, and database integration."
+
+3. ⭐ **Database Expert**
+   "Expert in PostgreSQL schema design, query optimization, migrations, and ORMs."
+
+4. **Testing Engineer**
+   "Specialized in Jest, React Testing Library, and E2E testing with Playwright."
+
+5. **DevOps Engineer**
+   "Expert in Docker, CI/CD, and deployment automation for Node.js applications."
+
+**Type number to select, or 'back' to choose different method:**
+
+### Step 2.3: Customize and Generate
+
+Follow same customization flow as Quick Start (Step 2.3-2.4 above).
+
+---
+
+## Method 3: Explore Roles (Domain Browser)
+
+### Step 2.1: Present Domains
+
+```diff
+  👉 Agent Creation - Explore Roles
+  ⏳ Choose domain
+```
+
+**Explore agent roles by domain:**
+
+1. 💻 **Software Development**
+   Frontend, Backend, DevOps, Testing, Security
+
+2. 🎨 **Creative & Design**
+   UI/UX, Content Writing, Branding, Video Production
+
+3. 💼 **Business & Finance**
+   Marketing, Sales, Strategy, Finance, HR
+
+4. 🏥 **Healthcare & Medicine**
+   Clinical, Research, Administration, Public Health
+
+5. 🔬 **Science & Research**
+   Data Science, Research Methods, Lab Management
+
+6. ⚖️ **Legal & Compliance**
+   Legal Research, Contract Review, Compliance
+
+7. 🏗️ **Engineering & Architecture**
+   Civil, Mechanical, Electrical, Architecture
+
+8. 🌾 **Agriculture & Food**
+   Farming, Food Science, Culinary
+
+[More domains available - type 'more' to see all]
+
+**Type number to explore domain, or 'back' to choose different method:**
+
+### Step 2.2: Present Roles in Domain
+
+User selects domain (e.g., "1" for Software Development).
+
+```diff
+  👉 Agent Creation - Explore Roles
+  ⏳ Software Development roles
+```
+
+**Software Development agent roles:**
+
+1. **Frontend Developer**
+   "Expert in modern frontend: React, Vue, Angular, TypeScript, CSS, accessibility, performance."
+
+2. **Backend Developer**
+   "Specialized in server-side: APIs, databases, authentication, microservices, serverless."
+
+3. **Full-Stack Developer**
+   "Complete web development: frontend, backend, databases, deployment."
+
+4. **DevOps Engineer**
+   "Expert in: Docker, Kubernetes, CI/CD, infrastructure as code, monitoring."
+
+5. **Mobile Developer**
+   "Specialized in: React Native, Flutter, iOS (Swift), Android (Kotlin)."
+
+6. **QA/Testing Specialist**
+   "Expert in: test strategies, automation, unit/integration/E2E testing, TDD."
+
+7. **Security Engineer**
+   "Specialized in: application security, vulnerability assessment, secure coding, penetration testing."
+
+8. **Data Engineer**
+   "Expert in: data pipelines, ETL, data warehousing, big data technologies."
+
+**Type number to select role, or 'back' to choose different domain:**
+
+### Step 2.3: Customize and Generate
+
+Follow same customization flow as Quick Start (Step 2.3-2.4 above).
+
+---
+
+## Method 4: Guided Wizard (Current System)
+
+### Step 2.1: Agent Type Selection
+
+**Current system - full control over agent definition.**
+
+Follow existing wizard steps (2.1 through 2.8 below).
 
 #### 2.1: Agent Type Selection
 
@@ -122,7 +386,90 @@ Example workflow:
 6. Verify tests pass
 7. Document changes
 
-### Step 3: Generate Agent Definition File
+---
+
+## Method 5: Natural Language (AI Generation)
+
+### Step 2.1: Collect Description
+
+```diff
+  👉 Agent Creation - Natural Language
+  ⏳ Describe your agent
+```
+
+**Describe what you need in plain English:**
+
+**Examples:**
+- "I need help optimizing React performance"
+- "An agent that reviews my Python code for security issues"
+- "Someone who can help me write technical documentation"
+- "Expert in PostgreSQL query optimization"
+- "Help me with Docker and Kubernetes deployment"
+
+**Your description:**
+
+### Step 2.2: Analyze and Generate Proposal
+
+User provides description (e.g., "I need help optimizing React performance").
+
+```diff
+  👉 Agent Creation - Natural Language
+  ⏳ Analyzing your request...
+```
+
+**AI analyzes the description and extracts:**
+- Agent type (specialist/generalist/coordinator)
+- Primary domain and focus area
+- Key capabilities needed
+- Suggested name
+- Generated description
+
+**Present proposal:**
+
+```diff
+  👉 Agent Creation - Natural Language
+  ⏳ Review proposal
+```
+
+**I understand you need:**
+
+**Agent Type:** Specialist
+**Primary Domain:** Software Development → Frontend
+**Focus Area:** React Performance Optimization
+
+**Suggested Capabilities:**
+- React profiling and debugging (React DevTools, Profiler API)
+- Performance optimization techniques (memoization, lazy loading)
+- Bundle size optimization (code splitting, tree shaking)
+- Rendering performance (virtual DOM, reconciliation)
+- Core Web Vitals improvement (LCP, FID, CLS)
+- Memory leak detection and prevention
+
+**Suggested Name:** `react-performance-optimizer`
+
+**Generated Description:**
+"Specialized in React performance optimization with expertise in profiling, bundle optimization, rendering performance, and Core Web Vitals improvement. Helps identify bottlenecks and implement performance best practices."
+
+**Does this match what you need?**
+
+1. **Yes, create it** - Generate agent with these capabilities
+2. **Modify name** - Change agent name
+3. **Modify description** - Edit description
+4. **Add more details** - Provide additional context to refine
+5. **Start over** - Try different description
+6. **Back** - Choose different creation method
+
+### Step 2.3: Refine if Needed
+
+If user chooses to modify or add details, iterate on the proposal.
+
+### Step 2.4: Generate Agent
+
+Once confirmed, generate complete agent definition using the AI-analyzed capabilities and description.
+
+---
+
+## Step 3: Generate Agent Definition File
 
 Create `{{{WS_AGENTS_PATH}}}/{agent-name}.md` with this structure:
 
