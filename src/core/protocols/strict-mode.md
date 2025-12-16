@@ -1,8 +1,3 @@
----
-inclusion: manual
-description: Opt-in precision mode for experimental development - loaded automatically when any agent is activated
----
-
 # Strict Mode System
 
 Opt-in precision mode for experimental/cutting-edge development where assumptions are dangerous.

@@ -24,6 +24,7 @@
     "build:powers": "bun run scripts/build-powers.ts",
     "validate:powers": "bun run scripts/validate-powers.ts",
     "dev": "bun run scripts/build.ts dev",
+    "dev:powers": "bun run scripts/dev-powers.ts",
     "test": "bun run scripts/test.ts",
     "clean": "bun run scripts/clean.ts",
     "snapshot": "bun run scripts/snapshot.ts",

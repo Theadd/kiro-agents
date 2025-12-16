@@ -102,26 +102,19 @@ This alias enables users to activate any agent with `/agents {name}` syntax.
 The protocol loading command uses parameter substitution to dynamically load protocols from the kiro-protocols Power:
 
 <alias>
-  <trigger>/protocols {protocol_name}</trigger>
+  <trigger>/protocols {filename}</trigger>
   <definition>
-## Load Protocol: {protocol_name}
+## Load Protocol: {filename}
 
-You are now loading the **{protocol_name}** protocol from kiro-protocols Power.
+You are now loading the **{filename}** protocol from kiro-protocols Power.
 
 **Execute protocol loading:**
-1. Call kiroPowers action="activate" with powerName="kiro-protocols"
-2. Call kiroPowers action="readSteering" with powerName="kiro-protocols", steeringFile="{protocol_name}.md"
-3. Follow all steps from the loaded protocol
+1. **Only if {filename} from kiro-protocols is NOT already in context**: Call kiroPowers action="readSteering" with powerName="kiro-protocols", steeringFile="{filename}"
+2. Follow all steps in the {filename} protocol from kiro-protocols
   </definition>
 </alias>
 
-This alias enables loading protocols on-demand with `/protocols {name}` syntax without showing in Kiro UI slash commands.
+This alias enables loading protocols on-demand with `/protocols {filename}` syntax without showing in Kiro UI slash commands.
 
-**Available protocols:**
-- agent-activation
-- agent-management
-- agent-creation
-- mode-switching
-- mode-management
 
 {{{KIRO_MODE_ALIASES}}}

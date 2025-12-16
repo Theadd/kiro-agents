@@ -129,6 +129,12 @@ interface PowerConfig {
  * **Current Powers:**
  * - `kiro-protocols` - Reusable protocol library for agent/mode management workflows
  * 
+ * **Protocol List:**
+ * - `strict-mode` - Precision mode that blocks execution on ambiguous input
+ * - `agent-activation` - Agent activation workflow
+ * - `agent-creation` - Agent creation wizard with multiple methods
+ * - `agent-management` - Interactive agent management interface
+ * 
  * **Adding New Power:**
  * 1. Create `powers/{name}/POWER.md` with required frontmatter
  * 2. Add configuration entry here with source directory and protocol list
@@ -140,6 +146,7 @@ const POWER_CONFIGS: PowerConfig[] = [
     displayName: "Kiro Protocols",
     sourceDir: "src/core/protocols",
     protocols: [
+      "strict-mode",
       "agent-activation",
       "agent-creation", 
       "agent-management",
