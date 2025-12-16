@@ -28,14 +28,15 @@
 1. **npm** (`bun run build`)
    - Compiles CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
    - Processes steering files with substitutions
-   - Maps to `build/npm/dist/`
-   - Cleans `build/npm/` after npm publish
+   - Copies pre-built power files from `powers/kiro-protocols/`
+   - Maps to `build/npm/dist/` and `build/npm/power/`
+   - Cleans `build/npm/` after build
 
-2. **power** (`bun run build:power`)
-   - Processes POWER.md with substitutions
-   - Creates mcp.json structure
-   - Maps to `power/` directory
-   - Committed to GitHub
+2. **powers** (`bun run build:powers`)
+   - Processes protocol files with substitutions
+   - Builds standalone powers to `powers/` directory
+   - Creates kiro-protocols power with protocols
+   - Must run BEFORE npm build
 
 3. **dev** (`bun run dev`)
    - Builds directly to `~/.kiro/steering/kiro-agents/`
@@ -48,6 +49,10 @@
 **npm** - Package distribution
 - Package name: `kiro-agents`
 - Executable via `npx` and `bunx`
+- Dual installation: steering files + kiro-protocols power
+- Installs to: `~/.kiro/steering/kiro-agents/` and `~/.kiro/powers/kiro-protocols/`
+- Cross-platform CLI tool
+- Removes old installation before installing new
 - Installs to: `~/.kiro/steering/kiro-agents/`
 - Cross-platform CLI tool
 - Removes old installation before installing new
@@ -61,17 +66,20 @@
 ## Build Commands
 
 ```bash
+# Build standalone powers (run FIRST)
+bun run build:powers
+
 # Build npm package (compiles CLI, processes files, cleans after)
 bun run build
-
-# Build Power distribution (processes files to power/)
-bun run build:power
 
 # Dev mode (watch, builds to user directory)
 bun run dev
 
 # Validate build
 bun run test
+
+# Validate powers
+bun run validate:powers
 
 # Clean build artifacts
 bun run clean

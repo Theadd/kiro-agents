@@ -119,18 +119,26 @@ npx kiro-agents  # or bunx kiro-agents
 ```
 
 **Behavior**:
-- Installs to `~/.kiro/steering/kiro-agents/`
-- Removes old installation before installing new
+- **Dual installation**: Installs both steering files AND kiro-protocols power
+- Steering files → `~/.kiro/steering/kiro-agents/`
+- Power dependency → `~/.kiro/powers/kiro-protocols/`
+- Removes old installations before installing new
 - Sets files to read-only after installation
 - Cross-platform (Windows, macOS, Linux)
+- Single command installs everything
 
 **Build Process**:
-- Compiles CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
-- Processes steering files with substitutions
-- Maps to `build/npm/dist/` structure
-- Cleans `build/npm/` after npm publish
+1. Build powers: `bun run build:powers` (processes protocols to `powers/kiro-protocols/`)
+2. Build npm: `bun run build` (compiles CLI, processes steering, copies power files)
+3. CLI installs both steering and power during `npx kiro-agents`
 
-### Kiro Power
+**Why Dual Installation**:
+- Protocols discoverable in Kiro Powers UI
+- Stable reference paths for protocol files
+- Reusable protocols across projects
+- Better Kiro ecosystem integration
+
+### Kiro Power (Alternative)
 
 **Target**: Users who want workspace-specific installation with auto-updates
 
@@ -140,13 +148,9 @@ npx kiro-agents  # or bunx kiro-agents
 - Installs to `.kiro/powers/kiro-agents/`
 - Auto-updates from GitHub
 - Keyword-based automatic loading
-- Better Kiro ecosystem integration
+- Workspace-specific (not global)
 
-**Build Process**:
-- Processes POWER.md with substitutions
-- Creates mcp.json structure
-- Maps to `power/` directory
-- Committed to GitHub
+**Note**: Most users should use npm package for global installation with dual setup
 
 ## User Workflows
 
