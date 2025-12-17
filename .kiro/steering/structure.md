@@ -33,7 +33,9 @@ kiro-agents/
 │   │           ├── mode-switching.md    # Mode switching protocol
 │   │           ├── mode-management.md   # Mode management protocol
 │   │           ├── kiro-spec-mode.md    # Spec mode definition (moved from agent-system/)
-│   │           └── kiro-vibe-mode.md    # Vibe mode definition (moved from agent-system/)
+│   │           ├── kiro-vibe-mode.md    # Vibe mode definition (moved from agent-system/)
+│   │           ├── kiro-as-spec-mode.md # As-Spec mode definition (role-based spec)
+│   │           └── kiro-as-vibe-mode.md # As-Vibe mode definition (role-based vibe)
 │   ├── utils/                    # Build utilities
 │   │   └── markdown-extractor.ts # Section extraction from markdown
 │   └── config.ts                 # Core substitutions
@@ -94,7 +96,7 @@ kiro-agents/
 - Base configuration
 
 **Kiro** - Kiro-specific implementations:
-- Mode system (vibe/spec)
+- Mode system (vibe/spec/as-vibe/as-spec)
 - Power metadata (POWER.md)
 - Kiro-specific configurations
 - Mode definitions
@@ -110,11 +112,12 @@ kiro-agents/
 - Must run BEFORE npm build
 
 **Power Dev Pipeline** (`scripts/dev-powers.ts`):
+- Uses manifest system (`PROTOCOL_SOURCE_MAPPINGS`) for automatic protocol discovery
 - Builds directly to `~/.kiro/powers/kiro-protocols/` for rapid iteration
 - Watch mode for protocol file changes in `src/`
 - Handles readonly files automatically (writable during build, readonly after)
-- Fast iteration for protocol development and testing
-- Uses same substitution system as production builds
+- Auto-discovers both core and Kiro-specific protocols via glob patterns
+- Uses same substitution system as production builds for consistency
 
 **npm Build Pipeline** (`scripts/build.ts`):
 - Two build targets: `npm`, `dev`
@@ -160,9 +163,11 @@ kiro-agents/
 - Fast iteration cycle
 
 **Dev:Powers Mode** (`~/.kiro/powers/kiro-protocols/`):
+- Uses manifest system for automatic protocol discovery (same as production)
 - Direct build to user's power directory
 - Watch mode for protocol development
 - Handles readonly files automatically
+- Auto-discovers protocols via `PROTOCOL_SOURCE_MAPPINGS` glob patterns
 - Fast iteration for protocol changes
 
 ## File Mapping
@@ -181,10 +186,12 @@ src/core/protocols/*.md → powers/kiro-protocols/steering/{name}.md
 
 # Kiro-specific protocols (includes mode definitions)
 src/kiro/steering/protocols/*.md → powers/kiro-protocols/steering/{name}.md
-  ├── mode-switching.md   → powers/kiro-protocols/steering/mode-switching.md
-  ├── mode-management.md  → powers/kiro-protocols/steering/mode-management.md
-  ├── kiro-spec-mode.md   → powers/kiro-protocols/steering/kiro-spec-mode.md
-  └── kiro-vibe-mode.md   → powers/kiro-protocols/steering/kiro-vibe-mode.md
+  ├── mode-switching.md     → powers/kiro-protocols/steering/mode-switching.md
+  ├── mode-management.md    → powers/kiro-protocols/steering/mode-management.md
+  ├── kiro-spec-mode.md     → powers/kiro-protocols/steering/kiro-spec-mode.md
+  ├── kiro-vibe-mode.md     → powers/kiro-protocols/steering/kiro-vibe-mode.md
+  ├── kiro-as-spec-mode.md  → powers/kiro-protocols/steering/kiro-as-spec-mode.md
+  └── kiro-as-vibe-mode.md  → powers/kiro-protocols/steering/kiro-as-vibe-mode.md
 ```
 
 **Benefits:**
@@ -192,19 +199,31 @@ src/kiro/steering/protocols/*.md → powers/kiro-protocols/steering/{name}.md
 - ✅ Single source of truth: All mappings in `src/manifest.ts`
 - ✅ Glob patterns: No manual file list updates needed
 
-### Dev:Powers Build (via `dev-powers.ts`)
+### Dev:Powers Build (via `dev-powers.ts` using manifest system)
+
+**Auto-discovered via `PROTOCOL_SOURCE_MAPPINGS` in `src/manifest.ts`:**
 
 ```
-# Dev mode builds directly to user's Kiro directory for rapid iteration
-src/core/protocols/strict-mode.md      → ~/.kiro/powers/kiro-protocols/steering/strict-mode.md
-src/core/protocols/agent-activation.md → ~/.kiro/powers/kiro-protocols/steering/agent-activation.md
-src/core/protocols/agent-management.md → ~/.kiro/powers/kiro-protocols/steering/agent-management.md
-src/core/protocols/agent-creation.md   → ~/.kiro/powers/kiro-protocols/steering/agent-creation.md
-src/kiro/steering/protocols/mode-switching.md  → ~/.kiro/powers/kiro-protocols/steering/mode-switching.md
-src/kiro/steering/protocols/mode-management.md → ~/.kiro/powers/kiro-protocols/steering/mode-management.md
+# Core protocols (cross-IDE compatible) - auto-discovered via manifest
+src/core/protocols/*.md → ~/.kiro/powers/kiro-protocols/steering/{name}.md
+  ├── strict-mode.md      → ~/.kiro/powers/kiro-protocols/steering/strict-mode.md
+  ├── agent-activation.md → ~/.kiro/powers/kiro-protocols/steering/agent-activation.md
+  ├── agent-management.md → ~/.kiro/powers/kiro-protocols/steering/agent-management.md
+  └── agent-creation.md   → ~/.kiro/powers/kiro-protocols/steering/agent-creation.md
 
-# Note: Same substitutions as production, different destination for testing
-# Handles readonly files: writable during build, readonly after
+# Kiro-specific protocols (includes mode definitions) - auto-discovered via manifest
+src/kiro/steering/protocols/*.md → ~/.kiro/powers/kiro-protocols/steering/{name}.md
+  ├── mode-switching.md     → ~/.kiro/powers/kiro-protocols/steering/mode-switching.md
+  ├── mode-management.md    → ~/.kiro/powers/kiro-protocols/steering/mode-management.md
+  ├── kiro-spec-mode.md     → ~/.kiro/powers/kiro-protocols/steering/kiro-spec-mode.md
+  ├── kiro-vibe-mode.md     → ~/.kiro/powers/kiro-protocols/steering/kiro-vibe-mode.md
+  ├── kiro-as-spec-mode.md  → ~/.kiro/powers/kiro-protocols/steering/kiro-as-spec-mode.md
+  └── kiro-as-vibe-mode.md  → ~/.kiro/powers/kiro-protocols/steering/kiro-as-vibe-mode.md
+
+# Benefits: Same as production build
+# - Auto-discovery: Add new protocol → automatically included
+# - Same substitutions as production, different destination for testing
+# - Handles readonly files: writable during build, readonly after
 ```
 
 ### npm Build
@@ -231,6 +250,8 @@ src/core/interactions/chit-chat.md → build/npm/dist/interactions/chit-chat.md
 src/core/.../interaction-styles.md → build/npm/dist/interactions/interaction-styles.md
 src/kiro/.../kiro-spec-mode.md     → build/npm/dist/modes/kiro-spec-mode.md
 src/kiro/.../kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
+src/kiro/.../kiro-as-spec-mode.md  → build/npm/dist/modes/kiro-as-spec-mode.md
+src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 ```
 
 ## Conventions

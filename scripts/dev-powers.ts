@@ -1,35 +1,57 @@
 #!/usr/bin/env bun
 /**
- * Development mode for Kiro Powers with file watching.
+ * Development mode for Kiro Powers with file watching and rapid iteration.
  * 
- * Builds powers directly to `~/.kiro/powers/kiro-protocols/` for rapid iteration.
+ * Builds powers directly to `~/.kiro/powers/kiro-protocols/` for immediate testing.
  * Watches `src/` directory for changes and automatically rebuilds. Handles readonly
- * files by temporarily making them writable during build.
+ * files by temporarily making them writable during build, then restoring protection.
+ * 
+ * **Current Implementation:**
+ * - Uses manifest system (`PROTOCOL_SOURCE_MAPPINGS`, `expandMappings`) for automatic protocol discovery
+ * - Auto-discovers both core and Kiro-specific protocols via glob patterns
+ * - Maintains same substitution system as production builds for consistency
  * 
  * **Workflow:**
  * 1. Initial build to `~/.kiro/powers/kiro-protocols/`
- * 2. Watch `src/` directory recursively
- * 3. Rebuild on any file change
- * 4. Continue until Ctrl-C
+ * 2. Watch `src/` directory recursively for changes
+ * 3. Auto-rebuild on any file modification
+ * 4. Continue until Ctrl-C (graceful shutdown)
  * 
- * **Readonly Handling:**
+ * **Readonly File Handling:**
  * - Detects readonly files in target directory
- * - Temporarily makes them writable for build
- * - Restores readonly status after build
+ * - Temporarily makes them writable for build operations
+ * - Restores readonly status after successful build
+ * - Prevents accidental modification of generated files
  * 
- * @example
+ * @example Basic usage
  * ```bash
  * bun run dev:powers
  * # Initial build, then watches for changes
  * # Edit src/core/protocols/agent-activation.md → auto-rebuilds
+ * # Press Ctrl-C to stop watching
  * ```
  * 
- * @see scripts/build-powers.ts - Base power build system using manifest-based protocol discovery
+ * @example Development workflow
+ * ```bash
+ * # Terminal 1: Start dev mode
+ * bun run dev:powers
+ * 
+ * # Terminal 2: Edit protocols
+ * code src/core/protocols/agent-activation.md
+ * # → Auto-rebuilds in Terminal 1
+ * 
+ * # Test in Kiro IDE immediately
+ * # Files available at ~/.kiro/powers/kiro-protocols/steering/
+ * ```
+ * 
+ * @see scripts/build-powers.ts - Production power build using identical manifest-based protocol discovery
+ * @see src/manifest.ts - PROTOCOL_SOURCE_MAPPINGS used for automatic protocol discovery
  */
 
 import { homedir } from "os";
 import { join } from "path";
 import { existsSync, readdirSync, statSync, chmodSync, constants, readFileSync, writeFileSync, mkdirSync } from "fs";
+import { PROTOCOL_SOURCE_MAPPINGS, expandMappings } from "../src/manifest.ts";
 
 /**
  * Build options passed to substitution functions during power processing.
@@ -81,51 +103,51 @@ interface Config {
 }
 
 /**
- * Power configuration defining source protocols and build behavior.
+ * Power configuration defining build behavior for dev mode with manifest-based discovery.
  * 
- * Each power is built independently with its own set of protocols copied from
- * source directories. Dev mode uses same config structure as production builds
- * but outputs to user's Kiro directory for rapid testing.
+ * Simplified config for dev mode that leverages manifest system for automatic protocol
+ * discovery. Protocols are auto-discovered via `PROTOCOL_SOURCE_MAPPINGS` glob patterns,
+ * eliminating need to maintain hardcoded protocol lists.
+ * 
+ * **Manifest Integration:**
+ * - Core protocols: `src/core/protocols/*.md` → auto-discovered
+ * - Kiro protocols: `src/kiro/steering/protocols/*.md` → auto-discovered
+ * - No manual protocol list maintenance required
+ * 
+ * @see PROTOCOL_SOURCE_MAPPINGS - Manifest mappings with glob patterns
+ * @see expandMappings - Resolves globs to concrete file paths
  */
 interface PowerConfig {
   /** Power name matching directory name (e.g., 'kiro-protocols') */
   name: string;
   /** Display name shown in Kiro IDE Powers panel (e.g., 'Kiro Protocols') */
   displayName: string;
-  /** Source directory containing protocol .md files (e.g., 'src/core/protocols') */
-  sourceDir: string;
-  /** Protocol file names to copy without .md extension (e.g., ['agent-activation', 'agent-management']) */
-  protocols: string[];
 }
 
 /**
- * Power configuration for kiro-protocols in dev mode.
+ * Power configuration for kiro-protocols in dev mode using manifest-based auto-discovery.
  * 
- * Defines which protocols to copy from source to user's Kiro directory during
- * development. Matches production config from `scripts/build-powers.ts` (now using manifest) but
- * excludes `generateIcon` since icon files are committed and not regenerated.
+ * Leverages manifest system for automatic protocol discovery, matching production build
+ * behavior. All protocols are auto-discovered via `PROTOCOL_SOURCE_MAPPINGS` glob patterns
+ * from `src/manifest.ts`, ensuring consistency between dev and production builds.
  * 
- * **Protocol List:**
- * - `strict-mode` - Precision mode that blocks execution on ambiguous input
- * - `agent-activation` - Agent activation workflow
- * - `agent-creation` - Agent creation wizard with multiple methods
- * - `agent-management` - Interactive agent management interface
+ * **Auto-Discovered Protocols (via manifest):**
+ * - Core protocols: `src/core/protocols/*.md` (strict-mode, agent-activation, agent-creation, agent-management)
+ * - Kiro protocols: `src/kiro/steering/protocols/*.md` (mode-switching, mode-management, kiro-spec-mode, kiro-vibe-mode)
  * 
- * **Note:** Kiro-specific protocols (mode-switching, mode-management) are handled
- * separately by `copyKiroProtocols()` function.
+ * **Benefits:**
+ * - No manual protocol list maintenance
+ * - Automatic inclusion of new protocols
+ * - Guaranteed consistency with production builds
+ * - Single source of truth in manifest system
  * 
- * @see scripts/build-powers.ts - Production config using manifest-based protocol discovery
+ * @see scripts/build-powers.ts - Production config using identical manifest system
+ * @see src/manifest.ts - PROTOCOL_SOURCE_MAPPINGS with glob patterns for auto-discovery
+ * @see expandMappings - Function that resolves glob patterns to concrete file paths
  */
 const KIRO_PROTOCOLS_CONFIG: PowerConfig = {
   name: "kiro-protocols",
   displayName: "Kiro Protocols",
-  sourceDir: "src/core/protocols",
-  protocols: [
-    "strict-mode",
-    "agent-activation",
-    "agent-creation",
-    "agent-management",
-  ],
 };
 
 /**
@@ -304,30 +326,31 @@ function makeReadonly(dirPath: string): void {
 }
 
 /**
- * Copies and processes protocol files from source directory to power steering directory.
+ * Copies and processes protocol files using manifest system for automatic discovery.
  * 
- * Creates steering/ subdirectory if needed, reads each protocol, applies substitutions,
- * and writes processed content to user's Kiro directory. Warns if source protocol not
- * found but continues with remaining protocols.
+ * Uses `PROTOCOL_SOURCE_MAPPINGS` from manifest.ts to discover all protocol files
+ * via glob patterns. Creates steering/ subdirectory if needed, reads each protocol,
+ * applies substitutions, and writes processed content. Warns if source protocol not found.
  * 
- * @param config - Power configuration with source directory and protocol list
+ * **Manifest Integration:**
+ * - Auto-discovers protocols via `expandMappings(PROTOCOL_SOURCE_MAPPINGS, "src", "power")`
+ * - Supports glob patterns: `core/protocols/*.md`, `kiro/steering/protocols/*.md`
+ * - Handles `{name}` placeholder replacement in destination paths
+ * 
  * @param powerPath - Destination power directory (e.g., '~/.kiro/powers/kiro-protocols')
  * @param substitutions - Substitution functions to apply
  * 
  * @example
  * ```typescript
- * await copyProtocols(
- *   KIRO_PROTOCOLS_CONFIG,
- *   '~/.kiro/powers/kiro-protocols',
- *   config.substitutions
- * );
- * // Reads src/core/protocols/*.md, applies substitutions, writes to ~/.kiro/powers/.../steering/
+ * await copyProtocols('~/.kiro/powers/kiro-protocols', config.substitutions);
+ * // Uses manifest to discover all protocols, processes with substitutions
  * ```
  * 
- * @see scripts/build-powers.ts - Production version using manifest-based protocol discovery
+ * @see PROTOCOL_SOURCE_MAPPINGS - Manifest mappings for protocol discovery
+ * @see expandMappings - Resolves glob patterns to concrete file paths
+ * @see scripts/build-powers.ts - Production version using same manifest system
  */
 async function copyProtocols(
-  config: PowerConfig,
   powerPath: string,
   substitutions: Substitutions
 ): Promise<void> {
@@ -338,10 +361,16 @@ async function copyProtocols(
     mkdirSync(steeringDir, { recursive: true });
   }
   
-  // Copy and process each protocol
-  for (const protocol of config.protocols) {
-    const srcPath = join(config.sourceDir, `${protocol}.md`);
-    const destPath = join(steeringDir, `${protocol}.md`);
+  // Use manifest to get all protocol files (replaces hardcoded protocol list)
+  console.log("📋 Using manifest to discover protocol files...");
+  const protocolMappings = await expandMappings(PROTOCOL_SOURCE_MAPPINGS, "src", "power");
+  
+  console.log(`📋 Found ${protocolMappings.length} protocol files in manifest`);
+  
+  // Copy and process each protocol from manifest
+  for (const mapping of protocolMappings) {
+    const srcPath = join("src", mapping.src);
+    const destPath = join(powerPath, mapping.dest);
     
     if (!existsSync(srcPath)) {
       console.warn(`⚠️  Protocol not found: ${srcPath}`);
@@ -357,61 +386,12 @@ async function copyProtocols(
     // Write processed content
     writeFileSync(destPath, processed, "utf-8");
     
-    console.log(`  ✅ Processed: ${protocol}.md`);
+    console.log(`  ✅ Processed: ${mapping.src} → ${mapping.dest}`);
   }
 }
 
-/**
- * Copies and processes Kiro-specific protocols (mode-switching, mode-management) to power.
- * 
- * Special handling for kiro-protocols power which includes both core protocols
- * and Kiro-specific mode system protocols. Applies substitutions to ensure
- * placeholders are replaced. Silently skips if source directory doesn't exist.
- * 
- * @param powerPath - Destination power directory (e.g., '~/.kiro/powers/kiro-protocols')
- * @param substitutions - Substitution functions to apply
- * 
- * @example
- * ```typescript
- * await copyKiroProtocols('~/.kiro/powers/kiro-protocols', config.substitutions);
- * // Reads src/kiro/steering/protocols/*.md, applies substitutions, writes to power
- * ```
- * 
- * @see scripts/build-powers.ts - Production version using manifest-based protocol discovery
- */
-async function copyKiroProtocols(
-  powerPath: string,
-  substitutions: Substitutions
-): Promise<void> {
-  const kiroProtocolsDir = "src/kiro/steering/protocols";
-  const steeringDir = join(powerPath, "steering");
-  
-  if (!existsSync(kiroProtocolsDir)) {
-    return;
-  }
-  
-  const kiroProtocols = ["mode-switching", "mode-management"];
-  
-  for (const protocol of kiroProtocols) {
-    const srcPath = join(kiroProtocolsDir, `${protocol}.md`);
-    const destPath = join(steeringDir, `${protocol}.md`);
-    
-    if (!existsSync(srcPath)) {
-      continue;
-    }
-    
-    // Read source file
-    const content = readFileSync(srcPath, "utf-8");
-    
-    // Apply substitutions
-    const processed = await applySubstitutions(content, substitutions, { target: 'power' });
-    
-    // Write processed content
-    writeFileSync(destPath, processed, "utf-8");
-    
-    console.log(`  ✅ Processed: ${protocol}.md (Kiro-specific)`);
-  }
-}
+// NOTE: copyKiroProtocols function removed - now handled by copyProtocols via manifest system
+// The manifest system auto-discovers both core and Kiro-specific protocols via glob patterns
 
 /**
  * Builds kiro-protocols power to user's Kiro directory for rapid iteration testing.
@@ -421,12 +401,12 @@ async function copyKiroProtocols(
  * Builds directly to `~/.kiro/powers/kiro-protocols/` for immediate testing in Kiro IDE.
  * 
  * **Build Steps:**
- * 1. Make existing files writable (remove readonly)
- * 2. Copy and process core protocols with substitutions
- * 3. Copy and process Kiro-specific protocols
- * 4. Restore readonly status on all files
+ * 1. Make existing files writable (remove readonly protection)
+ * 2. Auto-discover protocols via manifest system (`PROTOCOL_SOURCE_MAPPINGS`)
+ * 3. Copy and process all protocols (core + Kiro-specific) with substitutions
+ * 4. Restore readonly status on all files for protection
  * 
- * @param config - Power configuration defining protocols and build behavior
+ * @param config - Power configuration (protocols auto-discovered via manifest)
  * @param substitutions - Substitution functions to apply during protocol processing
  * 
  * @example
@@ -449,12 +429,9 @@ async function buildPowerDev(config: PowerConfig, substitutions: Substitutions):
   makeWritable(powerPath);
   
   try {
-    // Copy and process protocols
+    // Copy and process protocols using manifest system (includes both core and Kiro-specific)
     console.log(`📋 Processing protocols...`);
-    await copyProtocols(config, powerPath, substitutions);
-    
-    // Copy and process Kiro-specific protocols
-    await copyKiroProtocols(powerPath, substitutions);
+    await copyProtocols(powerPath, substitutions);
     
     console.log(`✅ Power built: ${config.displayName}`);
   } finally {

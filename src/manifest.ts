@@ -93,7 +93,7 @@ export const STEERING_MAPPINGS: FileMapping[] = [
   { src: "core/interactions/chit-chat.md", dest: "interactions/chit-chat.md" },
   
   // Mode definitions (loaded by /modes command)
-  { src: "kiro/steering/agent-system/*.md", dest: "modes/{name}.md" },
+  { src: "kiro/steering/protocols/kiro-*-mode.md", dest: "modes/{name}.md" },
 ];
 
 /**

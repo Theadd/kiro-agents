@@ -294,6 +294,7 @@ export const substitutions = {
 - Simply add `.md` files to `src/core/protocols/` or `src/kiro/steering/protocols/`
 - Manifest glob patterns automatically discover and include them
 - No configuration changes needed
+- Example: New modes `kiro-as-vibe-mode.md` and `kiro-as-spec-mode.md` were auto-discovered
 
 ## Testing Strategy
 
