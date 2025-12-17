@@ -11,8 +11,6 @@ Implements a centralized file mapping system in `src/manifest.ts` that serves as
 - Glob pattern support for automatic protocol discovery via manifest mappings
 - CLI generation from templates with embedded file lists from manifest
 - Comprehensive manifest system documentation in workspace steering files
-- Validation script (`scripts/validate-manifest.ts`) for build consistency
-- Documentation guide (`docs/contributing/MANIFEST-SYSTEM.md`) for contributors
 
 ## Changed
 - Build system now uses manifest for all file operations instead of hardcoded lists

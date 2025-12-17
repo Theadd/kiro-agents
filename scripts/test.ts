@@ -123,14 +123,14 @@ async function testNpmBuild() {
   // Check dist files exist
   const distFiles = [
     "build/npm/dist/aliases.md",
-    "build/npm/dist/protocols/strict-mode.md",
     "build/npm/dist/agents.md",
     "build/npm/dist/modes.md",
     "build/npm/dist/strict.md",
     "build/npm/dist/interactions/chit-chat.md",
-    "build/npm/dist/interactions/interaction-styles.md",
     "build/npm/dist/modes/kiro-spec-mode.md",
     "build/npm/dist/modes/kiro-vibe-mode.md",
+    "build/npm/dist/modes/kiro-as-spec-mode.md",
+    "build/npm/dist/modes/kiro-as-vibe-mode.md",
   ];
   
   let missingFiles = 0;
@@ -233,6 +233,10 @@ async function testPowerBuild() {
     "build/npm/power/steering/agent-management.md",
     "build/npm/power/steering/mode-switching.md",
     "build/npm/power/steering/mode-management.md",
+    "build/npm/power/steering/kiro-vibe-mode.md",
+    "build/npm/power/steering/kiro-spec-mode.md",
+    "build/npm/power/steering/kiro-as-vibe-mode.md",
+    "build/npm/power/steering/kiro-as-spec-mode.md",
   ];
   
   let missingFiles = 0;

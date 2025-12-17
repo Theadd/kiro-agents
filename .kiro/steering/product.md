@@ -60,8 +60,10 @@ When working on this codebase, follow these principles:
 **Purpose**: Switch between interaction styles based on workflow needs
 
 **Modes**:
-- **Vibe Mode**: Flexible, conversational, quick iterations, no formal workflow
-- **Spec Mode**: Structured feature development with requirements → design → tasks workflow
+- **Vibe Mode**: Flexible, conversational, quick iterations, no formal workflow (with vibe tools)
+- **Spec Mode**: Structured feature development with requirements → design → tasks workflow (with spec tools)
+- **As-Vibe Mode**: Vibe interaction style but keeps current tools
+- **As-Spec Mode**: Spec interaction style but keeps current tools
 
 **Implementation**:
 - Mode definitions in `src/kiro/steering/protocols/kiro-{mode}-mode.md` (moved from agent-system/)
@@ -166,17 +168,24 @@ npx kiro-agents  # or bunx kiro-agents
 ### Switching Modes
 
 1. User types `/modes` to see options
-2. Or directly: `/modes vibe` or `/modes spec`
+2. Or directly: `/modes vibe`, `/modes spec`, `/modes as-vibe`, `/modes as-spec`
 3. Mode definition loaded into context
 4. AI assumes mode protocols
 5. File changes preserved, workflow state reset
+
+**Mode Types:**
+- **Full modes** (`vibe`/`spec`): Change both tools and interaction style
+- **Role modes** (`as-vibe`/`as-spec`): Change only interaction style, keep current tools
 
 ### Combining Features
 
 1. User can be in a mode AND use an agent: `/modes spec` then `/agents kiro-master`
 2. User can enable strict mode while in agent/mode: `/strict on`
 3. User can enable debug mode for development: `/debug on`
-4. All features work together, layered capabilities
+4. **Agent Superpowers**: Use role modes to combine agent tools with preferred interaction style:
+   - `/agents {specialized-agent}` then `/modes as-vibe` = Agent tools + vibe flexibility
+   - `/agents {specialized-agent}` then `/modes as-spec` = Agent tools + spec structure
+5. All features work together, layered capabilities
 
 ## Development Conventions
 
@@ -261,5 +270,6 @@ Developers using Kiro IDE who want:
 - Ability to create specialized agents for different tasks
 - Structured workflows for complex features (spec mode)
 - Flexible workflows for quick iterations (vibe mode)
+- **Agent superpowers**: Specialized tools with preferred interaction style (as-vibe/as-spec modes)
 - Precision mode for critical development (strict mode)
 - Extensible and customizable AI interactions

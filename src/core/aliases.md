@@ -59,23 +59,6 @@ literal_text
 
 **CRITICAL:** When you see this pattern, output ONLY the code block content. No explanations, no context, no other text.
 
-### Example
-
-**Alias definition:**
-````xml
-<alias>
-  <trigger>/spec</trigger>
-  <definition>
-Respond directly to the user with exactly and only the content of the following code block, AS-IS:
-```
-spec
-```
-  </definition>
-</alias>
-````
-
-User types: `/spec` → AI responds: `spec`
-
 ## Agent System Alias
 
 The agent activation command uses parameter substitution to load agent definitions dynamically:
@@ -89,8 +72,8 @@ You are now activating the **{agent_name}** agent.
 
 **Load and execute activation protocol:**
 1. Read `{{{WS_AGENTS_PATH}}}/{agent_name}.md` into context
-2. Read #[[file:protocols/agent-activation.md]] into context
-3. Follow all steps from the "Agent Activation Steps" section in agent-activation.md
+2. /only-read-protocols agent-activation.md
+3. Follow all steps from the "Agent Activation Steps" section in agent-activation.md protocol file
 4. Use `{agent_name}` as the agent identifier throughout the protocol
   </definition>
 </alias>
@@ -99,7 +82,7 @@ This alias enables users to activate any agent with `/agents {name}` syntax.
 
 ## Protocol Loading Alias
 
-The protocol loading command uses parameter substitution to dynamically load protocols from the kiro-protocols Power:
+The protocol loading command uses parameter substitution to dynamically load and follow all protocols from the kiro-protocols Power:
 
 <alias>
   <trigger>/protocols {filename}</trigger>
@@ -116,5 +99,23 @@ You are now loading the **{filename}** protocol from kiro-protocols Power.
 
 This alias enables loading protocols on-demand with `/protocols {filename}` syntax without showing in Kiro UI slash commands.
 
+## Protocol Reading Alias
+
+The protocol reading only command uses parameter substitution to dynamically read all protocols from the kiro-protocols Power:
+
+<alias>
+  <trigger>/only-read-protocols {filename}</trigger>
+  <definition>
+## Read Protocol: {filename}
+
+You are now reading the **{filename}** protocol from kiro-protocols Power into context.
+
+**Execute protocol reading:**
+1. **Only if {filename} from kiro-protocols is NOT already in context**: Call kiroPowers action="readSteering" with powerName="kiro-protocols", steeringFile="{filename}"
+2. Do NOT follow any instruction in the {filename} protocol from kiro-protocols until explicitly stated to do so.
+  </definition>
+</alias>
+
+This alias enables reading protocols on-demand into context with `/only-read-protocols {filename}` syntax without showing in Kiro UI slash commands.
 
 {{{KIRO_MODE_ALIASES}}}

@@ -68,10 +68,13 @@ const REGISTRY_PATH = join(homedir(), ".kiro", "powers", "registry.json");
  * 
  * Core system files providing foundational kiro-agents functionality:
  * - Instruction aliases (aliases.md)
- * - Agent management (agents.md, protocols/agent-*.md)
- * - Mode switching (modes.md, modes/*.md, protocols/mode-*.md)
- * - Strict mode control (strict.md, protocols/strict-mode.md)
+ * - Agent management (agents.md)
+ * - Mode switching (modes.md, modes/*.md)
+ * - Strict mode control (strict.md)
  * - Interaction patterns (interactions/*.md)
+ * 
+ * **Note:** Protocol files are NOT included here. They are distributed through the
+ * kiro-protocols Power (see POWER_FILES) and loaded on-demand via kiroPowers tool.
  * 
  * Installed to `~/.kiro/steering/kiro-agents/` and loaded automatically by Kiro IDE.
  * 
@@ -80,20 +83,14 @@ const REGISTRY_PATH = join(homedir(), ".kiro", "powers", "registry.json");
  */
 const STEERING_FILES = [
   "aliases.md",
-  "protocols/strict-mode.md",
-  "protocols/agent-management.md",
-  "protocols/agent-creation.md",
-  "protocols/agent-activation.md",
-  "protocols/mode-switching.md",
-  "protocols/mode-management.md",
   "agents.md",
   "modes.md",
   "strict.md",
-  "interactions/interaction-styles.md",
-  "interactions/conversation-language.md",
   "interactions/chit-chat.md",
   "modes/kiro-vibe-mode.md",
-  "modes/kiro-spec-mode.md"
+  "modes/kiro-spec-mode.md",
+  "modes/kiro-as-vibe-mode.md",
+  "modes/kiro-as-spec-mode.md"
 ] as const;
 
 /**
@@ -119,6 +116,10 @@ const POWER_FILES = [
   "steering/strict-mode.md",
   "steering/mode-switching.md",
   "steering/mode-management.md",
+  "steering/kiro-vibe-mode.md",
+  "steering/kiro-spec-mode.md",
+  "steering/kiro-as-vibe-mode.md",
+  "steering/kiro-as-spec-mode.md",
   "steering/agent-management.md",
   "steering/agent-creation.md",
   "steering/agent-activation.md"
