@@ -72,12 +72,12 @@ powers/{power-name}/
      {
        name: "my-new-power",
        displayName: "My New Power",
-       sourceDir: "src/path/to/protocols",
-       protocols: ["protocol1", "protocol2"],
        generateIcon: true,
      },
    ];
    ```
+   
+   **Note:** Protocols are now auto-discovered via manifest system from `src/core/protocols/` and `src/kiro/steering/protocols/`. No need to specify individual protocol files.
 
 4. **Build the power:**
    ```bash
@@ -120,20 +120,7 @@ Instead:
    touch src/kiro/steering/protocols/my-new-protocol.md
    ```
 
-2. **Update power configuration in `scripts/build-powers.ts`:**
-   ```typescript
-   {
-     name: "kiro-protocols",
-     protocols: [
-       "agent-activation",
-       "agent-creation",
-       "agent-management",
-       "my-new-protocol",  // Add here
-     ],
-   }
-   ```
-
-3. **Rebuild:**
+2. **Rebuild (protocols auto-discovered via manifest):**
    ```bash
    bun run build:powers kiro-protocols
    ```
@@ -264,7 +251,7 @@ Powers are distributed directly from this GitHub repository:
 
 **Solutions:**
 1. Check source files exist in `src/`
-2. Validate power config in `build-powers.ts`
+2. Validate power config in `build-powers.ts` (protocols now auto-discovered via manifest)
 3. Check protocol markdown syntax
 4. Review build error messages
 

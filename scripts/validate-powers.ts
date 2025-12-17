@@ -27,7 +27,7 @@
  * # or: bun run scripts/validate-powers.ts kiro-protocols
  * ```
  * 
- * @see scripts/build-powers.ts - Power build system
+ * @see scripts/build-powers.ts - Power build system using manifest-based protocol discovery
  * @see powers/README.md - Power structure documentation
  */
 

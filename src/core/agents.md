@@ -15,7 +15,7 @@ If the user's message contains `/agents {agent_name}` with a specific agent name
 1. **DO NOT execute the interactive management flow below**
 2. **INSTEAD, execute the instruction alias for agent activation:**
    - Read `{{{WS_AGENTS_PATH}}}/{agent_name}.md` into context
-   - Read #[[file:protocols/agent-activation.md]] into context
+   - /protocols agent-activation.md
    - Follow all steps from the "Agent Activation Steps" section in agent-activation.md
    - Use `{agent_name}` as the agent identifier throughout the protocol
 3. **Stop processing this document** - The agent activation protocol takes over

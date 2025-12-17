@@ -17,22 +17,31 @@
 
 ## Build System
 
+**Centralized Manifest System** (`src/manifest.ts`)
+- Single source of truth for all file mappings across build targets
+- Glob pattern support for automatic file discovery
+- Type-safe file mapping definitions with target filtering
+- Guaranteed consistency between dev mode and CLI installation
+
 **Custom Dual Build Pipeline** (`scripts/build.ts`)
+- Uses centralized manifest system for all file operations
 - Bun.build API for CLI compilation (npm only)
 - Dynamic substitution system
-- File mapping and transformation
+- File mapping and transformation via manifest
 - Three build modes: npm, power, dev
 
 **Build Targets**:
 
 1. **npm** (`bun run build`)
+   - Generates CLI from template: `bin/cli.template.ts` → `bin/cli.ts` (with embedded file lists from manifest)
    - Compiles CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
-   - Processes steering files with substitutions
+   - Processes steering files via `STEERING_MAPPINGS` from manifest
    - Copies pre-built power files from `powers/kiro-protocols/`
-   - Maps to `build/npm/dist/` and `build/npm/power/`
+   - Maps to `build/npm/dist/` and `build/npm/power/` using manifest
    - Cleans `build/npm/` after build
 
 2. **dev** (`bun run dev`)
+   - Uses same manifest mappings as npm build for consistency
    - Builds directly to `~/.kiro/steering/kiro-agents/`
    - Watch mode for file changes
    - No CLI compilation
@@ -41,9 +50,11 @@
 **Powers Build** (separate script):
 
 - **powers** (`bun run build:powers`)
-  - Processes protocol files with substitutions
+  - Uses `PROTOCOL_SOURCE_MAPPINGS` from manifest for automatic protocol discovery
+  - Supports glob patterns: `core/protocols/*.md`, `kiro/steering/protocols/*.md`
+  - Auto-discovers and processes all protocol files with substitutions
   - Builds to `powers/*/steering/` directories
-  - Creates kiro-protocols power with protocols
+  - Creates kiro-protocols power with all discovered protocols
   - Must run BEFORE npm build
 
 ## Distribution
@@ -60,9 +71,10 @@
 - Removes old installation before installing new
 
 **Powers System** - Multi-power architecture
-- Built via `bun run build:powers` script
+- Built via `bun run build:powers` script using centralized manifest system
+- Auto-discovers source protocols via `PROTOCOL_SOURCE_MAPPINGS` glob patterns
 - Source protocols in `src/core/protocols/` and `src/kiro/steering/protocols/`
-- Output to `powers/*/steering/` directories (auto-generated)
+- Output to `powers/*/steering/` directories (auto-generated from manifest)
 - Copied to npm package during build
 - Installed by CLI to `~/.kiro/powers/kiro-protocols/`
 
@@ -153,6 +165,37 @@ Captures context that git commits don't:
 - **Smart filtering** - AI excludes temporary/experimental changes
 - **Collaborative** - Multiple devs work in parallel
 
+## Centralized Manifest System
+
+**Architecture** (`src/manifest.ts`):
+- Single source of truth for all file mappings across build targets
+- Type-safe `FileMapping` interface with glob pattern support
+- Target filtering (`npm`, `dev`, `cli`, `power`) for build-specific files
+- Automatic file discovery via glob patterns (no manual file lists)
+
+**Key Mappings**:
+- `STEERING_MAPPINGS` - Core system files for `~/.kiro/steering/kiro-agents/`
+- `POWER_MAPPINGS` - Power files for `~/.kiro/powers/kiro-protocols/`
+- `PROTOCOL_SOURCE_MAPPINGS` - Source protocols with glob auto-discovery
+
+**Glob Pattern Support**:
+- `core/protocols/*.md` - Auto-discovers all core protocols
+- `kiro/steering/protocols/*.md` - Auto-discovers all Kiro-specific protocols
+- `{name}` placeholder replacement in destination paths
+- No manual file list updates needed when adding new protocols
+
+**Benefits**:
+- **Single Source of Truth**: Change once, applies to all build targets
+- **Auto-Discovery**: Add new protocol → automatically included in builds
+- **Guaranteed Consistency**: Dev mode matches CLI installation exactly
+- **Type Safety**: Compile-time validation of all file mappings
+- **CLI Generation**: Embeds file lists in generated CLI for installation
+
+**Functions**:
+- `expandMappings()` - Resolves glob patterns to concrete file paths
+- `getSteeringFilesForCLI()` - Generates file list for CLI installation
+- `getPowerFilesForCLI()` - Generates power file list for CLI installation
+
 ## Configuration System
 
 **Dynamic Substitutions**:
@@ -228,24 +271,29 @@ export const substitutions = {
 ### Steering Files Development
 
 1. **Make changes** to source files in `src/core/` or `src/kiro/steering/`
-2. **Run dev mode** with `bun run dev` (watch mode)
+2. **Run dev mode** with `bun run dev` (watch mode, uses manifest for consistency)
 3. **Test locally** - Files in `~/.kiro/steering/kiro-agents/`
 4. **Build for distribution**:
-   - Powers: `bun run build:powers` (first)
-   - npm: `bun run build` (after powers)
+   - Powers: `bun run build:powers` (first, uses manifest auto-discovery)
+   - npm: `bun run build` (after powers, uses manifest for all mappings)
 5. **Validate** with `bun run test`
 6. **Publish** when ready
 
 ### Protocol Files Development
 
 1. **Make changes** to protocol files in `src/core/protocols/` or `src/kiro/steering/protocols/`
-2. **Run dev:powers mode** with `bun run dev:powers` (watch mode)
+2. **Run dev:powers mode** with `bun run dev:powers` (watch mode, uses manifest auto-discovery)
 3. **Test locally** - Files in `~/.kiro/powers/kiro-protocols/steering/`
 4. **Build for distribution**:
-   - Powers: `bun run build:powers` (regenerates `powers/kiro-protocols/steering/`)
+   - Powers: `bun run build:powers` (uses manifest to auto-discover and regenerate `powers/kiro-protocols/steering/`)
    - npm: `bun run build` (includes power files)
 5. **Validate** with `bun run test`
 6. **Publish** when ready
+
+**Adding New Protocols**:
+- Simply add `.md` files to `src/core/protocols/` or `src/kiro/steering/protocols/`
+- Manifest glob patterns automatically discover and include them
+- No configuration changes needed
 
 ## Testing Strategy
 
@@ -275,7 +323,7 @@ export const substitutions = {
 
 ### Powers Distribution
 
-1. Run `bun run build:powers` to regenerate `powers/*/steering/`
+1. Run `bun run build:powers` to regenerate `powers/*/steering/` using manifest auto-discovery
 2. Run `bun run test` to validate
 3. Commit regenerated steering files to GitHub
 4. Push to repository
@@ -317,10 +365,16 @@ export const substitutions = {
 ### dev:powers (Protocol Files)
 
 **Fast Iteration**:
+- Uses manifest system for automatic protocol discovery
 - Direct build to power directory (`~/.kiro/powers/kiro-protocols/`)
 - Watch mode for automatic rebuilds
 - Handles readonly files automatically
 - Immediate testing in Kiro IDE
+
+**Manifest Integration**:
+- Auto-discovers protocols via `PROTOCOL_SOURCE_MAPPINGS` glob patterns
+- Includes both core and Kiro-specific protocols automatically
+- No manual file list updates needed when adding new protocols
 
 **Readonly Handling**:
 - Detects readonly files in target directory

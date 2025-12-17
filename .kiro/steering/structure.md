@@ -5,21 +5,22 @@
 ```
 kiro-agents/
 ├── src/                          # Source files
+│   ├── manifest.ts               # **CENTRALIZED FILE MANIFEST** - Single source of truth for all file mappings
 │   ├── core/                     # Cross-IDE compatible
 │   │   ├── aliases.md            # Instruction alias system with injected Kiro aliases
 │   │   ├── agents.md             # Interactive agent menu
-│   │   ├── strict-mode.md        # Strict mode rules
 │   │   ├── strict.md             # Interactive strict control
 │   │   ├── docs/                 # Extended documentation
 │   │   │   ├── aliases-guide.md  # Complete alias documentation
 │   │   │   └── agent-system-guide.md  # Complete agent system guide
-│   │   ├── protocols/            # Protocol files (auxiliary .md)
+│   │   ├── protocols/            # Protocol files (auxiliary .md) - auto-discovered via manifest
 │   │   │   ├── agent-activation.md  # Agent activation protocol
 │   │   │   ├── agent-management.md  # Agent management protocol
 │   │   │   ├── agent-creation.md    # Agent creation protocol
-│   │   │   └── mode-switching.md    # Mode switching protocol
+│   │   │   └── strict-mode.md       # Strict mode protocol
 │   │   └── interactions/
 │   │       ├── chit-chat.md      # ADHD-C patterns
+│   │       ├── conversation-language.md  # Language usage guidelines
 │   │       └── interaction-styles.md
 │   ├── kiro/                     # Kiro-specific
 │   │   ├── POWER.md              # Power metadata template
@@ -28,18 +29,17 @@ kiro-agents/
 │   │   ├── shared-aliases.md     # Reusable alias definitions
 │   │   └── steering/
 │   │       ├── modes.md          # Interactive mode menu
-│   │       ├── protocols/        # Kiro-specific protocols
-│   │       │   ├── mode-switching.md
-│   │       │   └── mode-management.md
-│   │       └── agent-system/
-│   │           ├── kiro-spec-mode.md
-│   │           └── kiro-vibe-mode.md
+│   │       └── protocols/        # Kiro-specific protocols - auto-discovered via manifest
+│   │           ├── mode-switching.md    # Mode switching protocol
+│   │           ├── mode-management.md   # Mode management protocol
+│   │           ├── kiro-spec-mode.md    # Spec mode definition (moved from agent-system/)
+│   │           └── kiro-vibe-mode.md    # Vibe mode definition (moved from agent-system/)
 │   ├── utils/                    # Build utilities
 │   │   └── markdown-extractor.ts # Section extraction from markdown
 │   └── config.ts                 # Core substitutions
 ├── scripts/                      # Build scripts
 │   ├── build.ts                  # npm package build pipeline
-│   ├── build-powers.ts           # Multi-power build system
+│   ├── build-powers.ts           # Multi-power build system using manifest-based protocol discovery
 │   ├── dev-powers.ts             # Dev mode for powers (watch)
 │   ├── validate-powers.ts        # Power validation
 │   ├── test.ts                   # Validation script
@@ -102,9 +102,11 @@ kiro-agents/
 ### Build Layer (`scripts/`, `bin/`)
 
 **Power Build Pipeline** (`scripts/build-powers.ts`):
-- Builds standalone powers to `powers/` directory
+- Builds standalone powers to `powers/` directory using centralized manifest system
+- Auto-discovers protocols via `PROTOCOL_SOURCE_MAPPINGS` from `src/manifest.ts`
+- Uses glob patterns: `core/protocols/*.md`, `kiro/steering/protocols/*.md`
 - Processes protocol files with substitutions
-- Creates kiro-protocols power
+- Creates kiro-protocols power with all discovered protocols
 - Must run BEFORE npm build
 
 **Power Dev Pipeline** (`scripts/dev-powers.ts`):
@@ -116,14 +118,17 @@ kiro-agents/
 
 **npm Build Pipeline** (`scripts/build.ts`):
 - Two build targets: `npm`, `dev`
+- Uses centralized manifest system (`src/manifest.ts`) for all file mappings
 - Compiles CLI to JavaScript (npm only)
 - Loads configuration with substitutions
-- Processes markdown files
+- Processes markdown files via `STEERING_MAPPINGS` from manifest
 - Copies pre-built power files from `powers/kiro-protocols/`
-- Maps files to target structure
+- Maps files to target structure with guaranteed consistency
 
 **CLI Tool** (`bin/cli.ts`):
+- Generated from `bin/cli.template.ts` with embedded file lists from manifest
 - Dual installation system for steering documents and kiro-protocols power
+- Uses `getSteeringFilesForCLI()` and `getPowerFilesForCLI()` from manifest
 - Installs core system files to `~/.kiro/steering/kiro-agents/`
 - Installs protocol library to `~/.kiro/powers/kiro-protocols/`
 - Creates symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
@@ -162,16 +167,30 @@ kiro-agents/
 
 ## File Mapping
 
-### Powers Build (via `build-powers.ts`)
+### Powers Build (via `build-powers.ts` using centralized manifest system)
+
+**Auto-discovered via `PROTOCOL_SOURCE_MAPPINGS` in `src/manifest.ts`:**
 
 ```
-src/core/protocols/strict-mode.md      → powers/kiro-protocols/steering/strict-mode.md
-src/core/protocols/agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
-src/core/protocols/agent-management.md → powers/kiro-protocols/steering/agent-management.md
-src/core/protocols/agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
-src/kiro/steering/protocols/mode-switching.md  → powers/kiro-protocols/steering/mode-switching.md
-src/kiro/steering/protocols/mode-management.md → powers/kiro-protocols/steering/mode-management.md
+# Core protocols (cross-IDE compatible)
+src/core/protocols/*.md → powers/kiro-protocols/steering/{name}.md
+  ├── strict-mode.md      → powers/kiro-protocols/steering/strict-mode.md
+  ├── agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
+  ├── agent-management.md → powers/kiro-protocols/steering/agent-management.md
+  └── agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
+
+# Kiro-specific protocols (includes mode definitions)
+src/kiro/steering/protocols/*.md → powers/kiro-protocols/steering/{name}.md
+  ├── mode-switching.md   → powers/kiro-protocols/steering/mode-switching.md
+  ├── mode-management.md  → powers/kiro-protocols/steering/mode-management.md
+  ├── kiro-spec-mode.md   → powers/kiro-protocols/steering/kiro-spec-mode.md
+  └── kiro-vibe-mode.md   → powers/kiro-protocols/steering/kiro-vibe-mode.md
 ```
+
+**Benefits:**
+- ✅ Auto-discovery: Add new protocol → automatically included
+- ✅ Single source of truth: All mappings in `src/manifest.ts`
+- ✅ Glob patterns: No manual file list updates needed
 
 ### Dev:Powers Build (via `dev-powers.ts`)
 
@@ -224,10 +243,15 @@ src/kiro/.../kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
 - Protocol files (.md) as single source of truth, injected via substitutions
 
 **Build Process**:
+- **Centralized Manifest System**: All file mappings in `src/manifest.ts` (single source of truth)
+- **Glob Pattern Support**: Auto-discovers files with `*.md` patterns, no manual updates needed
+- **Manifest-Based Protocol Discovery**: `PROTOCOL_SOURCE_MAPPINGS` with glob patterns for automatic protocol inclusion
+- **Guaranteed Consistency**: Dev mode matches CLI installation exactly (no more mismatches)
+- **CLI Generation**: `bin/cli.ts` generated from template with embedded file lists from manifest
 - Deterministic builds (same input = same output)
 - Dynamic substitutions applied at build time
 - Two build targets: npm, dev
-- Powers built separately via `build:powers` script
+- Powers built separately via `build:powers` script using manifest auto-discovery
 - npm build cleans after completion
 - Dev mode watches for changes
 

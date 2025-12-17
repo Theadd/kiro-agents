@@ -59,10 +59,14 @@ const REGISTRY_PATH = join(homedir(), ".kiro", "powers", "registry.json");
 /**
  * Steering files to install from dist/ directory in package.
  * 
- * Core system files that provide foundational kiro-agents functionality including
- * instruction aliases, agent management, mode switching, strict mode control, and
- * interaction patterns. Installed to `~/.kiro/steering/kiro-agents/` and loaded
- * automatically by Kiro IDE.
+ * Core system files providing foundational kiro-agents functionality:
+ * - Instruction aliases (aliases.md)
+ * - Agent management (agents.md, protocols/agent-*.md)
+ * - Mode switching (modes.md, modes/*.md, protocols/mode-*.md)
+ * - Strict mode control (strict.md, protocols/strict-mode.md)
+ * - Interaction patterns (interactions/*.md)
+ * 
+ * Installed to `~/.kiro/steering/kiro-agents/` and loaded automatically by Kiro IDE.
  * 
  * @see POWER_FILES - Protocol files installed separately as kiro-protocols power
  * @see scripts/build.ts - NPM_FILE_MAPPINGS that processes these files during build
@@ -82,9 +86,12 @@ const STEERING_FILES = [
 /**
  * Power files to install from power/ directory in package.
  * 
- * kiro-protocols power files including metadata, protocol library, and icon.
- * These files are copied from `powers/kiro-protocols/` during build and packaged
- * in npm distribution for dual installation alongside steering files.
+ * kiro-protocols power files:
+ * - Power metadata (POWER.md, mcp.json, icon.png)
+ * - Protocol library (steering/agent-activation.md, steering/agent-creation.md, etc.)
+ * 
+ * Copied from `powers/kiro-protocols/` during build, packaged in npm distribution
+ * for dual installation alongside steering files.
  * 
  * @see scripts/build.ts - NPM_POWER_FILES constant that copies these during build
  * @see STEERING_FILES - Core system files installed separately
@@ -101,8 +108,13 @@ const POWER_FILES = [
 ] as const;
 
 /**
- * Power metadata extracted from POWER.md frontmatter.
- * This metadata is used to register the power in Kiro's registry.
+ * Power metadata extracted from POWER.md frontmatter for registry registration.
+ * 
+ * @property name - Power identifier (e.g., 'kiro-protocols')
+ * @property displayName - Human-readable name shown in Powers UI (e.g., 'Kiro Protocols')
+ * @property description - Brief description of power capabilities
+ * @property keywords - Search terms for power discovery
+ * @property author - Power author/maintainer
  */
 interface PowerMetadata {
   name: string;
@@ -114,6 +126,14 @@ interface PowerMetadata {
 
 /**
  * Kiro registry structure for tracking installed powers.
+ * 
+ * Located at `~/.kiro/powers/registry.json`, maintains state of all powers
+ * installed in Kiro IDE for Powers UI integration.
+ * 
+ * @property version - Registry format version (e.g., '1.0.0')
+ * @property powers - Map of power name to power entry
+ * @property repoSources - Map of repo ID to repository source
+ * @property lastUpdated - ISO timestamp of last registry modification
  */
 interface KiroRegistry {
   version: string;
@@ -123,7 +143,19 @@ interface KiroRegistry {
 }
 
 /**
- * Power entry in the registry.
+ * Power entry in the registry representing an installed or available power.
+ * 
+ * @property name - Power identifier
+ * @property displayName - Human-readable name
+ * @property description - Power capabilities description
+ * @property mcpServers - MCP server names provided by power (empty for kiro-protocols)
+ * @property author - Power author/maintainer
+ * @property keywords - Search terms for discovery
+ * @property installed - Whether power is currently installed
+ * @property installedAt - ISO timestamp of installation (if installed)
+ * @property installPath - Path to symlink directory in installed/ (if installed)
+ * @property source - Repository source information
+ * @property sourcePath - Path to actual power directory (if installed)
  */
 interface PowerEntry {
   name: string;
@@ -144,7 +176,15 @@ interface PowerEntry {
 }
 
 /**
- * Repository source entry in the registry.
+ * Repository source entry tracking power source locations.
+ * 
+ * @property name - Repository display name (full path for local repos)
+ * @property type - Source type ('local' for filesystem, 'git' for remote)
+ * @property enabled - Whether source is active for power discovery
+ * @property addedAt - ISO timestamp when source was added
+ * @property path - Filesystem path to repository
+ * @property lastSync - ISO timestamp of last synchronization
+ * @property powerCount - Number of powers available from this source
  */
 interface RepoSource {
   name: string;
