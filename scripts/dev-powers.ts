@@ -24,7 +24,7 @@
  * # Edit src/core/protocols/agent-activation.md → auto-rebuilds
  * ```
  * 
- * @see scripts/build-powers.ts - Base power build system
+ * @see scripts/build-powers.ts - Base power build system using manifest-based protocol discovery
  */
 
 import { homedir } from "os";
@@ -59,7 +59,7 @@ interface SubstitutionOptions {
  * };
  * ```
  * 
- * @see scripts/build-powers.ts - Production power build with same substitution pattern
+ * @see scripts/build-powers.ts - Production power build with manifest-based protocol discovery
  */
 type Substitutions = { [key: string]: (options: SubstitutionOptions) => string };
 
@@ -102,7 +102,7 @@ interface PowerConfig {
  * Power configuration for kiro-protocols in dev mode.
  * 
  * Defines which protocols to copy from source to user's Kiro directory during
- * development. Matches production config from `scripts/build-powers.ts` but
+ * development. Matches production config from `scripts/build-powers.ts` (now using manifest) but
  * excludes `generateIcon` since icon files are committed and not regenerated.
  * 
  * **Protocol List:**
@@ -114,7 +114,7 @@ interface PowerConfig {
  * **Note:** Kiro-specific protocols (mode-switching, mode-management) are handled
  * separately by `copyKiroProtocols()` function.
  * 
- * @see scripts/build-powers.ts - Production config with same protocol list
+ * @see scripts/build-powers.ts - Production config using manifest-based protocol discovery
  */
 const KIRO_PROTOCOLS_CONFIG: PowerConfig = {
   name: "kiro-protocols",
@@ -177,7 +177,7 @@ async function loadConfig(): Promise<Config> {
  * ```
  * 
  * @see scripts/build.ts - Same multi-pass algorithm used in main build
- * @see scripts/build-powers.ts - Same multi-pass algorithm used in power build
+ * @see scripts/build-powers.ts - Same multi-pass algorithm used in manifest-based power build
  */
 async function applySubstitutions(
   content: string,
@@ -324,7 +324,7 @@ function makeReadonly(dirPath: string): void {
  * // Reads src/core/protocols/*.md, applies substitutions, writes to ~/.kiro/powers/.../steering/
  * ```
  * 
- * @see scripts/build-powers.ts - Production version with same logic
+ * @see scripts/build-powers.ts - Production version using manifest-based protocol discovery
  */
 async function copyProtocols(
   config: PowerConfig,
@@ -377,7 +377,7 @@ async function copyProtocols(
  * // Reads src/kiro/steering/protocols/*.md, applies substitutions, writes to power
  * ```
  * 
- * @see scripts/build-powers.ts - Production version with same logic
+ * @see scripts/build-powers.ts - Production version using manifest-based protocol discovery
  */
 async function copyKiroProtocols(
   powerPath: string,
@@ -435,7 +435,7 @@ async function copyKiroProtocols(
  * // Builds to ~/.kiro/powers/kiro-protocols/ with substitutions applied
  * ```
  * 
- * @see scripts/build-powers.ts - Production build to powers/ directory
+ * @see scripts/build-powers.ts - Production build to powers/ directory using manifest system
  */
 async function buildPowerDev(config: PowerConfig, substitutions: Substitutions): Promise<void> {
   const userHome = homedir();

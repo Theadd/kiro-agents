@@ -1,8 +1,3 @@
----
-inclusion: manual
-description: Vibe mode protocols for flexible, conversational development assistance
----
-
 # Kiro Vibe Mode
 
 Flexible, conversational development mode for general coding assistance, exploration, and rapid iteration.

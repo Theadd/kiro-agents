@@ -35,6 +35,7 @@
 import { homedir } from "os";
 import { join } from "path";
 import { rmSync } from "fs";
+import { STEERING_MAPPINGS, POWER_MAPPINGS, expandMappings, getSteeringFilesForCLI, getPowerFilesForCLI } from "../src/manifest.ts";
 
 /**
  * Build target types for different distribution channels.
@@ -45,99 +46,25 @@ import { rmSync } from "fs";
  * @property npm-no-clean - Build npm package but preserve artifacts (used by test.ts and release.ts for inspection/publish)
  * @property dev - Build to user directory (`~/.kiro/steering/kiro-agents/`) with watch mode for rapid iteration
  * 
- * @see scripts/build-powers.ts - Separate build system for powers/ directory
+ * @see scripts/build-powers.ts - Separate build system for powers/ directory using manifest-based protocol discovery
  */
 type BuildTarget = "npm" | "npm-no-clean" | "dev";
 
 /**
- * File mappings for npm distribution.
+ * DEPRECATED: File mappings now managed by src/manifest.ts
  * 
- * Maps source files to npm package structure (installed to `~/.kiro/steering/kiro-agents/`).
- * These are core system files that provide foundational kiro-agents functionality including
- * instruction aliases, agent management, mode switching, strict mode control, and interaction
- * patterns. Files are always loaded by Kiro IDE.
+ * This section has been replaced by the centralized manifest system which provides:
+ * - Single source of truth for all file mappings
+ * - Glob pattern support for automatic file discovery
+ * - Guaranteed consistency between npm, dev, and cli targets
+ * - Type-safe mapping definitions
  * 
- * **Key exclusion:** `agent-system.md` is NOT included - npm distribution relies on `aliases.md`
- * which contains the agent activation alias. The full `agent-system.md` context is only
- * included in Power distribution for better Kiro ecosystem integration.
+ * **Note:** Protocol files are NOT in STEERING_MAPPINGS. They are distributed exclusively
+ * through the kiro-protocols Power (POWER_MAPPINGS) and loaded on-demand via kiroPowers tool.
  * 
- * **File categories:**
- * - Core system files (always loaded): aliases.md
- * - Protocol files (auxiliary): strict-mode.md, agent-activation.md, agent-management.md, agent-creation.md, mode-switching.md, mode-management.md
- * - Interactive interfaces (manual): agents.md, modes.md, strict.md
- * - Interaction patterns: chit-chat.md, interaction-styles.md
- * - Mode definitions: kiro-spec-mode.md, kiro-vibe-mode.md
- * 
- * @see NPM_POWER_FILES - Power files copied from powers/kiro-protocols/ during npm build
- * @see bin/cli.ts - STEERING_FILES constant that installs these files
+ * @see src/manifest.ts - STEERING_MAPPINGS and POWER_MAPPINGS
+ * @see expandMappings - Function that resolves globs and generates concrete mappings
  */
-const NPM_FILE_MAPPINGS = [
-  // Core system files (always loaded)
-  { src: "src/core/aliases.md", dest: "build/npm/dist/aliases.md" },
-  
-  // Protocol files (auxiliary, not in steering list)
-  { src: "src/core/protocols/strict-mode.md", dest: "build/npm/dist/protocols/strict-mode.md" },
-  { src: "src/core/protocols/agent-activation.md", dest: "build/npm/dist/protocols/agent-activation.md" },
-  { src: "src/core/protocols/agent-management.md", dest: "build/npm/dist/protocols/agent-management.md" },
-  { src: "src/core/protocols/agent-creation.md", dest: "build/npm/dist/protocols/agent-creation.md" },
-  { src: "src/kiro/steering/protocols/mode-switching.md", dest: "build/npm/dist/protocols/mode-switching.md" },
-  { src: "src/kiro/steering/protocols/mode-management.md", dest: "build/npm/dist/protocols/mode-management.md" },
-  
-  // Interactive interfaces (manual inclusion)
-  { src: "src/core/agents.md", dest: "build/npm/dist/agents.md" },
-  { src: "src/kiro/steering/modes.md", dest: "build/npm/dist/modes.md" },
-  { src: "src/core/strict.md", dest: "build/npm/dist/strict.md" },
-  
-  // Interaction patterns
-  { src: "src/core/interactions/chit-chat.md", dest: "build/npm/dist/interactions/chit-chat.md" },
-  { src: "src/core/interactions/interaction-styles.md", dest: "build/npm/dist/interactions/interaction-styles.md" },
-  
-  // Mode definitions
-  { src: "src/kiro/steering/agent-system/kiro-spec-mode.md", dest: "build/npm/dist/modes/kiro-spec-mode.md" },
-  { src: "src/kiro/steering/agent-system/kiro-vibe-mode.md", dest: "build/npm/dist/modes/kiro-vibe-mode.md" },
-] as const;
-
-/**
- * Power files to copy to npm distribution.
- * 
- * These files are copied from the `powers/kiro-protocols/` directory to `build/npm/power/`
- * so they can be installed alongside steering files. The CLI will install these to
- * `~/.kiro/powers/kiro-protocols/` during npm installation and register the power
- * in Kiro's registry.json for automatic UI integration.
- * 
- * **Source:** Pre-built kiro-protocols power from multi-power system
- * **Destination:** npm package for dual installation (steering + power)
- * 
- * **Protocol Files:**
- * - `strict-mode` - Precision mode that blocks execution on ambiguous input
- * - `agent-activation` - Agent activation workflow
- * - `agent-creation` - Agent creation wizard with multiple methods
- * - `agent-management` - Interactive agent management interface
- * - `mode-management` - Interactive mode management interface
- * - `mode-switching` - Mode switching workflow
- * 
- * @see bin/cli.ts - CLI that installs these files and registers power in registry.json
- * @see powers/kiro-protocols/ - Source power directory
- */
-const NPM_POWER_FILES = [
-  { src: "powers/kiro-protocols/POWER.md", dest: "build/npm/power/POWER.md" },
-  { src: "powers/kiro-protocols/mcp.json", dest: "build/npm/power/mcp.json" },
-  { src: "powers/kiro-protocols/icon.png", dest: "build/npm/power/icon.png" },
-  { src: "powers/kiro-protocols/steering/strict-mode.md", dest: "build/npm/power/steering/strict-mode.md" },
-  { src: "powers/kiro-protocols/steering/agent-activation.md", dest: "build/npm/power/steering/agent-activation.md" },
-  { src: "powers/kiro-protocols/steering/agent-creation.md", dest: "build/npm/power/steering/agent-creation.md" },
-  { src: "powers/kiro-protocols/steering/agent-management.md", dest: "build/npm/power/steering/agent-management.md" },
-  { src: "powers/kiro-protocols/steering/mode-management.md", dest: "build/npm/power/steering/mode-management.md" },
-  { src: "powers/kiro-protocols/steering/mode-switching.md", dest: "build/npm/power/steering/mode-switching.md" },
-] as const;
-
-
-
-// File mappings for dev mode (user directory)
-const DEV_FILE_MAPPINGS = NPM_FILE_MAPPINGS.map(mapping => ({
-  src: mapping.src,
-  dest: mapping.dest.replace("build/npm/dist/", "")
-}));
 
 /**
  * Options passed to substitution functions during build.
@@ -373,10 +300,17 @@ async function buildFile(
 }
 
 /**
- * Compiles CLI tool from TypeScript to JavaScript.
+ * Compiles CLI tool from template with embedded file lists.
  * 
- * Uses Bun.build to compile `bin/cli.ts` to Node.js-compatible JavaScript.
- * Only runs during npm builds (not dev builds).
+ * Process:
+ * 1. Gets file lists from manifest (`STEERING_FILES`, `POWER_FILES`)
+ * 2. Reads CLI template (`bin/cli.template.ts`)
+ * 3. Injects file lists as JSON arrays
+ * 4. Writes temporary CLI file (`bin/cli.generated.ts`)
+ * 5. Compiles to Node.js-compatible JavaScript
+ * 
+ * This ensures CLI file lists match exactly what npm and dev builds produce,
+ * eliminating the dev mode mismatch issue.
  * 
  * **Build Configuration:**
  * - Target: Node.js runtime
@@ -385,21 +319,41 @@ async function buildFile(
  * 
  * @throws Error if compilation fails
  * 
- * @example
+ * @example Compile CLI with embedded file lists
  * ```typescript
  * await buildCLI();
- * // Compiles bin/cli.ts → build/npm/bin/cli.js
+ * // Generates CLI with embedded file lists from manifest
+ * // Compiles bin/cli.generated.ts → build/npm/bin/cli.js
  * ```
  */
 async function buildCLI(): Promise<void> {
-  console.log("🔧 Building CLI...\n");
+  console.log("🔧 Building CLI with embedded file lists from manifest...\n");
   
+  // Get file lists from manifest
+  const steeringFiles = await getSteeringFilesForCLI();
+  const powerFiles = await getPowerFilesForCLI();
+  
+  console.log(`📋 Embedding ${steeringFiles.length} steering files`);
+  console.log(`📋 Embedding ${powerFiles.length} power files\n`);
+  
+  // Read CLI template
+  const template = await Bun.file("bin/cli.template.ts").text();
+  
+  // Inject file lists (format as TypeScript const arrays)
+  const cliCode = template
+    .replace("/* STEERING_FILES_PLACEHOLDER */", JSON.stringify(steeringFiles, null, 2))
+    .replace("/* POWER_FILES_PLACEHOLDER */", JSON.stringify(powerFiles, null, 2));
+  
+  // Write generated CLI
+  await Bun.write("bin/cli.generated.ts", cliCode);
+  
+  // Compile generated CLI
   const result = await Bun.build({
-    entrypoints: ["./bin/cli.ts"],
+    entrypoints: ["./bin/cli.generated.ts"],
     outdir: "./build/npm/bin",
     target: "node",
     format: "esm",
-    naming: "[dir]/[name].js",
+    naming: "cli.js",
   });
   
   if (!result.success) {
@@ -413,69 +367,93 @@ async function buildCLI(): Promise<void> {
 
 
 /**
- * Copies power files to npm distribution.
+ * Copies power files to npm distribution using manifest.
  * 
  * Copies pre-built power files from `powers/kiro-protocols/` directory to `build/npm/power/`
  * so they can be included in the npm package and installed by the CLI. This enables dual
  * installation where npm installs both steering files AND the kiro-protocols power dependency,
  * with automatic registry registration for Powers UI integration.
  * 
- * @example
+ * Uses `POWER_MAPPINGS` from manifest to auto-discover all power files including protocols.
+ * 
+ * @example Copy power files for npm package
  * ```typescript
  * await copyPowerFiles();
  * // Copies powers/kiro-protocols/POWER.md, mcp.json, icon.png, steering/*.md to build/npm/power/
  * ```
  * 
- * @see NPM_POWER_FILES - List of files to copy
+ * @see src/manifest.ts - POWER_MAPPINGS source of truth
  * @see bin/cli.ts - CLI that installs these to ~/.kiro/powers/kiro-protocols/ and updates registry.json
  */
 async function copyPowerFiles(): Promise<void> {
-  console.log("\n⚡ Copying power files...\n");
+  console.log("\n⚡ Copying power files from manifest...\n");
   
-  for (const mapping of NPM_POWER_FILES) {
-    const srcFile = Bun.file(mapping.src);
+  // Expand power mappings with glob resolution
+  const powerFiles = await expandMappings(POWER_MAPPINGS, "powers/kiro-protocols", "npm");
+  
+  console.log(`📋 Copying ${powerFiles.length} power files...\n`);
+  
+  for (const mapping of powerFiles) {
+    const srcPath = join("powers/kiro-protocols", mapping.src);
+    const destPath = join("build/npm/power", mapping.dest);
+    
+    const srcFile = Bun.file(srcPath);
     
     if (!await srcFile.exists()) {
-      console.warn(`⚠️  Power file not found: ${mapping.src}`);
+      console.warn(`⚠️  Power file not found: ${srcPath}`);
       continue;
     }
     
     const content = await srcFile.arrayBuffer();
-    await Bun.write(mapping.dest, content, { createPath: true });
+    await Bun.write(destPath, content, { createPath: true });
     console.log(`✅ Copied: ${mapping.src} → ${mapping.dest}`);
   }
 }
 
 /**
- * Builds npm package distribution.
+ * Builds npm package distribution using manifest.
  * 
- * Compiles CLI tool and processes all steering files with substitutions.
+ * Compiles CLI tool with embedded file lists and processes all steering files with substitutions.
  * Output goes to `build/npm/` which is included in npm package then cleaned.
- * The CLI handles power installation and registry.json registration during user installation.
+ * The CLI handles power installation and `registry.json` registration during user installation.
+ * 
+ * Uses `STEERING_MAPPINGS` from manifest to discover files (mix of explicit paths and glob patterns).
+ * This ensures consistency with dev mode and CLI installation.
+ * 
+ * **Note:** Protocol files are NOT in steering mappings. They are distributed exclusively
+ * through the kiro-protocols Power (copied from `powers/kiro-protocols/`) and loaded
+ * on-demand via kiroPowers tool.
  * 
  * **Build Steps:**
- * 1. Compile CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
- * 2. Process steering files with substitutions
- * 3. Map files to `build/npm/dist/` structure
+ * 1. Compile CLI with embedded file lists from manifest
+ * 2. Expand steering mappings with glob resolution (excludes protocols)
+ * 3. Process steering files with substitutions
  * 4. Copy power files from `powers/kiro-protocols/` to `build/npm/power/`
  * 
  * @param config - Configuration with substitution functions
  * 
- * @example
+ * @example Build npm distribution
  * ```typescript
  * await buildNpm(config);
  * // Creates build/npm/bin/cli.js, build/npm/dist/*.md, and build/npm/power/*
  * ```
  */
 async function buildNpm(config: Config): Promise<void> {
-  console.log("📦 Building npm distribution...\n");
+  console.log("📦 Building npm distribution from manifest...\n");
   
-  // Build CLI
+  // Build CLI with embedded file lists
   await buildCLI();
   
-  // Build all npm files
-  for (const mapping of NPM_FILE_MAPPINGS) {
-    await buildFile(mapping.src, mapping.dest, config.substitutions, { target: "npm" });
+  // Expand steering mappings with glob resolution
+  const steeringFiles = await expandMappings(STEERING_MAPPINGS, "src", "npm");
+  
+  console.log(`📋 Building ${steeringFiles.length} steering files...\n`);
+  
+  // Build all steering files
+  for (const mapping of steeringFiles) {
+    const srcPath = join("src", mapping.src);
+    const destPath = join("build/npm/dist", mapping.dest);
+    await buildFile(srcPath, destPath, config.substitutions, { target: "npm" });
   }
   
   // Copy power files
@@ -487,36 +465,52 @@ async function buildNpm(config: Config): Promise<void> {
 
 
 /**
- * Builds directly to user's Kiro directory for development.
+ * Builds directly to user's Kiro directory for development using manifest.
  * 
- * Processes steering files and writes to `~/.kiro/steering/kiro-agents/`.
+ * Processes steering files and writes to `~/.kiro/steering/kiro-agents/`
  * No CLI compilation needed. Used with watch mode for rapid iteration.
+ * 
+ * Uses `STEERING_MAPPINGS` from manifest - SAME as npm build - ensuring dev mode
+ * installs exactly the same files as CLI installation. This fixes the dev mode mismatch!
+ * 
+ * **Note:** Protocol files are NOT included. They are distributed through kiro-protocols
+ * Power (use `bun run dev:powers` for protocol development) and loaded on-demand via
+ * kiroPowers tool.
  * 
  * **Build Steps:**
  * 1. Resolve user home directory
- * 2. Process steering files with substitutions
- * 3. Write directly to `~/.kiro/steering/kiro-agents/`
+ * 2. Expand steering mappings (mix of explicit paths and glob patterns, excludes protocols)
+ * 3. Process steering files with substitutions
+ * 4. Write directly to `~/.kiro/steering/kiro-agents/`
  * 
  * @param config - Configuration with substitution functions
  * 
- * @example
+ * @example Build to user directory
  * ```typescript
  * await buildDev(config);
  * // Writes files to ~/.kiro/steering/kiro-agents/
+ * // Files match exactly what CLI installs (no protocols)
  * ```
  */
 async function buildDev(config: Config): Promise<void> {
-  console.log("🔧 Building dev mode (user directory)...\n");
+  console.log("🔧 Building dev mode from manifest (user directory)...\n");
   
   const userSteeringPath = join(homedir(), ".kiro", "steering", "kiro-agents");
   
+  // Expand steering mappings - SAME as npm, ensures consistency!
+  const steeringFiles = await expandMappings(STEERING_MAPPINGS, "src", "dev");
+  
+  console.log(`📋 Building ${steeringFiles.length} steering files...\n`);
+  
   // Build all files to user directory
-  for (const mapping of DEV_FILE_MAPPINGS) {
+  for (const mapping of steeringFiles) {
+    const srcPath = join("src", mapping.src);
     const destPath = join(userSteeringPath, mapping.dest);
-    await buildFile(mapping.src, destPath, config.substitutions, { target: "dev" });
+    await buildFile(srcPath, destPath, config.substitutions, { target: "dev" });
   }
   
   console.log(`\n✅ Dev build completed in ${userSteeringPath}/`);
+  console.log(`✅ Files match CLI installation (no more dev mode mismatch!)`);
 }
 
 /**
@@ -535,7 +529,7 @@ async function buildDev(config: Config): Promise<void> {
  * - `npm-no-clean` - Same as npm but preserves artifacts (for release script)
  * - `dev` - Builds to user directory with watch mode (for development)
  * 
- * **Note:** Powers are built separately via `scripts/build-powers.ts`
+ * **Note:** Powers are built separately via `scripts/build-powers.ts` using manifest-based protocol discovery
  * 
  * @param target - Build target (npm/npm-no-clean/dev)
  * 
@@ -551,7 +545,7 @@ async function buildDev(config: Config): Promise<void> {
  * // Loads Kiro config, builds to build/npm/, preserves for npm publish
  * ```
  * 
- * @see scripts/build-powers.ts - Separate build system for powers/ directory
+ * @see scripts/build-powers.ts - Separate build system for powers/ directory using manifest-based protocol discovery
  */
 async function build(target: BuildTarget): Promise<void> {
   console.log(`🔨 Starting build: ${target}...\n`);

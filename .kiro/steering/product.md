@@ -64,10 +64,11 @@ When working on this codebase, follow these principles:
 - **Spec Mode**: Structured feature development with requirements → design → tasks workflow
 
 **Implementation**:
-- Mode definitions in `src/kiro/steering/agent-system/kiro-{mode}-mode.md`
+- Mode definitions in `src/kiro/steering/protocols/kiro-{mode}-mode.md` (moved from agent-system/)
 - Activated via `/modes {name}` command
 - Interactive management via `/modes` command
 - Modes preserve file changes but reset workflow state
+- Distributed via kiro-protocols power for better organization
 
 **Key Behaviors**:
 - Modes define HOW AI interacts, not WHAT it works on
@@ -130,8 +131,8 @@ npx kiro-agents  # or bunx kiro-agents
   - Appears immediately as "installed" in Kiro Powers UI
 
 **Build Process**:
-1. Build powers: `bun run build:powers` (processes protocols to `powers/kiro-protocols/`)
-2. Build npm: `bun run build` (compiles CLI, processes steering, copies power files from `powers/`)
+1. Build powers: `bun run build:powers` (uses manifest to auto-discover and process protocols to `powers/kiro-protocols/`)
+2. Build npm: `bun run build` (compiles CLI, processes steering via manifest, copies power files from `powers/`)
 3. CLI installs both steering and power during `npx kiro-agents`
 4. CLI creates symbolic links and registers power automatically
 
@@ -217,10 +218,13 @@ npx kiro-agents  # or bunx kiro-agents
 
 ### Build System Rules
 
-1. **Two Build Targets**: npm, dev (powers built separately via `build:powers`)
-2. **Deterministic Builds**: Same input = same output
-3. **Dynamic Substitutions**: Applied at build time via config functions
-4. **File Mapping**: Explicit mapping from `src/` to target directories
+1. **Centralized Manifest System**: All file mappings defined in `src/manifest.ts` (single source of truth)
+2. **Glob Pattern Support**: Auto-discovers files with `*.md` patterns, no manual updates needed
+3. **Manifest-Based Protocol Discovery**: `PROTOCOL_SOURCE_MAPPINGS` auto-discovers protocols via glob patterns
+4. **Two Build Targets**: npm, dev (powers built separately via `build:powers` using manifest)
+5. **Deterministic Builds**: Same input = same output
+6. **Dynamic Substitutions**: Applied at build time via config functions
+7. **Guaranteed Consistency**: Dev mode matches CLI installation exactly (no more mismatches)
 
 ### Powers Distribution Protection
 
@@ -233,7 +237,7 @@ npx kiro-agents  # or bunx kiro-agents
 
 **Workflow**:
 - **Contributors**: Modify `src/core/protocols/` or `src/kiro/steering/protocols/` only
-- **Build System**: Run `bun run build:powers` to regenerate `powers/*/steering/`
+- **Build System**: Run `bun run build:powers` to regenerate `powers/*/steering/` using manifest auto-discovery
 - **Maintainers**: Commit regenerated steering files after validating changes
 - **Release**: `bun run release` publishes npm package with pre-built power files
 

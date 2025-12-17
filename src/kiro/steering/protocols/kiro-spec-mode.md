@@ -1,8 +1,3 @@
----
-inclusion: manual
-description: Spec mode protocols for structured feature development with requirements, design, and implementation planning
----
-
 # Kiro Spec Mode
 
 Structured feature development mode following spec-driven methodology with formal requirements, design documents, and task planning.
