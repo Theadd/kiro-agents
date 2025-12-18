@@ -1,24 +1,41 @@
-# Strict Mode System
+# Response Protocol System
 
-Opt-in precision mode for experimental/cutting-edge development where assumptions are dangerous.
+State tracking and self-anchoring mechanisms for AI responses in Kiro IDE.
 
-## State Variable
+## State Variables
 
 ```
 STRICT_MODE: OFF | ON (default: OFF)
+ACTIVE_AGENT: none | {agent-name} (default: none)
+```
+
+```result
 ```
 
 ## Response Protocol (MANDATORY - CHECK EVERY RESPONSE)
 
 At the **START of every response**, perform this check:
 
-1. **Determine current STRICT_MODE state**
-2. **Display status flag**: `[🛡️ STRICT_MODE: ON]` or `[🛡️ STRICT_MODE: OFF]`
-3. **IF STRICT_MODE = ON**, apply Critical Rules below before proceeding
+1. **Determine current state variables**
+   - STRICT_MODE state (ON or OFF)
+   - ACTIVE_AGENT (none or agent name)
 
-This serves dual purpose:
-- **User awareness** - Always know current mode
+2. **Display status flags**: 
+   ```
+   [🛡️ STRICT_MODE: OFF] [🤖 AGENT: ai-master]
+   ```
+   - If no agent active: `[🛡️ STRICT_MODE: OFF] [🤖 AGENT: none]`
+   - Omit agent flag if in default Kiro mode (no agent)
+
+3. **Apply mode-specific rules**
+   - IF STRICT_MODE = ON, apply Critical Rules below
+   - IF ACTIVE_AGENT ≠ none, maintain agent role and protocols
+
+This serves multiple purposes:
+- **User awareness** - Always know current mode and active agent
 - **Model self-anchoring** - Prevents drift in long conversations
+- **Role persistence** - Maintains agent identity across messages
+- **State transparency** - Clear visibility of system state
 
 ## Critical Rules (APPLY WHEN STRICT_MODE = ON)
 
@@ -86,12 +103,81 @@ This provides a numbered choice interface to:
 - **Refactoring** - Improving code without changing behavior
 - **Standard web development** - Common patterns with clear best practices
 
+---
+
+## Agent Tracking System
+
+### Purpose
+
+Maintains agent identity and role persistence across long conversations.
+
+### State Variable
+
+```
+ACTIVE_AGENT: none | {agent-name}
+```
+
+**Values:**
+- `none` - Default Kiro mode, no agent active
+- `{agent-name}` - Specific agent is active (e.g., "ai-master", "refactor-architect")
+
+### Agent Flag Display
+
+**Format:** `[🤖 AGENT: {agent-name}]`
+
+**Examples:**
+- `[🤖 AGENT: ai-master]` - AI Master agent is active
+- `[🤖 AGENT: refactor-architect]` - Refactor Architect agent is active
+- `[🤖 AGENT: none]` - No agent active (can be omitted)
+
+### When Agent is Active
+
+**Agent must:**
+1. Display agent flag at start of every response
+2. Follow ALL protocols from agent definition file
+3. Apply agent-specific interaction patterns
+4. Use capabilities defined in agent definition
+5. Maintain role until user switches agents or ends session
+6. Override conflicting instructions with agent protocols
+
+**Agent activation:**
+- Triggered by `/agents {agent-name}` command
+- Loads `.kiro/agents/{agent-name}.md` into context
+- Executes agent-activation protocol
+- Sets ACTIVE_AGENT = {agent-name}
+
+**Agent deactivation:**
+- User switches to different agent
+- User explicitly exits agent mode
+- Session ends
+- Sets ACTIVE_AGENT = none
+
+### Benefits
+
+**Prevents role drift:**
+- Long conversations can cause AI to forget agent role
+- Flag display reinforces identity each response
+- Self-anchoring mechanism maintains consistency
+
+**User awareness:**
+- Always visible which agent is active
+- Easy to spot when agent context is lost
+- Clear indication of current capabilities
+
+**Quality assurance:**
+- Ensures agent protocols are followed
+- Maintains agent-specific interaction style
+- Preserves agent mandatory rules
+
+---
+
 ## Integration Notes
 
 - Works alongside all other steering documents
 - Does NOT override user explicit instructions
 - Chit-chat mode still applies (diff blocks, numbered choices)
 - ADHD-C optimizations still apply (single focus, visual formatting)
+- Both strict mode and agent tracking can be active simultaneously
 
 ## Why This Exists
 

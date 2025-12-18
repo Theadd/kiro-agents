@@ -41,7 +41,7 @@ When working on this codebase, follow these principles:
 
 ### 1. Agent System
 
-**Purpose**: Specialized AI personas with defined capabilities and workflows
+**Purpose**: Specialized AI agents with defined capabilities and workflows
 
 **Implementation**:
 - Agents defined in `.kiro/agents/{name}.md` files
