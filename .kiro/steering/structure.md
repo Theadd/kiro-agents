@@ -64,7 +64,23 @@ kiro-agents/
 │   │   └── steering/             # Protocol files (auto-generated, not committed)
 │   └── README.md                 # Powers documentation
 ├── docs/                         # Documentation
-│   └── VERSIONING.md             # Versioning system guide
+│   ├── ARCHITECTURE.md           # System design and component relationships
+│   ├── design/                   # Design rationale
+│   │   ├── README.md             # Design documentation index
+│   │   ├── protocol-system.md    # Why layered protocols work
+│   │   ├── interaction-patterns.md  # How patterns reduce cognitive load
+│   │   └── neurodivergent-accessibility.md  # ADHD-C design principles
+│   ├── user-guide/               # User-facing documentation
+│   │   └── creating-powerful-agents.md  # Layered architecture guide
+│   ├── contributing/             # Contribution guides
+│   │   ├── DUAL_INSTALLATION.md
+│   │   ├── MANIFEST-SYSTEM.md
+│   │   ├── TESTING.md
+│   │   └── VERSIONING.md
+│   ├── agents.md                 # Agent system documentation
+│   ├── modes.md                  # Mode system documentation
+│   └── resources/                # Media assets
+│       └── animate-kiro.gif
 ├── .changeset/                   # Changesets
 │   ├── config.json               # Changesets configuration
 │   ├── README.md                 # Workflow documentation
