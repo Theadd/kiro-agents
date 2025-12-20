@@ -51,7 +51,7 @@ kiro-agents is a pure markdown steering document system that provides an agent f
 **Types:**
 - **Interactive interfaces** - `agents.md`, `modes.md`, `strict.md`
 - **System configuration** - `aliases.md` (instruction alias definitions)
-- **Interaction patterns** - `chit-chat.md`, `interaction-styles.md`
+- **Interaction patterns** - Available via kiro-protocols Power
 
 **Processing:**
 - Loaded into AI context at runtime
@@ -241,7 +241,7 @@ npx kiro-agents  # or bunx kiro-agents
 **1. Steering Files** → `~/.kiro/steering/kiro-agents/`
 - Core system files (aliases.md, strict-mode.md)
 - Interactive interfaces (agents.md, modes.md, strict.md)
-- Interaction patterns (chit-chat.md, interaction-styles.md)
+- Mode definitions (kiro-spec-mode.md, kiro-vibe-mode.md, etc.)
 
 **2. kiro-protocols Power** → `~/.kiro/powers/kiro-protocols/`
 - Power metadata (POWER.md, mcp.json, icon.png)
@@ -494,9 +494,9 @@ src/
 │   │   ├── agent-activation.md
 │   │   ├── agent-creation.md
 │   │   ├── agent-management.md
+│   │   ├── chit-chat.md
 │   │   └── strict-mode.md
 │   ├── interactions/
-│   │   ├── chit-chat.md
 │   │   └── interaction-styles.md
 │   └── docs/
 │       ├── agent-system-guide.md
@@ -527,8 +527,11 @@ User Installation:
 ├── agents.md
 ├── modes.md
 ├── strict.md
-├── chit-chat.md
-└── interaction-styles.md
+└── modes/
+    ├── kiro-spec-mode.md
+    ├── kiro-vibe-mode.md
+    ├── kiro-as-spec-mode.md
+    └── kiro-as-vibe-mode.md
 
 ~/.kiro/powers/kiro-protocols/
 ├── POWER.md

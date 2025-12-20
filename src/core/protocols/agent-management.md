@@ -8,7 +8,9 @@ When entering agent management mode:
 
 ### Step 1: Activate Chit-Chat Mode
 
-Load and apply protocols from `chit-chat.md` steering document:
+/only-read-protocols chit-chat.md
+
+Apply protocols from chit-chat.md:
 
 - **Use diff blocks** to show progress and current state
 - **Provide numbered choice lists** (4-8 options, up to 16 if needed)

@@ -227,7 +227,7 @@ As-Spec mode works alongside:
 - Any agent system
 - Any tool configuration
 - Strict mode (`/strict on`)
-- Chit-chat mode (diff blocks, numbered choices)
+- Chit-chat protocol (diff blocks, numbered choices)
 - Current MCP server setup
 - Existing capabilities
 

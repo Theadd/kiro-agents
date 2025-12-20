@@ -8,6 +8,8 @@ keywords: ["modes", "vibe", "spec", "workflow", "interactive"]
 
 You are now in **mode management** using chit-chat interaction protocol.
 
+/only-read-protocols chit-chat.md
+
 {{{MODE_MANAGEMENT_PROTOCOL}}}
 
 ---

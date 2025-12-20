@@ -182,7 +182,14 @@ Adapt to user's language while maintaining technical consistency.
 
 ## Activation
 
-Auto-activated when loaded. Manually deactivate only on explicit user request.
+**Auto-activated when loaded.**
+
+Can be deactivated or reactivated at any time by:
+- Explicit user request
+- Protocol instructions stating "chit-chat is inactive" or "deactivate chit-chat"
+- Agent definitions specifying different interaction protocols
+
+When deactivated, chit-chat patterns do not apply until reactivated.
 
 ---
 

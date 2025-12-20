@@ -133,8 +133,8 @@ When you execute `/agents {name}`, the system:
 
 When you execute `/agents` (without parameters), the system:
 
-1. **Activates chit-chat mode**
-   - Loads `chit-chat.md` steering
+1. **Loads chit-chat protocol**
+   - Loads `chit-chat.md` from kiro-protocols Power
    - Uses diff blocks for progress tracking
    - Provides numbered choices
    - Maintains single focus per message
@@ -387,7 +387,7 @@ Agents SHOULD have:
 ```
 
 **What happens:**
-1. Chit-chat mode activates
+1. Chit-chat protocol loads
 2. System scans `{{{WS_AGENTS_PATH}}}/` directory
 3. AI presents numbered list of available agents
 4. AI offers management operations
@@ -451,14 +451,14 @@ Agents can load additional steering documents:
 - Optional documents loaded based on context or explicit request
 - Documents remain loaded until agent deactivated
 
-### With Chit-Chat Mode
+### With Chit-Chat Protocol
 
 Agents can use chit-chat interaction patterns:
 
 ```markdown
 ## Interaction Protocol
 
-This agent uses chit-chat mode for all interactions:
+This agent uses chit-chat protocol for all interactions:
 
 - Begin with diff block showing current state
 - Provide numbered choice list (4-6 options, up to 16 if needed)
@@ -575,7 +575,7 @@ When task requires multiple perspectives:
 5. **Integration rules** - Specify required steering documents and dependencies
 
 **Interaction Design:**
-1. **Consistent interaction** - Follow established patterns (chit-chat mode, etc.)
+1. **Consistent interaction** - Follow established patterns (chit-chat protocol, etc.)
 2. **Clear formatting** - Use visual hierarchy and formatting consistently
 3. **Helpful errors** - Provide actionable error messages and suggestions
 4. **Progressive disclosure** - Start simple, reveal complexity as needed
@@ -712,7 +712,7 @@ When task requires multiple perspectives:
 **Possible Causes:**
 - `agent-system.md` not in steering directory
 - Missing `inclusion: always` in frontmatter
-- `chit-chat.md` not available
+- `chit-chat.md` not available in kiro-protocols Power
 - Steering documents not loaded
 
 **Solutions:**
@@ -728,9 +728,9 @@ When task requires multiple perspectives:
    ---
    ```
 
-3. **Verify chit-chat.md exists:**
+3. **Verify chit-chat.md exists in kiro-protocols Power:**
    - Required for interactive management
-   - Should be in steering directory
+   - Should be in kiro-protocols Power steering directory
    - Check file is valid markdown
 
 4. **Reload steering documents:**

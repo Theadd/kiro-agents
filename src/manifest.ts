@@ -1,22 +1,35 @@
 /**
  * Centralized file manifest for kiro-agents distribution.
  * 
- * Single source of truth for all file mappings across build targets (npm, dev, cli).
- * Uses glob patterns for automatic file discovery and consistent mappings. Replaces
- * hardcoded file lists in build scripts and CLI with declarative manifest system.
+ * Single source of truth for all file mappings across build targets (npm, dev, cli, power).
+ * Uses glob patterns for automatic file discovery and consistent mappings. Eliminates
+ * hardcoded file lists in build scripts and CLI through declarative manifest system.
  * 
  * **Key Benefits:**
  * - Single source of truth - change once, applies everywhere
- * - Glob pattern support - auto-discovers files, no manual updates
- * - Guaranteed consistency - dev mode matches CLI installation
- * - Type safety - compile-time validation of mappings
+ * - Glob pattern support - auto-discovers files, no manual updates needed
+ * - Guaranteed consistency - dev mode matches CLI installation exactly
+ * - Type safety - compile-time validation of all mappings
+ * - Target filtering - include/exclude files per build target
  * 
- * @example expandMappings(STEERING_MAPPINGS, "src", "npm")
- * @example getSteeringFilesForCLI() returns array of destination paths
+ * @example Expand steering mappings for npm build
+ * ```typescript
+ * const files = await expandMappings(STEERING_MAPPINGS, "src", "npm");
+ * // Returns concrete file paths with globs resolved
+ * ```
  * 
- * @see scripts/build.ts - Uses STEERING_MAPPINGS and expandMappings
- * @see scripts/build-powers.ts - Uses PROTOCOL_SOURCE_MAPPINGS and expandMappings for manifest-based protocol discovery
- * @see bin/cli.ts - Uses getSteeringFilesForCLI() and getPowerFilesForCLI()
+ * @example Get file lists for CLI generation
+ * ```typescript
+ * const steeringFiles = await getSteeringFilesForCLI();
+ * const powerFiles = await getPowerFilesForCLI();
+ * // Used to embed file lists in generated CLI
+ * ```
+ * 
+ * @see scripts/build.ts - Uses STEERING_MAPPINGS and expandMappings for steering files
+ * @see scripts/build-powers.ts - Uses PROTOCOL_SOURCE_MAPPINGS for protocol auto-discovery
+ * @see scripts/dev-powers.ts - Uses PROTOCOL_SOURCE_MAPPINGS for dev mode protocol builds
+ * @see bin/cli.template.ts - Uses getSteeringFilesForCLI() and getPowerFilesForCLI()
+ * @see scripts/validate-manifest.ts - Validates manifest consistency
  */
 
 import { glob } from "glob";
@@ -29,29 +42,54 @@ import { basename } from "path";
  * Each target can filter mappings using the `targets` property in FileMapping.
  * 
  * @property npm - Build npm package (compiles CLI, processes files, cleans after)
- * @property dev - Build to user directory with watch mode
- * @property cli - CLI installation target (generates file lists for bin/cli.ts constants)
- * @property power - Power build target (builds to powers directories)
+ * @property dev - Build to user directory (`~/.kiro/steering/kiro-agents/`) with watch mode
+ * @property cli - CLI installation target (generates file lists for `bin/cli.ts` constants)
+ * @property power - Power build target (builds to `powers/` directories)
+ * 
+ * @example Target-specific file filtering
+ * ```typescript
+ * { src: "debug.md", dest: "debug.md", targets: ["dev"] }
+ * // Only included in dev builds, excluded from npm/cli/power
+ * ```
  */
 export type BuildTarget = "npm" | "dev" | "cli" | "power";
 
 /**
  * File mapping with glob pattern support and target filtering.
  * 
- * @property src - Source path relative to base directory (supports glob patterns)
- * @property dest - Destination path relative to target root (supports name placeholder)
+ * Defines how source files map to destination paths across build targets.
+ * Supports glob patterns for automatic file discovery and `{name}` placeholder
+ * for dynamic destination paths based on source filename.
+ * 
+ * @property src - Source path relative to base directory (supports glob patterns like `*.md`)
+ * @property dest - Destination path relative to target root (supports `{name}` placeholder)
  * @property targets - Optional: Only include for specific targets (omit for all targets)
  * 
- * @example Direct mapping: { src: "core/aliases.md", dest: "aliases.md" }
- * @example Glob pattern: { src: "core/protocols/*.md", dest: "protocols/{name}.md" }
- * @example Target-specific: { src: "debug.md", dest: "debug.md", targets: ["dev"] }
+ * @example Direct mapping
+ * ```typescript
+ * { src: "core/aliases.md", dest: "aliases.md" }
+ * // Maps src/core/aliases.md → dest/aliases.md
+ * ```
+ * 
+ * @example Glob pattern with placeholder
+ * ```typescript
+ * { src: "core/protocols/*.md", dest: "protocols/{name}.md" }
+ * // Maps src/core/protocols/agent-activation.md → dest/protocols/agent-activation.md
+ * // Auto-discovers all .md files in directory
+ * ```
+ * 
+ * @example Target-specific mapping
+ * ```typescript
+ * { src: "debug.md", dest: "debug.md", targets: ["dev"] }
+ * // Only included in dev builds, excluded from npm/cli/power
+ * ```
  */
 export interface FileMapping {
-  /** Source path relative to base directory (supports glob patterns) */
+  /** Source path relative to base directory (supports glob patterns like `*.md`) */
   src: string;
-  /** Destination path relative to target root (supports {name} placeholder) */
+  /** Destination path relative to target root (supports `{name}` placeholder for filename) */
   dest: string;
-  /** Optional: Only include for specific targets */
+  /** Optional: Only include for specific targets (omit to include in all targets) */
   targets?: BuildTarget[];
 }
 
@@ -65,14 +103,25 @@ export interface FileMapping {
  * **File Categories:**
  * - Core system files (always loaded): `aliases.md`
  * - Interactive interfaces (manual inclusion): `agents.md`, `modes.md`, `strict.md`
- * - Interaction patterns: `interactions/chit-chat.md` (explicit inclusion)
- * - Mode definitions: `modes/*.md` (auto-discovered via glob)
+ * - Mode definitions: `kiro-*-mode.md` (auto-discovered via glob)
  * 
  * **Note:** Protocol files are NOT included in steering mappings. They are distributed
  * exclusively through the kiro-protocols Power and loaded on-demand via kiroPowers tool.
  * 
  * **Glob Patterns:**
- * - `kiro/steering/agent-system/*.md` - Auto-discovers mode definitions
+ * - `kiro/steering/protocols/kiro-*-mode.md` - Auto-discovers mode definitions
+ * 
+ * @example Adding new steering file
+ * ```typescript
+ * { src: "core/new-feature.md", dest: "new-feature.md" }
+ * // Automatically included in all builds
+ * ```
+ * 
+ * @example Adding mode definition
+ * ```typescript
+ * // Just create src/kiro/steering/protocols/kiro-custom-mode.md
+ * // Glob pattern auto-discovers it, no manifest changes needed
+ * ```
  */
 export const STEERING_MAPPINGS: FileMapping[] = [
   // Core system files (always loaded)
@@ -90,7 +139,6 @@ export const STEERING_MAPPINGS: FileMapping[] = [
   
   // Interaction patterns (loaded by agents/modes)
   // { src: "core/interactions/*.md", dest: "interactions/{name}.md" },
-  { src: "core/interactions/chit-chat.md", dest: "interactions/chit-chat.md" },
   
   // Mode definitions (loaded by /modes command)
   { src: "kiro/steering/protocols/kiro-*-mode.md", dest: "modes/{name}.md" },
@@ -104,11 +152,17 @@ export const STEERING_MAPPINGS: FileMapping[] = [
  * 
  * **File Categories:**
  * - Power metadata: `POWER.md`, `mcp.json`, `icon.png`
- * - Protocol files: `steering/*.md` (auto-discovered)
+ * - Protocol files: `steering/*.md` (auto-discovered via glob)
  * 
  * **Note:** Power files are copied from pre-built `powers/kiro-protocols/`
  * directory during npm build. The source protocols are built separately
- * via `scripts/build-powers.ts` using manifest-based protocol discovery
+ * via `scripts/build-powers.ts` using PROTOCOL_SOURCE_MAPPINGS.
+ * 
+ * @example Adding new power metadata file
+ * ```typescript
+ * { src: "README.md", dest: "README.md" }
+ * // Automatically included in power distribution
+ * ```
  */
 export const POWER_MAPPINGS: FileMapping[] = [
   // Power metadata
@@ -124,7 +178,24 @@ export const POWER_MAPPINGS: FileMapping[] = [
  * Protocol source mappings - Source protocols that get built into kiro-protocols power.
  * 
  * These mappings define which source protocol files get copied and processed
- * into the kiro-protocols power during the build-powers step using manifest-based discovery.
+ * into the kiro-protocols power during the build-powers step. Uses glob patterns
+ * for automatic protocol discovery - add new protocol files and they're automatically
+ * included in builds.
+ * 
+ * **Auto-Discovered Protocols:**
+ * - Core protocols: `src/core/protocols/*.md` (agent-activation, agent-management, etc.)
+ * - Kiro protocols: `src/kiro/steering/protocols/*.md` (mode-switching, kiro-*-mode, etc.)
+ * 
+ * **Benefits:**
+ * - Add new protocol → automatically included in builds
+ * - No manual file list updates needed
+ * - Consistent across production and dev builds
+ * 
+ * @example Adding new protocol
+ * ```typescript
+ * // Just create src/core/protocols/new-protocol.md
+ * // Glob pattern auto-discovers it, no manifest changes needed
+ * ```
  */
 export const PROTOCOL_SOURCE_MAPPINGS: FileMapping[] = [
   { src: "core/protocols/*.md", dest: "steering/{name}.md" },
@@ -136,11 +207,20 @@ export const PROTOCOL_SOURCE_MAPPINGS: FileMapping[] = [
  * 
  * Result of expanding a FileMapping with glob resolution and placeholder replacement.
  * Ready for direct use in build operations (read `src`, write `dest`).
+ * 
+ * @property src - Concrete source path relative to base directory (e.g., `'core/protocols/agent-activation.md'`)
+ * @property dest - Concrete destination path relative to target root (e.g., `'protocols/agent-activation.md'`)
+ * 
+ * @example Expanded from glob pattern
+ * ```typescript
+ * // Input: { src: "core/protocols/*.md", dest: "protocols/{name}.md" }
+ * // Output: { src: "core/protocols/agent-activation.md", dest: "protocols/agent-activation.md" }
+ * ```
  */
 export interface ExpandedMapping {
-  /** Concrete source path relative to base directory (e.g., 'core/protocols/agent-activation.md') */
+  /** Concrete source path relative to base directory (e.g., `'core/protocols/agent-activation.md'`) */
   src: string;
-  /** Concrete destination path relative to target root (e.g., 'protocols/agent-activation.md') */
+  /** Concrete destination path relative to target root (e.g., `'protocols/agent-activation.md'`) */
   dest: string;
 }
 
@@ -148,10 +228,11 @@ export interface ExpandedMapping {
  * Resolves glob patterns to actual file paths.
  * 
  * Uses glob library to find all files matching the pattern in the base directory.
- * Returns paths relative to the base directory.
+ * Returns paths relative to the base directory. Supports standard glob syntax
+ * including `*` (any characters), `**` (recursive), and `?` (single character).
  * 
- * @param pattern - Glob pattern (e.g., `'core/protocols/*.md'`)
- * @param baseDir - Base directory to search from (e.g., `'src'`)
+ * @param pattern - Glob pattern (e.g., `'core/protocols/*.md'`, `'**​/*.ts'`)
+ * @param baseDir - Base directory to search from (e.g., `'src'`, `'powers/kiro-protocols'`)
  * @returns Array of resolved file paths relative to `baseDir`
  * 
  * @example Resolve core protocols
@@ -164,6 +245,12 @@ export interface ExpandedMapping {
  * ```typescript
  * await resolveGlob("steering/*.md", "powers/kiro-protocols");
  * // Returns: ['steering/agent-activation.md', 'steering/mode-switching.md', ...]
+ * ```
+ * 
+ * @example Recursive glob
+ * ```typescript
+ * await resolveGlob("**​/*.md", "src");
+ * // Returns all .md files in src/ and subdirectories
  * ```
  */
 export async function resolveGlob(pattern: string, baseDir: string): Promise<string[]> {
@@ -178,6 +265,15 @@ export async function resolveGlob(pattern: string, baseDir: string): Promise<str
  * 2. Resolve glob patterns to concrete file paths
  * 3. Replace `{name}` placeholder with filename (without extension)
  * 4. Return array of concrete `src`/`dest` pairs
+ * 
+ * **Glob Resolution:**
+ * - `*.md` matches all .md files in directory
+ * - `**​/*.md` matches all .md files recursively
+ * - Non-glob paths pass through unchanged
+ * 
+ * **Placeholder Replacement:**
+ * - `{name}` replaced with filename without extension
+ * - Example: `agent-activation.md` → `{name}` becomes `agent-activation`
  * 
  * @param mappings - File mappings with potential glob patterns
  * @param baseDir - Base directory for source files (e.g., `'src'`, `'powers/kiro-protocols'`)
@@ -202,6 +298,13 @@ export async function resolveGlob(pattern: string, baseDir: string): Promise<str
  * //   { src: 'steering/agent-activation.md', dest: 'steering/agent-activation.md' },
  * //   ...
  * // ]
+ * ```
+ * 
+ * @example Target filtering
+ * ```typescript
+ * // Mapping: { src: "debug.md", dest: "debug.md", targets: ["dev"] }
+ * await expandMappings([mapping], "src", "npm");  // Returns: [] (excluded)
+ * await expandMappings([mapping], "src", "dev");  // Returns: [{ src: "debug.md", dest: "debug.md" }]
  * ```
  */
 export async function expandMappings(
@@ -241,7 +344,8 @@ export async function expandMappings(
  * Gets all steering files for CLI installation.
  * 
  * Expands STEERING_MAPPINGS with `'cli'` target and returns destination paths only.
- * Used to generate `STEERING_FILES` constant in CLI during build.
+ * Used to generate `STEERING_FILES` constant in CLI during build. Ensures CLI
+ * installs exactly the same files as dev mode builds.
  * 
  * **Note:** Protocol files are NOT included. They are distributed through kiro-protocols
  * Power and loaded on-demand via kiroPowers tool, not as steering files.
@@ -251,9 +355,12 @@ export async function expandMappings(
  * @example Get steering files for CLI
  * ```typescript
  * const files = await getSteeringFilesForCLI();
- * // Returns: ['aliases.md', 'agents.md', 'modes.md', 'strict.md', 'interactions/chit-chat.md', ...]
+ * // Returns: ['aliases.md', 'agents.md', 'modes.md', 'strict.md', 'modes/kiro-spec-mode.md', ...]
  * // Used in bin/cli.template.ts to generate STEERING_FILES constant
  * ```
+ * 
+ * @see bin/cli.template.ts - Uses this function to embed file list in generated CLI
+ * @see STEERING_MAPPINGS - Source mappings that get expanded
  */
 export async function getSteeringFilesForCLI(): Promise<string[]> {
   const expanded = await expandMappings(STEERING_MAPPINGS, "src", "cli");
@@ -264,7 +371,8 @@ export async function getSteeringFilesForCLI(): Promise<string[]> {
  * Gets all power files for CLI installation.
  * 
  * Expands POWER_MAPPINGS with `'cli'` target and returns destination paths only.
- * Used to generate `POWER_FILES` constant in CLI during build.
+ * Used to generate `POWER_FILES` constant in CLI during build. Includes power
+ * metadata and all protocol files discovered via glob patterns.
  * 
  * @returns Array of relative destination paths (e.g., `['POWER.md', 'steering/agent-activation.md']`)
  * 
@@ -274,6 +382,9 @@ export async function getSteeringFilesForCLI(): Promise<string[]> {
  * // Returns: ['POWER.md', 'mcp.json', 'icon.png', 'steering/agent-activation.md', ...]
  * // Used in bin/cli.template.ts to generate POWER_FILES constant
  * ```
+ * 
+ * @see bin/cli.template.ts - Uses this function to embed file list in generated CLI
+ * @see POWER_MAPPINGS - Source mappings that get expanded
  */
 export async function getPowerFilesForCLI(): Promise<string[]> {
   const expanded = await expandMappings(POWER_MAPPINGS, "powers/kiro-protocols", "cli");

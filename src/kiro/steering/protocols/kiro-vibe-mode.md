@@ -218,7 +218,7 @@ Vibe mode can be activated via:
 
 Vibe mode works alongside:
 - Strict mode (`/strict on`) - adds precision when needed
-- Chit-chat mode - structured choices when helpful
+- Chit-chat protocol - structured choices when helpful
 - Agent system - can activate agents while in Vibe mode
 
 ## Key Differentiators from Spec Mode

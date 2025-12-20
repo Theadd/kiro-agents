@@ -17,9 +17,9 @@ kiro-agents/
 │   │   │   ├── agent-activation.md  # Agent activation protocol
 │   │   │   ├── agent-management.md  # Agent management protocol
 │   │   │   ├── agent-creation.md    # Agent creation protocol
+│   │   │   ├── chit-chat.md         # ADHD-C interaction patterns
 │   │   │   └── strict-mode.md       # Strict mode protocol
 │   │   └── interactions/
-│   │       ├── chit-chat.md      # ADHD-C patterns
 │   │       ├── conversation-language.md  # Language usage guidelines
 │   │       └── interaction-styles.md
 │   ├── kiro/                     # Kiro-specific
@@ -108,7 +108,8 @@ kiro-agents/
 - Instruction alias system (aliases.md)
 - Agent system protocols
 - Strict mode definitions
-- Interaction patterns (chit-chat, styles)
+- Chit-chat interaction protocol
+- Interaction patterns (styles)
 - Base configuration
 
 **Kiro** - Kiro-specific implementations:
@@ -262,10 +263,10 @@ src/core/protocols/agent-management.md → build/npm/dist/protocols/agent-manage
 src/core/protocols/agent-creation.md   → build/npm/dist/protocols/agent-creation.md
 src/kiro/steering/protocols/mode-switching.md → build/npm/dist/protocols/mode-switching.md
 src/kiro/steering/protocols/mode-management.md → build/npm/dist/protocols/mode-management.md
-src/core/interactions/chit-chat.md → build/npm/dist/interactions/chit-chat.md
-src/core/.../interaction-styles.md → build/npm/dist/interactions/interaction-styles.md
-src/kiro/.../kiro-spec-mode.md     → build/npm/dist/modes/kiro-spec-mode.md
-src/kiro/.../kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
+src/core/interactions/conversation-language.md → build/npm/dist/interactions/conversation-language.md
+src/core/interactions/interaction-styles.md → build/npm/dist/interactions/interaction-styles.md
+src/kiro/steering/protocols/kiro-spec-mode.md     → build/npm/dist/modes/kiro-spec-mode.md
+src/kiro/steering/protocols/kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
 src/kiro/.../kiro-as-spec-mode.md  → build/npm/dist/modes/kiro-as-spec-mode.md
 src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 ```

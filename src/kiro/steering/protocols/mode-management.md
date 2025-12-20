@@ -8,7 +8,9 @@ When entering mode management:
 
 ### Step 1: Load Chit-Chat Mode
 
-Apply protocols from `chit-chat.md` steering document:
+/only-read-protocols chit-chat.md
+
+Apply protocols from chit-chat.md:
 - Use diff blocks to show progress
 - Provide numbered choice lists (4-6 options)
 - Maintain single focus per message

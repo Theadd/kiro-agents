@@ -86,7 +86,6 @@ const STEERING_FILES = [
   "agents.md",
   "modes.md",
   "strict.md",
-  "interactions/chit-chat.md",
   "modes/kiro-vibe-mode.md",
   "modes/kiro-spec-mode.md",
   "modes/kiro-as-vibe-mode.md",
@@ -120,6 +119,7 @@ const POWER_FILES = [
   "steering/kiro-spec-mode.md",
   "steering/kiro-as-vibe-mode.md",
   "steering/kiro-as-spec-mode.md",
+  "steering/chit-chat.md",
   "steering/agent-management.md",
   "steering/agent-creation.md",
   "steering/agent-activation.md"

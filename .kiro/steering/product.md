@@ -159,7 +159,7 @@ npx kiro-agents  # or bunx kiro-agents
 ### Creating First Agent
 
 1. User types `/agents`
-2. Interactive wizard activates (chit-chat mode)
+2. Interactive wizard activates (chit-chat protocol)
 3. User chooses "Create new agent"
 4. Wizard guides through agent creation
 5. Agent file created in `.kiro/agents/{name}.md`

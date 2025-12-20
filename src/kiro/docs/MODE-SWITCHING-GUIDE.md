@@ -74,7 +74,7 @@ agent-system/
 ├── kiro-vibe-mode.md      # Vibe mode protocols
 ├── kiro-spec-mode.md      # Spec mode protocols
 ├── strict-mode.md         # Strict mode (works with both)
-├── chit-chat.md           # Chit-chat interaction style
+├── chit-chat.md           # Chit-chat interaction protocol
 └── MODE-SWITCHING-GUIDE.md # This file
 
 agent-system.md             # Main system with mode commands

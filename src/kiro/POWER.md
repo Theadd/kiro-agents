@@ -2,7 +2,7 @@
 name: "kiro-agents"
 displayName: "Kiro Agents & Modes System"
 description: "Advanced AI agent system with specialized agents, mode switching, strict mode, and interactive workflows for Kiro IDE"
-keywords: ["agent", "agents", "mode", "modes", "vibe", "spec", "strict", "workflow", "kiro-master", "chit-chat", "interactive"]
+keywords: ["agent", "agents", "mode", "modes", "vibe", "spec", "strict", "workflow", "kiro-master", "interactive", "protocols"]
 author: "R. Beltran"
 version: "{{{VERSION}}}"
 ---
@@ -154,7 +154,7 @@ This power includes comprehensive guidance organized by workflow:
 - `strict.md` - Interactive strict mode control (via `/strict`)
 
 ### Interaction Patterns (On Demand)
-- `interactions/chit-chat.md` - Choice-based interaction patterns
+- `steering/chit-chat.md` - Choice-based interaction protocol
 - `interactions/conversation-language.md` - Language guidelines
 - `interactions/interaction-styles.md` - Interaction style patterns
 
