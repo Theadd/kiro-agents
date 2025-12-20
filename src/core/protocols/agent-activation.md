@@ -18,7 +18,7 @@ This file contains:
 - Integration requirements
 
 This enables `/strict {state}` command for this agent session. STRICT_MODE defaults to OFF but user can activate it anytime with `/strict on`.
-/protocols strict-mode.md
+/only-read-protocols strict-mode.md
 
 ### Step 2: Assume Agent Role
 

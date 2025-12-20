@@ -32,7 +32,6 @@ Execute `listDirectory` on `{{{WS_AGENTS_PATH}}}/`:
 
 **If directory doesn't exist OR directory is empty:**
 1. **Load agent creation protocol**:
-   - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
    - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 2. Create `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md` agent automatically using the description from "Initial Agent" section
 3. Follow the agent definition structure from agent-creation.md protocol
@@ -86,7 +85,6 @@ Based on user selection:
 #### Option 2 - Create New Agent
 
 - **Load agent creation protocol**:
-  - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
   - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 - Follow all steps from the "Method Selection" section in agent-creation.md
 - Present 5 creation methods to user:
@@ -103,7 +101,6 @@ Based on user selection:
 #### Option 3 - Manage Existing Agent
 
 - **Load agent structure reference**:
-  - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
   - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 - Show numbered list of available agents
 - User selects agent to manage

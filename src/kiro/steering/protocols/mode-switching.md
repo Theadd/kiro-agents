@@ -6,9 +6,12 @@ This file contains the detailed instructions for switching Kiro modes. It is ref
 
 When switching to mode `{mode_name}`:
 
-### Step 1: Load Mode Definition
+### Step 1: Load Mode Definition and Strict Mode
 
 /only-read-protocols kiro-{mode_name}-mode.md
+
+This enables `/strict {state}` command for this mode session. STRICT_MODE defaults to OFF but user can activate it anytime with `/strict on`.
+/only-read-protocols strict-mode.md
 
 This kiro-{mode_name}-mode.md file contains:
 - Mode identity and purpose
