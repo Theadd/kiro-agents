@@ -175,7 +175,7 @@ ACTIVE_AGENT: none | {agent-name}
 
 - Works alongside all other steering documents
 - Does NOT override user explicit instructions
-- Chit-chat mode still applies (diff blocks, numbered choices)
+- Chit-chat protocol still applies (diff blocks, numbered choices)
 - ADHD-C optimizations still apply (single focus, visual formatting)
 - Both strict mode and agent tracking can be active simultaneously
 

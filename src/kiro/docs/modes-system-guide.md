@@ -215,8 +215,8 @@ This warning ensures you don't accidentally lose workflow progress.
 
 When you execute `/modes` (without parameters), the system:
 
-1. **Activates chit-chat mode**
-   - Loads `chit-chat.md` steering
+1. **Loads chit-chat protocol**
+   - Loads `chit-chat.md` from kiro-protocols Power
    - Uses diff blocks for progress tracking
    - Provides numbered choices
    - Maintains single focus per message
@@ -302,7 +302,7 @@ When you execute `/modes` (without parameters), the system:
 ```
 
 **What happens:**
-1. Chit-chat mode activates
+1. Chit-chat protocol loads
 2. System scans for available modes
 3. AI presents numbered list of modes
 4. AI offers comparison and switching options
@@ -640,13 +640,13 @@ How this mode organizes files:
 **Possible causes:**
 - `modes-system.md` not loaded
 - Missing `inclusion: always` in frontmatter
-- `chit-chat.md` not available
+- `chit-chat.md` not available in kiro-protocols Power
 - Steering documents not loaded
 
 **Solutions:**
 1. Verify `modes-system.md` location
 2. Check frontmatter is correct
-3. Verify `chit-chat.md` exists
+3. Verify kiro-protocols Power is installed
 4. Reload steering documents
 5. Check Kiro logs for errors
 

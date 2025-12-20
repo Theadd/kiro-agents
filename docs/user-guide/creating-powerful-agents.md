@@ -219,4 +219,3 @@ Your agents become as powerful as the AI model itself, within the clear boundari
 - [Agent System Guide](../core/docs/agent-system-guide.md) - Complete agent system documentation
 - [Neurodivergent Accessibility](../design/neurodivergent-accessibility.md) - Chit-chat flexibility and numbered choices
 - [Architecture Overview](../ARCHITECTURE.md) - System design and component relationships
-

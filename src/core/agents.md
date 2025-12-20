@@ -28,6 +28,8 @@ If the user's message contains `/agents {agent_name}` with a specific agent name
 
 You are now in **agent management mode** using chit-chat interaction protocol.
 
+/only-read-protocols chit-chat.md
+
 /protocols agent-management.md
 
 ## Initial Agent

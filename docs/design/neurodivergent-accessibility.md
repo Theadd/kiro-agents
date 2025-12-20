@@ -149,7 +149,7 @@ While developed through the lived experience of one person with ADHD-C, the patt
 
 **Resources:**
 
-- Protocol implementation: `src/core/interactions/chit-chat.md`
+- Protocol implementation: `src/core/protocols/chit-chat.md`
 - GitHub repository: [kiro-agents](https://github.com/Theadd/kiro-agents)
 - Feedback and contributions welcome
 

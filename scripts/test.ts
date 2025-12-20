@@ -126,7 +126,6 @@ async function testNpmBuild() {
     "build/npm/dist/agents.md",
     "build/npm/dist/modes.md",
     "build/npm/dist/strict.md",
-    "build/npm/dist/interactions/chit-chat.md",
     "build/npm/dist/modes/kiro-spec-mode.md",
     "build/npm/dist/modes/kiro-vibe-mode.md",
     "build/npm/dist/modes/kiro-as-spec-mode.md",
@@ -228,6 +227,7 @@ async function testPowerBuild() {
   // Check protocol files exist (power contains protocols from kiro-protocols power)
   const protocolFiles = [
     "build/npm/power/steering/strict-mode.md",
+    "build/npm/power/steering/chit-chat.md",
     "build/npm/power/steering/agent-activation.md",
     "build/npm/power/steering/agent-creation.md",
     "build/npm/power/steering/agent-management.md",

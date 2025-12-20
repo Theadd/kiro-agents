@@ -217,7 +217,7 @@ Spec mode can be activated via:
 
 Spec mode works alongside:
 - Strict mode (`/strict on`)
-- Chit-chat mode (diff blocks, numbered choices)
+- Chit-chat protocol (diff blocks, numbered choices)
 - Agent system (can activate agents while in Spec mode)
 
 ## Key Differentiators from Vibe Mode

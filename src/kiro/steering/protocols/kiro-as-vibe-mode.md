@@ -225,7 +225,7 @@ As-Vibe mode works alongside:
 - Any agent system
 - Any tool configuration
 - Strict mode (`/strict on`) - adds precision when needed
-- Chit-chat mode - structured choices when helpful
+- Chit-chat protocol - structured choices when helpful
 - Current MCP server setup
 - Existing capabilities
 

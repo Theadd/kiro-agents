@@ -4,7 +4,7 @@ inclusion: manual
 
 # Available Interaction Styles
  
-## 1. Chit-Chat Mode (Interactive)
+## 1. Chit-Chat Protocol (Interactive)
  
 **Best for**: ADHD-C users, complex workflows, step-by-step guidance
  
@@ -101,7 +101,7 @@ inclusion: manual
 - Combines multiple styles
 - Adapts based on task complexity
 - Simple tasks → Direct execution
-- Complex tasks → Chit-chat or consultative
+- Complex tasks → Chit-chat protocol or consultative
 
 **Example agents**: project-manager-hybrid
  
@@ -138,11 +138,11 @@ inclusion: manual
  
 You can combine elements from different styles:
  
-**Example**: Consultative + Chit-Chat
+**Example**: Consultative + Chit-Chat Protocol
 
 - Ask clarifying questions (consultative)
-- Use diff blocks and numbered choices (chit-chat)
-- Single focus per message (chit-chat)
+- Use diff blocks and numbered choices (chit-chat protocol)
+- Single focus per message (chit-chat protocol)
 
 **Example**: Direct Execution + Documentation
 
@@ -155,8 +155,8 @@ You can combine elements from different styles:
  
 **Consider**:
 
-1. **Task complexity** - Simple → Direct, Complex → Chit-chat/Wizard
+1. **Task complexity** - Simple → Direct, Complex → Chit-chat protocol/Wizard
 2. **User expertise** - Expert → Direct, Beginner → Wizard/Consultative
 3. **Decision impact** - High → Consultative, Low → Direct
-4. **Interaction frequency** - Many steps → Chit-chat, One-shot → Direct
-5. **Cognitive load** - High → Chit-chat (ADHD-optimized), Low → Any
+4. **Interaction frequency** - Many steps → Chit-chat protocol, One-shot → Direct
+5. **Cognitive load** - High → Chit-chat protocol (ADHD-optimized), Low → Any
