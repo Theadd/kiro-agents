@@ -103,13 +103,11 @@ export interface FileMapping {
  * **File Categories:**
  * - Core system files (always loaded): `aliases.md`
  * - Interactive interfaces (manual inclusion): `agents.md`, `modes.md`, `strict.md`
- * - Mode definitions: `kiro-*-mode.md` (auto-discovered via glob)
  * 
- * **Note:** Protocol files are NOT included in steering mappings. They are distributed
- * exclusively through the kiro-protocols Power and loaded on-demand via kiroPowers tool.
- * 
- * **Glob Patterns:**
- * - `kiro/steering/protocols/kiro-*-mode.md` - Auto-discovers mode definitions
+ * **Note:** Protocol files (including mode definitions) are NOT included in steering mappings.
+ * They are distributed exclusively through the kiro-protocols Power and loaded on-demand
+ * via kiroPowers tool. Mode definitions like `kiro-spec-mode.md` and `kiro-vibe-mode.md`
+ * are now part of the protocol library, not steering files.
  * 
  * @example Adding new steering file
  * ```typescript
@@ -117,10 +115,11 @@ export interface FileMapping {
  * // Automatically included in all builds
  * ```
  * 
- * @example Adding mode definition
+ * @example Adding mode definition (goes to protocols, not steering)
  * ```typescript
- * // Just create src/kiro/steering/protocols/kiro-custom-mode.md
- * // Glob pattern auto-discovers it, no manifest changes needed
+ * // Create src/kiro/steering/protocols/kiro-custom-mode.md
+ * // It will be auto-discovered by PROTOCOL_SOURCE_MAPPINGS
+ * // Distributed via kiro-protocols Power, not as steering file
  * ```
  */
 export const STEERING_MAPPINGS: FileMapping[] = [
@@ -141,7 +140,7 @@ export const STEERING_MAPPINGS: FileMapping[] = [
   // { src: "core/interactions/*.md", dest: "interactions/{name}.md" },
   
   // Mode definitions (loaded by /modes command)
-  { src: "kiro/steering/protocols/kiro-*-mode.md", dest: "modes/{name}.md" },
+  // { src: "kiro/steering/protocols/kiro-*-mode.md", dest: "modes/{name}.md" },
 ];
 
 /**
