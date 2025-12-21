@@ -1,16 +1,19 @@
 # Mode Switching Protocol
 
-This file contains the detailed instructions for switching Kiro modes. It is referenced by the `/modes {mode_name}` alias in `modes-system.md`.
+This file contains the detailed instructions for switching Kiro modes. It is referenced by the `/modes {mode_name}` instruction alias.
 
 ## Mode Switch Steps
 
 When switching to mode `{mode_name}`:
 
-### Step 1: Load Mode Definition
+### Step 1: Load Mode Definition and Strict Mode
 
-Read `kiro-{mode_name}-mode.md` from agent-system directory into context.
+/only-read-protocols kiro-{mode_name}-mode.md
 
-This file contains:
+This enables `/strict {state}` command for this mode session. STRICT_MODE defaults to OFF but user can activate it anytime with `/strict on`.
+/only-read-protocols strict-mode.md
+
+This kiro-{mode_name}-mode.md file contains:
 - Mode identity and purpose
 - Interaction protocols
 - Workflow patterns (if any)
@@ -24,7 +27,8 @@ This file contains:
 For this session, you are in **{mode_name} mode**.
 
 You will:
-- Follow ALL protocols and instructions from `kiro-{mode_name}-mode.md`
+- 
+- Follow ALL protocols and instructions from the `kiro-{mode_name}-mode.md` file
 - Apply mode-specific interaction patterns
 - Use capabilities defined in the mode definition
 - Maintain this mode until user switches modes or ends session

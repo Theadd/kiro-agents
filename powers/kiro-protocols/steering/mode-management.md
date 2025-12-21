@@ -8,7 +8,9 @@ When entering mode management:
 
 ### Step 1: Load Chit-Chat Mode
 
-Apply protocols from `chit-chat.md` steering document:
+/only-read-protocols chit-chat.md
+
+Apply protocols from chit-chat.md:
 - Use diff blocks to show progress
 - Provide numbered choice lists (4-6 options)
 - Maintain single focus per message
@@ -20,18 +22,7 @@ Begin with a diff block showing:
   ⏳ Mode selection
 ```
 
-### Step 2: Detect Available Modes
-
-Scan agent-system directory for `kiro-*-mode.md` files:
-- Extract mode names from filenames (remove `kiro-` prefix and `-mode.md` suffix)
-- Read frontmatter for descriptions
-- Identify current mode from context (if any)
-
-**Available Kiro modes:**
-- **vibe** - Flexible, conversational development assistance
-- **spec** - Structured feature development with requirements, design, and tasks
-
-### Step 3: Present Mode Selection
+### Step 2: Present Mode Selection
 
 Use this response structure:
 
@@ -44,19 +35,24 @@ Use this response structure:
 
 **Available Kiro modes:**
 
-- **vibe** - Flexible, conversational development assistance
-- **spec** - Structured feature development with requirements, design, and tasks
+- **vibe** - Flexible, conversational development assistance (with vibe tools)
+- **spec** - Structured feature development with requirements, design, and tasks (with spec tools)
+- **as-vibe** - Vibe interaction style (keeps current tools)
+- **as-spec** - Spec interaction style (keeps current tools)
 
 **What would you like to do?**
 
-1. **Switch to vibe mode** - Flexible development and quick iterations
-2. **Switch to spec mode** - Structured feature planning and implementation
-3. **View mode details** - See full mode capabilities and protocols
-4. **Mode comparison** - Understand differences between modes
-5. **Stay in current mode** - Continue with current mode
-6. **Help** - Learn about mode system
+1. **Switch to vibe mode** - Flexible development with vibe tools
+2. **Switch to spec mode** - Structured development with spec tools
+3. **Switch to as-vibe mode** - Vibe interaction style (keeps current tools)
+4. **Switch to as-spec mode** - Spec interaction style (keeps current tools)
+5. **Switch to spec-as-vibe mode** - Spec tools with vibe interaction style
+6. **View mode details** - See full mode capabilities and protocols
+7. **Mode comparison** - Understand differences between modes
+8. **Stay in current mode** - Continue with current mode
+9. **Help** - Learn about mode system
 
-### Step 4: Handle User Choice
+### Step 3: Handle User Choice
 
 Based on user selection:
 
@@ -64,15 +60,33 @@ Based on user selection:
 
 - Execute `/modes vibe` command
 - Load vibe mode protocols
-- Begin flexible interaction
+- Begin flexible interaction with vibe tools
 
 #### Option 2 - Switch to spec
 
 - Execute `/modes spec` command
 - Load spec mode protocols
-- Begin structured workflow
+- Begin structured workflow with spec tools
 
-#### Option 3 - View mode details
+#### Option 3 - Switch to as-vibe
+
+- Execute `/modes as-vibe` command
+- Load as-vibe mode protocols
+- Begin flexible interaction (keeps current tools)
+
+#### Option 4 - Switch to as-spec
+
+- Execute `/modes as-spec` command
+- Load as-spec mode protocols
+- Begin structured interaction (keeps current tools)
+
+#### Option 5 - Switch to spec-as-vibe
+
+- Execute `/spec-as-vibe` command
+- Load spec tools with vibe interaction style
+- Begin flexible interaction with spec capabilities
+
+#### Option 6 - View mode details
 
 - Show numbered list of modes
 - User selects mode to view
@@ -80,45 +94,57 @@ Based on user selection:
 - Explain capabilities and use cases
 - Offer to switch to that mode
 
-#### Option 4 - Mode comparison
+#### Option 7 - Mode comparison
 
-- Show side-by-side comparison:
-  - **Vibe Mode**: Flexible, conversational, quick iterations, no formal workflow
-  - **Spec Mode**: Structured workflow with requirements → design → tasks, approval gates
+- Show comprehensive comparison:
+  - **Vibe Mode**: Flexible, conversational, quick iterations, no formal workflow (with vibe tools)
+  - **Spec Mode**: Structured workflow with requirements → design → tasks, approval gates (with spec tools)
+  - **As-Vibe Mode**: Flexible interaction style but keeps current tools
+  - **As-Spec Mode**: Structured interaction style but keeps current tools
 - Explain when to use each mode:
-  - Use vibe for: Quick fixes, exploration, prototyping, iterative development
-  - Use spec for: Complex features, team collaboration, formal planning, documentation
+  - Use vibe for: Quick fixes, exploration, prototyping, iterative development (need vibe tools)
+  - Use spec for: Complex features, team collaboration, formal planning, documentation (need spec tools)
+  - Use as-vibe for: Flexible interaction with current tools (agent superpowers + vibe style)
+  - Use as-spec for: Structured interaction with current tools (agent superpowers + spec methodology)
 - Highlight key differences:
-  - Workflow: None vs. Structured phases
-  - Approval: Direct changes vs. Approval gates
-  - Documentation: Minimal vs. Comprehensive
+  - **Tools**: vibe/spec change tools, as-vibe/as-spec keep current tools
+  - **Interaction**: vibe/as-vibe flexible, spec/as-spec structured
+  - **Use case**: Combine agent capabilities with desired interaction style
 - Help user choose appropriate mode
 
-#### Option 5 - Stay in current mode
+#### Option 8 - Stay in current mode
 
 - Confirm staying in current mode
 - Return to normal interaction
 - Preserve current state
 
-#### Option 6 - Help
+#### Option 9 - Help
 
 Explain mode system:
-- **What are modes?** - Different interaction styles for different workflows
+- **What are modes?** - Different interaction styles and tool sets for different workflows
 - **How to switch?** - Use `/modes {name}` or `/modes` for interactive menu
+- **Mode types:**
+  - **Full modes** (vibe/spec): Change both tools and interaction style
+  - **Role modes** (as-vibe/as-spec): Change only interaction style, keep current tools
 - **Mode benefits:**
-  - Vibe: Fast iteration, flexible approach
-  - Spec: Structured planning, comprehensive documentation
+  - Vibe: Fast iteration, flexible approach (with vibe tools)
+  - Spec: Structured planning, comprehensive documentation (with spec tools)
+  - As-Vibe: Flexible interaction with current tools (agent superpowers + vibe style)
+  - As-Spec: Structured interaction with current tools (agent superpowers + spec methodology)
 - **Mode coordination:**
   - Modes can be combined with agents
   - File changes preserved when switching
   - Workflow state resets when switching
+  - Role modes enable "agent superpowers" - specialized tools with preferred interaction style
 - **Usage examples:**
   - Quick bug fix → Use vibe mode
   - New feature with requirements → Use spec mode
+  - Agent with spec tools but want flexibility → Use as-vibe mode
+  - Agent with vibe tools but want structure → Use as-spec mode
   - Refactoring existing code → Use vibe mode
   - Team feature with documentation → Use spec mode
 
-### Step 5: Maintain Chit-Chat Mode
+### Step 4: Maintain Chit-Chat Mode
 
 Continue using diff blocks and numbered choices throughout mode management session.
 

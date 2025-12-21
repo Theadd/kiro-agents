@@ -8,7 +8,9 @@ When entering agent management mode:
 
 ### Step 1: Activate Chit-Chat Mode
 
-Load and apply protocols from `chit-chat.md` steering document:
+/only-read-protocols chit-chat.md
+
+Apply protocols from chit-chat.md:
 
 - **Use diff blocks** to show progress and current state
 - **Provide numbered choice lists** (4-8 options, up to 16 if needed)
@@ -32,7 +34,6 @@ Execute `listDirectory` on `.kiro/agents/`:
 
 **If directory doesn't exist OR directory is empty:**
 1. **Load agent creation protocol**:
-   - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
    - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 2. Create `.kiro/agents/kiro-master.md` agent automatically using the description from "Initial Agent" section
 3. Follow the agent definition structure from agent-creation.md protocol
@@ -86,7 +87,6 @@ Based on user selection:
 #### Option 2 - Create New Agent
 
 - **Load agent creation protocol**:
-  - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
   - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 - Follow all steps from the "Method Selection" section in agent-creation.md
 - Present 5 creation methods to user:
@@ -103,7 +103,6 @@ Based on user selection:
 #### Option 3 - Manage Existing Agent
 
 - **Load agent structure reference**:
-  - Call `kiroPowers` with action="activate", powerName="kiro-protocols"
   - Call `kiroPowers` with action="readSteering", powerName="kiro-protocols", steeringFile="agent-creation.md"
 - Show numbered list of available agents
 - User selects agent to manage

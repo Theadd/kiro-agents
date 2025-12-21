@@ -18,7 +18,7 @@ When user initiates agent creation:
 
 ### Step 1: Present Creation Methods
 
-Use chit-chat mode for the creation process:
+Use chit-chat protocol for the creation process:
 
 ```diff
   👉 Agent Creation
@@ -355,7 +355,7 @@ Group by category. Example:
 1. **Formal** - Professional, structured responses
 2. **Casual** - Conversational, friendly tone
 3. **Technical** - Precise, detailed explanations
-4. **Chit-chat mode** - Interactive with diff blocks and numbered choices
+4. **Chit-chat protocol** - Interactive with diff blocks and numbered choices
 
 **Confirmation requirements:**
 - Always confirm before changes
