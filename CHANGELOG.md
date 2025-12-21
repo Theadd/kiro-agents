@@ -1,5 +1,109 @@
 # Changelog
 
+## 1.11.0
+
+### Minor Changes
+
+- 0861aa1: # Add dev:powers watch mode and fix strict-mode protocol distribution
+
+  Added new `dev:powers` watch mode for rapid protocol development iteration with automatic readonly file handling. Fixed missing strict-mode.md protocol in kiro-protocols power distribution. Includes comprehensive documentation updates for the new development workflow.
+
+  ## Added
+
+  - `dev:powers` npm script for watch mode that builds protocols to user's Kiro directory
+  - `scripts/dev-powers.ts` with automatic readonly file handling and watch mode for protocol changes
+  - strict-mode protocol to kiro-protocols power distribution (now includes 6 protocols)
+  - Dev:Powers Mode documentation in structure.md showing new build target and file mappings
+  - Protocol Files Development workflow section in tech.md with separate guidance for protocol vs steering development
+
+  ## Changed
+
+  - Updated kiro-protocols power to include strict-mode protocol in Core Protocols section
+  - Test validation now expects 6 protocol files instead of 5
+  - Documentation paths updated to reflect strict-mode.md location in protocols directory
+
+  ## Fixed
+
+  - strict-mode.md now properly distributed with kiro-protocols power (was missing from protocols array)
+
+- e33522d: # Add role-based modes and optimize chit-chat protocol for neurodivergent accessibility
+
+  Introduces as-vibe and as-spec modes enabling "agent superpowers" (combining specialized agent tools with preferred interaction style), optimizes chit-chat.md by 53% while preserving functionality, and adds comprehensive neurodivergent accessibility documentation explaining cross-condition benefits.
+
+  ## Added
+
+  - Role-based modes: `kiro-as-vibe-mode.md` and `kiro-as-spec-mode.md` for combining agent tools with preferred interaction style
+  - Neurodivergent accessibility guide: `docs/neurodivergent-accessibility.md` explaining benefits for ADHD, autism, dyslexia, executive function disorders, anxiety, and processing differences
+  - "Working with Numbered Choices" section in accessibility docs explaining flexibility (request more options, filter, state intent directly)
+  - Agent superpowers concept documentation in workspace steering files
+
+  ## Changed
+
+  - Optimized `chit-chat.md` from ~4,500 to ~2,100 tokens (53% reduction) by condensing examples and removing redundancy while preserving all protocols
+  - Updated terminology from "ADHD-C Users" to "ADHD Users" with clarification "(in particular, ADHD-C)" for easier typing
+  - Increased numbered choice count from 4-6 to 6-8 options (up to 16 maximum) across chit-chat protocol
+  - Updated mode management protocol to include as-vibe/as-spec options and remove auto-detection step
+  - Refined mode switching protocol with better literal response handling
+  - Updated workspace steering files to document new mode types and agent superpowers workflow
+
+  ## Removed
+
+  - Verbose examples and redundant explanations from chit-chat.md protocols
+  - Auto-detection Step 2 from mode management (simplified workflow)
+  - Anecdotal metrics, implementation notes, and future considerations sections from accessibility docs (focused on core concepts)
+
+- ca5f560: # Centralized manifest system with automatic protocol discovery
+
+  Implements a centralized file mapping system in `src/manifest.ts` that serves as single source of truth for all build targets. Replaces scattered hardcoded file mappings with glob pattern support for automatic protocol discovery, ensuring dev mode matches CLI installation exactly.
+
+  ## Added
+
+  - Centralized manifest system (`src/manifest.ts`) with type-safe file mappings
+  - Glob pattern support for automatic protocol discovery via manifest mappings
+  - CLI generation from templates with embedded file lists from manifest
+  - Comprehensive manifest system documentation in workspace steering files
+
+  ## Changed
+
+  - Build system now uses manifest for all file operations instead of hardcoded lists
+  - Protocol discovery is automatic via glob patterns for core and Kiro-specific protocols
+  - Dev mode guaranteed to match CLI installation (no more file mismatches)
+  - Mode definitions moved from `agent-system/` to `protocols/` directory for better organization
+  - All build scripts updated to use centralized manifest system
+  - Workspace steering documentation updated to reflect new architecture
+
+  ## Fixed
+
+  - Dev mode file inconsistency where different files were installed vs CLI
+  - Manual file list maintenance when adding new protocols
+  - Scattered file mappings across multiple build scripts
+
+- ac3208c: # Migrate chit-chat protocol to kiro-protocols Power with smart activation
+
+  Moved chit-chat.md from global steering to kiro-protocols Power for on-demand loading, reducing base context overhead. Implemented smart detection in agent-activation.md to automatically load and activate chit-chat protocol only for agents that use it, preventing protocol leakage when switching between agents with different interaction styles.
+
+  ## Added
+
+  - Smart chit-chat detection in agent-activation.md that scans agent definitions for chit-chat indicators (Response Style, protocol mentions, section headers)
+  - Conditional chit-chat loading: protocol loads only when agent needs it, with explicit state declaration
+  - Flexible control via natural language instructions in chit-chat.md activation section
+
+  ## Changed
+
+  - Moved chit-chat.md from interactions directory to protocols directory (now distributed via kiro-protocols Power instead of global steering)
+  - Updated chit-chat.md activation section to allow control via protocol instructions, not just user requests
+  - Updated manifest.ts to remove chit-chat.md from STEERING_MAPPINGS (now auto-discovered by PROTOCOL_SOURCE_MAPPINGS glob pattern)
+  - Updated agent-activation.md with Step 1.5 for chit-chat state management and Step 3 with explicit behavior for both states
+  - Updated 28+ documentation files to use "chit-chat protocol" terminology and correct file paths
+  - Updated test.ts to reflect chit-chat.md now in kiro-protocols Power (11 protocol files total)
+  - Updated workspace steering files (product.md, structure.md) to reflect new chit-chat location and terminology
+
+  ## Fixed
+
+  - Agent activation via `/agents {name}` now correctly loads chit-chat.md when agent specifies chit-chat protocol
+  - Chit-chat patterns no longer persist inappropriately when switching from chit-chat agent to non-chit-chat agent
+  - Non-chit-chat agents no longer forced to use diff blocks and numbered choices when chit-chat.md is in context from previous session
+
 ## 1.10.1
 
 ### Patch Changes

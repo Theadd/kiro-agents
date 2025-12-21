@@ -85,11 +85,7 @@ const STEERING_FILES = [
   "aliases.md",
   "agents.md",
   "modes.md",
-  "strict.md",
-  "modes/kiro-vibe-mode.md",
-  "modes/kiro-spec-mode.md",
-  "modes/kiro-as-vibe-mode.md",
-  "modes/kiro-as-spec-mode.md"
+  "strict.md"
 ] as const;
 
 /**
