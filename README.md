@@ -6,11 +6,16 @@ Build agents for any domain: development, design, business, research, or anythin
 
 ## Features
 
-- 🤖 **Specialized Agents** - Create domain-specific AI assistants with custom capabilities and workflows
-- 🔄 **Flexible Modes** - Switch between vibe (conversational) and spec (structured) workflows  
-- 🎯 **Strict Mode** - Precision mode that blocks execution on ambiguous input
-- 💬 **Zero-Prompt Interaction** - Numbered choices and diff blocks eliminate prompt writing
+**Core Capabilities:**
+- 🎯 **Guided Agent Creation** - Multiple creation methods: templates, role explorer, natural language, or step-by-step wizard
+- 🔧 **Powerful Refinement** - Modify and perfect agents through kiro-master, the auto-created management agent
+- 💬 **Interactive by Default** - Guided workflows with minimal prompt writing for both creating and using agents
+- 🌐 **Unlimited Domains** - Build agents for any field: development, design, business, research, or anything else
 - 📦 **Minimal Footprint** - 1.35K base context (<0.7% of Kiro's 200K), protocols load on-demand
+
+**Additional Features:**
+- 🔄 **Flexible Modes** - Switch between vibe (conversational) and spec (structured) workflows
+- 🎯 **Strict Mode** - Precision mode that blocks execution on ambiguous input
 
 ## Installation
 
