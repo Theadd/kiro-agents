@@ -94,8 +94,25 @@ git show --no-pager
 
 ## Markdown Formatting
 
-**Tables in conversation**: Wrap in 4-backtick `bash` blocks
-**Markdown in code blocks**: Use 4-backticks (prevents nesting issues)
+**CRITICAL - Nested Markdown Code Blocks**: When showing markdown content that contains code blocks, use **4-backticks for outer blocks** and **3-backticks for inner blocks**:
+
+````markdown
+## Example Section
+
+Here's some code:
+```javascript
+console.log("hello");
+```
+````
+
+**Key Rule**: Always reduce backtick count by 1 for each nesting level:
+- Outer block (your response): 4-backticks
+- Inner block (content you're showing): 3-backticks
+- If showing a file that has an example with 4-backticks, reduce it to 3-backticks
+
+**Why**: The parser needs different backtick counts to distinguish nesting levels. Using the same count causes premature block closure.
+
+**Common in this project**: Almost all `.md` files (steering documents, protocols, docs) contain code blocks, so default to 4-backticks for markdown content.
 
 ## Versioning Workflow
 
