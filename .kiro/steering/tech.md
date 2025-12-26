@@ -218,7 +218,7 @@ Captures context that git commits don't:
 - `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injects agent-management.md content
 - `{{{PROTOCOLS_PATH}}}` - Path to protocols directory (target-aware)
 - `{{{KIRO_PROTOCOLS_PATH}}}` - Path to Kiro-specific protocols (target-aware)
-- `{{{KIRO_MODE_ALIASES}}}` - Injects mode system alias from shared-aliases.md
+- `{{{ADDITIONAL_ALIASES}}}` - Injects Kiro-specific aliases from shared-aliases.md (protocol loading, protocol reading, mode system, conversation transfer state restoration)
 
 **Example**:
 ```typescript
@@ -234,11 +234,14 @@ export const substitutions = {
     // Uses injectProtocol helper to read and extract content
     return injectProtocol('agent-management.md', '## Agent Management Steps');
   },
-  '{{{KIRO_MODE_ALIASES}}}': ({ target }) => {
-    // Uses extractSection to get content from shared file
-    let content = extractSection('src/kiro/shared-aliases.md', 'Mode System Alias');
+  '{{{ADDITIONAL_ALIASES}}}': ({ target }) => {
+    // Extracts multiple sections from shared-aliases.md
+    const protocolLoading = extractSection('src/kiro/shared-aliases.md', 'Protocol Loading Alias');
+    const protocolReading = extractSection('src/kiro/shared-aliases.md', 'Protocol Reading Alias');
+    const modeAliases = extractSection('src/kiro/shared-aliases.md', 'Mode System Alias');
+    const stateRestoration = extractSection('src/kiro/shared-aliases.md', 'Conversation Transfer State Restoration');
     // Can contain nested substitutions that will be processed recursively
-    return content;
+    return `${protocolLoading}\n\n${protocolReading}\n\n${modeAliases}\n\n---\n\n${stateRestoration}`;
   }
 }
 ```

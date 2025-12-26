@@ -155,30 +155,45 @@ export const substitutions = {
   /** Injects mode management protocol from Kiro-specific protocols directory */
   '{{{MODE_MANAGEMENT_PROTOCOL}}}': () => injectProtocol('mode-management.md', '## Mode Management Steps', 'src/kiro/steering/protocols'),
   /** 
-   * Injects mode system alias from shared aliases file with nested substitution support.
+   * Injects additional Kiro-specific aliases from shared aliases file.
    * 
-   * Extracts section containing `{{{KIRO_PROTOCOLS_PATH}}}` placeholder. The build system's
-   * multi-pass processor automatically resolves the nested placeholder in a subsequent pass.
+   * Extracts reusable alias definitions from `src/kiro/shared-aliases.md` for injection into
+   * main `aliases.md` steering document. Combines multiple sections with proper separation.
    * 
-   * **Processing flow:**
-   * 1. First pass: This function returns content with `{{{KIRO_PROTOCOLS_PATH}}}`
-   * 2. Second pass: Build system resolves `{{{KIRO_PROTOCOLS_PATH}}}` to actual path
+   * **Sections included (in order):**
+   * 1. Protocol Loading Alias - `/protocols {filename}` command for loading and executing protocols
+   * 2. Protocol Reading Alias - `/only-read-protocols {filename}` command for loading without executing
+   * 3. Mode System Alias - Mode switching commands (`/modes {name}`, `/spec-as-vibe`)
+   * 4. Conversation Transfer State Restoration - Auto-detects and restores STRICT_MODE/ACTIVE_AGENT state
+   * 
+   * **Multi-pass substitution:**
+   * Extracted content may contain nested placeholders (e.g., `{{{KIRO_PROTOCOLS_PATH}}}`) that get
+   * resolved in subsequent build passes, enabling modular content injection.
+   * 
+   * @param target - Build target ('npm' | 'power' | 'dev'), passed to nested substitutions
+   * @returns Combined alias definitions with separators, or error comment on failure
    * 
    * @example Multi-pass resolution
    * ```typescript
    * // Pass 1: Returns "Path: {{{KIRO_PROTOCOLS_PATH}}}/mode-switching.md"
    * // Pass 2: Resolves to "Path: ~/.kiro/steering/kiro-agents/protocols/mode-switching.md"
    * ```
+   * 
+   * @see src/kiro/shared-aliases.md - Source file with reusable alias definitions
+   * @see scripts/build.ts - Multi-pass substitution processor
    */
-  '{{{KIRO_MODE_ALIASES}}}': ({ target }: any) => {
+  '{{{ADDITIONAL_ALIASES}}}': ({ target }: any) => {
     try {
-      // Extract section from shared aliases file (contains {{{KIRO_PROTOCOLS_PATH}}} placeholder)
-      const content = extractSection('src/kiro/shared-aliases.md', 'Mode System Alias');
+      // Extract all sections from shared aliases file in order
+      const protocolLoading = extractSection('src/kiro/shared-aliases.md', 'Protocol Loading Alias');
+      const protocolReading = extractSection('src/kiro/shared-aliases.md', 'Protocol Reading Alias');
+      const modeAliases = extractSection('src/kiro/shared-aliases.md', 'Mode System Alias');
+      const stateRestoration = extractSection('src/kiro/shared-aliases.md', 'Conversation Transfer State Restoration');
       
-      // Return content with nested placeholder - build system will resolve in next pass
-      return content;
+      // Return combined content with separators
+      return `${protocolLoading}\n\n${protocolReading}\n\n${modeAliases}\n\n---\n\n${stateRestoration}`;
     } catch (error: any) {
-      return `<!-- Error loading mode alias: ${error.message} -->`;
+      return `<!-- Error loading additional aliases: ${error.message} -->`;
     }
   }
 }
