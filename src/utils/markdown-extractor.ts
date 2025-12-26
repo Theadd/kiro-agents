@@ -7,10 +7,11 @@
  * **Use cases:**
  * - Extract protocol sections for build-time injection (e.g., "## Agent Management Steps")
  * - Create reusable substitution functions for config.ts
- * - Parse markdown with complex nested structures (code blocks, XML aliases)
+ * - Parse markdown with complex nested structures (code blocks, nested XML aliases)
  * 
  * **Key features:**
  * - Scope-aware parsing: Headers inside code blocks/XML tags are ignored
+ * - Nested XML support: Properly tracks nested `<alias>` tags and other XML structures
  * - Anchor or title matching: Query by "Section Title" or "#section-title"
  * - Section boundaries: Extracts from header to next same-level header
  * 
@@ -65,11 +66,14 @@ function checkCodeFence(content: string, i: number): number {
 }
 
 /**
- * Parses XML tag at position, handling multi-line tags and self-closing syntax.
+ * Parses XML tag at position, handling multi-line tags, self-closing syntax, and nested tags.
+ * 
+ * Detects both opening and closing tags to maintain proper XML scope tracking.
+ * Called even when already inside XML context to handle nested tag structures.
  * 
  * @param content - Full markdown content
- * @param i - Current position index
- * @returns Tag metadata (name, closing/self-closing status, end position) or null
+ * @param i - Current position index (must point to '<' character)
+ * @returns Tag metadata (name, closing/self-closing status, end position) or null if invalid
  */
 function checkXmlTag(content: string, i: number): { tag: string; isClosing: boolean; selfClosing: boolean; end: number } | null {
   if (content.charCodeAt(i) !== 60) return null; // Not '<'
@@ -102,8 +106,14 @@ function checkXmlTag(content: string, i: number): { tag: string; isClosing: bool
  * 
  * **Parsing behavior:**
  * - Headers inside code blocks or XML tags are ignored
+ * - XML tag detection handles nested structures (checks even when inside XML)
  * - Section ends at next same-or-higher level header
  * - Trailing whitespace trimmed
+ * 
+ * **State tracking:**
+ * - 0 = normal scope (headers detected)
+ * - 1 = inside code block (headers ignored)
+ * - 2 = inside XML tag (headers ignored, nested tags tracked)
  * 
  * @param content - Full markdown content
  * @param query - Section title (exact match) or anchor with # prefix (e.g., "#installation")
@@ -145,8 +155,8 @@ function extractSectionFromContent(content: string, query: string): string {
       }
     }
     
-    // Detect XML tag
-    if (state === 0 && content.charCodeAt(i) === 60) {
+    // Detect XML tag (check even when inside XML for nested tags)
+    if (content.charCodeAt(i) === 60) {
       const tag = checkXmlTag(content, i);
       if (tag && !tag.selfClosing) {
         if (tag.isClosing) {

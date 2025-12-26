@@ -84,10 +84,11 @@ function test(name: string, passed: boolean, message: string) {
  * 
  * **Expected Files:**
  * - CLI: `build/npm/bin/cli.js`
- * - Steering: `build/npm/dist/*.md`
- * - Protocols: `build/npm/dist/protocols/*.md`
- * - Interactions: `build/npm/dist/interactions/*.md`
- * - Modes: `build/npm/dist/modes/*.md`
+ * - Steering: `build/npm/dist/*.md` (core system files only)
+ * 
+ * **Note:** Mode definitions (kiro-spec-mode.md, kiro-vibe-mode.md, etc.) are
+ * distributed via kiro-protocols Power, not npm dist. They're validated in
+ * testPowerBuild() instead.
  * 
  * @example
  * ```typescript
@@ -120,16 +121,12 @@ async function testNpmBuild() {
     existsSync(cliPath) ? "CLI found at build/npm/bin/cli.js" : "CLI not found"
   );
   
-  // Check dist files exist
+  // Check dist files exist (steering files only, mode definitions are in kiro-protocols Power)
   const distFiles = [
     "build/npm/dist/aliases.md",
     "build/npm/dist/agents.md",
     "build/npm/dist/modes.md",
     "build/npm/dist/strict.md",
-    "build/npm/dist/modes/kiro-spec-mode.md",
-    "build/npm/dist/modes/kiro-vibe-mode.md",
-    "build/npm/dist/modes/kiro-as-spec-mode.md",
-    "build/npm/dist/modes/kiro-as-vibe-mode.md",
   ];
   
   let missingFiles = 0;
