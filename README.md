@@ -23,7 +23,7 @@ Build agents for any domain: development, design, business, research, or anythin
 npx kiro-agents
 ```
 
-Installs globally to `~/.kiro/` and works in all workspaces.
+Installs kiro-agents and the kiro-protocols Power. Run the same command to update to the latest version.
 
 ## Quick Start
 
@@ -39,7 +39,7 @@ On first run, this automatically creates **kiro-master** (your Kiro management a
 
 From the agent menu, choose **"Create new agent"** and pick a creation method:
 
-- **Quick Start** - Choose from templates (frontend, backend, testing, etc.)
+- **Quick Start** - Choose from templates
 - **Explore Roles** - Browse agents by domain
 - **Natural Language** - Just describe what you need
 - **Project-Specific** - AI analyzes your codebase
@@ -67,26 +67,25 @@ The agent stays active until you switch to another or end the session.
 
 ## How It Works
 
-**Markdown-Based System**
-kiro-agents consists entirely of markdown steering documents—AI instructions with no runtime code. These files are installed to `~/.kiro/steering/kiro-agents/` and guide how Kiro IDE responds to your commands.
+**Simple Markdown Files**
+kiro-agents uses plain markdown files with AI instructions—no code to run, no dependencies to install. These files guide how Kiro IDE responds to your commands.
 
-**Protocol Library**
-Reusable protocols (agent creation, mode switching, strict mode) are distributed via the kiro-protocols Power. They load on-demand, keeping base context minimal at 1.35K tokens.
+**kiro-protocols Power**
+Automatically installed alongside kiro-agents, this Power provides protocols (agent creation, mode switching, strict mode) that load on-demand when needed.
 
-**Agent Storage**
-When you create agents, they're saved as `.md` files in `.kiro/agents/`. Each agent definition contains capabilities, workflows, and interaction protocols. Activate them with `/agents {name}` to assume that specialized role.
+**On-Demand Loading**
+Protocols load only when needed, keeping your context clean. Base system uses just 1.35K tokens.
 
-**Instruction Aliases**
-Commands like `/agents`, `/modes`, and `/strict` are instruction aliases—XML patterns that trigger specific protocols. You can create custom commands using the same pattern.
+**Your Agents, Your Files**
+Agents you create are saved as `.md` files in `.kiro/agents/`. Edit them like any document, version control them with git, reuse them across projects.
 
 ## Documentation
 
-- **[Getting Started](docs/GETTING-STARTED.md)** - Step-by-step onboarding guide
-- **[User Guide](docs/user-guide/)** - Agents, modes, commands, workflows, examples
-- **[Developer Guide](docs/developer-guide/)** - Contributing, versioning, build system, testing
-- **[Design Rationale](docs/design/)** - Neurodivergent accessibility, protocol system, interaction patterns
+- **[Getting Started](docs/GETTING_STARTED.md)** - Step-by-step onboarding guide
 - **[Architecture Overview](docs/ARCHITECTURE.md)** - System design and component relationships
-- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Creating Powerful Agents](docs/user-guide/creating-powerful-agents.md)** - Layered architecture guide
+- **[Design Rationale](docs/design/)** - Protocol system, interaction patterns, neurodivergent accessibility
+- **[Contributing](CONTRIBUTING.md)** - Development workflow, build system, testing, versioning
 
 ## Contributing
 
@@ -97,7 +96,6 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - [npm Package](https://www.npmjs.com/package/kiro-agents)
 - [GitHub Repository](https://github.com/Theadd/kiro-agents)
 - [Kiro IDE](https://kiro.dev)
-- [Demo Video](https://youtu.be/Arccq_JhpFk) (3:52)
 
 ## License
 
