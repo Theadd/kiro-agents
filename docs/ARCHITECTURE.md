@@ -11,6 +11,7 @@ System design and component relationships for kiro-agents.
 - [Distribution Architecture](#distribution-architecture)
 - [Agent System](#agent-system)
 - [Mode System](#mode-system)
+- [Conversation Transfer State Restoration](#conversation-transfer-state-restoration)
 - [Instruction Alias System](#instruction-alias-system)
 - [File Organization](#file-organization)
 - [Data Flow](#data-flow)
@@ -223,6 +224,7 @@ PROTOCOL_SOURCE_MAPPINGS: FileMapping[]
 - `{{{COMMANDS_LIST}}}` - Auto-generated command list
 - `{{{AGENT_LIST}}}` - List of available agents
 - `{{{PROTOCOLS_PATH}}}` - Path to protocols directory (target-aware)
+- `{{{ADDITIONAL_ALIASES}}}` - Injects protocol loading, mode system, conversation transfer from shared-aliases.md
 - `{{{AGENT_MANAGEMENT_PROTOCOL}}}` - Injects agent-management.md content
 
 ---
@@ -408,6 +410,66 @@ User Installation
 
 ---
 
+## Conversation Transfer State Restoration
+
+### Purpose
+
+Automatically restore STRICT_MODE and ACTIVE_AGENT state when Kiro IDE generates conversation summaries due to context limit.
+
+### Problem
+
+When conversations exceed context limits, Kiro generates automatic summaries with "CONTEXT TRANSFER:" prefix. Critical session state (STRICT_MODE, ACTIVE_AGENT) is lost, causing:
+- Agent role forgotten
+- Strict mode rules not applied
+- Workflow disruption
+
+### Solution
+
+**Detection-based restoration** in `aliases.md` (always loaded):
+
+1. **Detect** - Check for "CONTEXT TRANSFER:" in initial context
+2. **Scan** - Search summary for state indicators (agent names, STRICT_MODE mentions)
+3. **Restore** - Reactivate agent and/or STRICT_MODE based on findings
+4. **Verify** - Display Response Protocol flags confirming restoration
+
+### Implementation
+
+**Location:** `src/kiro/shared-aliases.md` → injected into `aliases.md` via `{{{ADDITIONAL_ALIASES}}}`
+
+**Execution:** Before generating first response in session
+
+**Detection Patterns:**
+- Agent: `/agents {name}`, `activated {name} agent`, `ACTIVE_AGENT: {name}`
+- STRICT_MODE: `STRICT_MODE: ON`, `/strict on`, `activated STRICT_MODE`
+
+**Restoration Logic:**
+
+**Case 1: Agent detected**
+1. Execute `/agents {agent_name}` (loads agent definition and protocols)
+2. Override STRICT_MODE if explicitly mentioned (ON or OFF)
+3. If not mentioned, use agent's default STRICT_MODE
+
+**Case 2: No agent, STRICT_MODE ON**
+1. Ask user: "Was an agent active? If so, which one?"
+2. Wait for response
+3. Activate agent if provided, then apply STRICT_MODE
+
+**Case 3: No agent, STRICT_MODE OFF/unknown**
+1. Continue normally (no restoration needed)
+
+**Override Behavior:**
+- Ignores "Do not ask for clarification" instruction from summary when Case 2 applies
+- State restoration takes precedence over summary instructions
+
+### Benefits
+
+- **Automatic** - No manual intervention required
+- **Intelligent** - Scans summary content for state clues
+- **Fallback** - Asks user when state is ambiguous
+- **Always active** - Loaded via `aliases.md` in every session
+
+---
+
 ## Instruction Alias System
 
 ### Purpose
@@ -464,17 +526,19 @@ literal_text
 - `/agents` - Interactive agent management
 - `/agents {agent_name}` - Activate specific agent
 
+**Protocol Loading:**
+- `/protocols {filename}` - Load and execute protocol from kiro-protocols Power
+- `/only-read-protocols {filename}` - Load protocol without executing (read-only)
+
 **Mode System:**
 - `/modes` - Interactive mode management
 - `/modes {mode_name}` - Switch to mode
 
-**Protocol Loading:**
-- `/protocols {filename}` - Load and execute protocol
-- `/only-read-protocols {filename}` - Read protocol without executing
-
 **Strict Mode:**
 - `/strict` - Interactive strict mode control
 - `/strict {state}` - Set strict mode (on/off)
+
+**Note:** Protocol loading aliases are Kiro-specific (use `kiroPowers` tool) and defined in `src/kiro/shared-aliases.md`.
 
 ---
 
@@ -504,7 +568,7 @@ src/
 ├── kiro/                     # Kiro-specific
 │   ├── POWER.md
 │   ├── config.ts
-│   ├── shared-aliases.md
+│   ├── shared-aliases.md     # Protocol loading, mode system, conversation transfer
 │   └── steering/
 │       ├── modes.md
 │       └── protocols/        # Auto-discovered
@@ -523,7 +587,7 @@ src/
 User Installation:
 
 ~/.kiro/steering/kiro-agents/
-├── aliases.md
+├── aliases.md                # Includes protocol loading, mode system, conversation transfer
 ├── agents.md
 ├── modes.md
 ├── strict.md
