@@ -65,6 +65,7 @@ kiro-agents/
 │   └── README.md                 # Powers documentation
 ├── docs/                         # Documentation
 │   ├── ARCHITECTURE.md           # System design and component relationships
+│   ├── GETTING_STARTED.md        # Step-by-step onboarding guide
 │   ├── design/                   # Design rationale
 │   │   ├── README.md             # Design documentation index
 │   │   ├── protocol-system.md    # Why layered protocols work
