@@ -1,0 +1,5 @@
+{
+    "kiroAgent.agentIgnoreFiles": [
+        ".kiroignore"
+    ]
+}

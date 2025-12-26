@@ -138,13 +138,14 @@ kiro-agents/
 - Uses same substitution system as production builds for consistency
 
 **npm Build Pipeline** (`scripts/build.ts`):
-- Two build targets: `npm`, `dev`
+- Three build modes: `npm` (clean after), `npm-no-clean` (preserve artifacts), `dev` (parallel watch)
 - Uses centralized manifest system (`src/manifest.ts`) for all file mappings
-- Compiles CLI to JavaScript (npm only)
+- Compiles CLI to JavaScript (npm modes only)
 - Loads configuration with substitutions
 - Processes markdown files via `STEERING_MAPPINGS` from manifest
 - Copies pre-built power files from `powers/kiro-protocols/`
 - Maps files to target structure with guaranteed consistency
+- Dev mode runs both `dev:agents` and `dev:powers` in parallel
 
 **CLI Tool** (`bin/cli.ts`):
 - Generated from `bin/cli.template.ts` with embedded file lists from manifest
@@ -175,14 +176,21 @@ kiro-agents/
 - Ready for npm inclusion (copied to `build/npm/power/`)
 
 **Dev Mode** (`~/.kiro/steering/kiro-agents/`):
-- Direct build to user directory
-- Watch mode for development
+- Parallel watch mode via `bun run dev`
+- Runs both `dev:agents` (steering) and `dev:powers` (protocols) simultaneously
+- Color-coded output for each process
 - No CLI compilation needed
 - Fast iteration cycle
 
+**Dev:Agents Mode** (`~/.kiro/steering/kiro-agents/`):
+- Direct build to user directory via `bun run dev:agents`
+- Watch mode for steering file development
+- No CLI compilation needed
+- Fast iteration for steering files only
+
 **Dev:Powers Mode** (`~/.kiro/powers/kiro-protocols/`):
 - Uses manifest system for automatic protocol discovery (same as production)
-- Direct build to user's power directory
+- Direct build to user's power directory via `bun run dev:powers`
 - Watch mode for protocol development
 - Handles readonly files automatically
 - Auto-discovers protocols via `PROTOCOL_SOURCE_MAPPINGS` glob patterns
@@ -289,10 +297,10 @@ src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 - **CLI Generation**: `bin/cli.ts` generated from template with embedded file lists from manifest
 - Deterministic builds (same input = same output)
 - Dynamic substitutions applied at build time
-- Two build targets: npm, dev
+- Three build modes: npm (clean), npm-no-clean (preserve), dev (parallel watch)
 - Powers built separately via `build:powers` script using manifest auto-discovery
-- npm build cleans after completion
-- Dev mode watches for changes
+- npm build cleans after completion by default
+- Dev mode runs both steering and powers watch processes
 
 **Distribution**:
 - npm: `build/npm/` included in package, then cleaned

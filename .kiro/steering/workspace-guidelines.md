@@ -66,14 +66,19 @@ Protocol + steering changes:
 
 ```bash
 # Development (watch mode)
-bun run dev         # Steering → ~/.kiro/steering/kiro-agents/
-bun run dev:powers  # Protocols → ~/.kiro/powers/kiro-protocols/
+bun run dev         # Parallel: Steering + Protocols → ~/.kiro/
+bun run dev:agents  # Steering only → ~/.kiro/steering/kiro-agents/
+bun run dev:powers  # Protocols only → ~/.kiro/powers/kiro-protocols/
 
 # Distribution
 bun run build:powers  # Powers (manifest auto-discovery)
-bun run build         # npm package
+bun run build         # npm package (cleans after)
 bun run test          # Validate
 bun run clean         # Remove build/
+
+# Validation
+bun run validate:powers    # Power structure
+bun run validate:manifest  # Manifest consistency
 ```
 
 ### Protocol Auto-Discovery
@@ -154,5 +159,12 @@ bun run validate:powers # Power structure
 
 ### Test Locally
 
-**Fast**: `bun run dev` or `bun run dev:powers` (watch mode → `~/.kiro/`)
-**Full**: `bun run build:powers && bun run build && bun link && kiro-agents`
+**Fast (Watch Mode)**:
+- `bun run dev` - Parallel watch for both steering and protocols
+- `bun run dev:agents` - Watch steering files only
+- `bun run dev:powers` - Watch protocol files only
+
+**Full Build Test**:
+```bash
+bun run build:powers && bun run build && bun link && kiro-agents
+```

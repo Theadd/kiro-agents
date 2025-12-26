@@ -230,10 +230,11 @@ npx kiro-agents  # or bunx kiro-agents
 1. **Centralized Manifest System**: All file mappings defined in `src/manifest.ts` (single source of truth)
 2. **Glob Pattern Support**: Auto-discovers files with `*.md` patterns, no manual updates needed
 3. **Manifest-Based Protocol Discovery**: `PROTOCOL_SOURCE_MAPPINGS` auto-discovers protocols via glob patterns
-4. **Two Build Targets**: npm, dev (powers built separately via `build:powers` using manifest)
+4. **Build Targets**: npm (with optional no-clean), dev (powers built separately via `build:powers` using manifest)
 5. **Deterministic Builds**: Same input = same output
 6. **Dynamic Substitutions**: Applied at build time via config functions
 7. **Guaranteed Consistency**: Dev mode matches CLI installation exactly (no more mismatches)
+8. **Manifest Validation**: `validate:manifest` ensures consistency across build system
 
 ### Powers Distribution Protection
 
