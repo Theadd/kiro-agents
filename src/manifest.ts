@@ -98,11 +98,11 @@ export interface FileMapping {
  * 
  * These files provide foundational kiro-agents functionality including
  * instruction aliases, agent management, mode switching, strict mode control,
- * and interaction patterns. Installed to `~/.kiro/steering/kiro-agents/`
+ * reflection system, and interaction patterns. Installed to `~/.kiro/steering/kiro-agents/`
  * 
  * **File Categories:**
  * - Core system files (always loaded): `aliases.md`
- * - Interactive interfaces (manual inclusion): `agents.md`, `modes.md`, `strict.md`
+ * - Interactive interfaces (manual inclusion): `agents.md`, `modes.md`, `strict.md`, `reflect.md`
  * 
  * **Note:** Protocol files (including mode definitions) are NOT included in steering mappings.
  * They are distributed exclusively through the kiro-protocols Power and loaded on-demand
@@ -131,10 +131,11 @@ export const STEERING_MAPPINGS: FileMapping[] = [
   // { src: "core/protocols/*.md", dest: "protocols/{name}.md" },
   // { src: "kiro/steering/protocols/*.md", dest: "protocols/{name}.md" },
   
-  // Interactive interfaces (manual inclusion via /agents, /modes, /strict)
+  // Interactive interfaces (manual inclusion via /agents, /modes, /strict, /reflect)
   { src: "core/agents.md", dest: "agents.md" },
   { src: "kiro/steering/modes.md", dest: "modes.md" },
   { src: "core/strict.md", dest: "strict.md" },
+  { src: "core/reflect.md", dest: "reflect.md" },
   
   // Interaction patterns (loaded by agents/modes)
   // { src: "core/interactions/*.md", dest: "interactions/{name}.md" },
@@ -354,7 +355,7 @@ export async function expandMappings(
  * @example Get steering files for CLI
  * ```typescript
  * const files = await getSteeringFilesForCLI();
- * // Returns: ['aliases.md', 'agents.md', 'modes.md', 'strict.md', 'modes/kiro-spec-mode.md', ...]
+ * // Returns: ['aliases.md', 'agents.md', 'modes.md', 'strict.md', 'reflect.md', ...]
  * // Used in bin/cli.template.ts to generate STEERING_FILES constant
  * ```
  * 

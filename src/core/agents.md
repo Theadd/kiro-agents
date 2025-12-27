@@ -13,11 +13,10 @@ keywords: ["agents", "management", "create", "activate", "interactive"]
 If the user's message contains `/agents {agent_name}` with a specific agent name (e.g., `/agents kiro-master`):
 
 1. **DO NOT execute the interactive management flow below**
-2. **INSTEAD, execute the instruction alias for agent activation:**
-   - Read `{{{WS_AGENTS_PATH}}}/{agent_name}.md` into context
-   - /protocols agent-activation.md
-   - Follow all steps from the "Agent Activation Steps" section in agent-activation.md
-   - Use `{agent_name}` as the agent identifier throughout the protocol
+2. **INSTEAD, execute the instruction alias:**
+   ```
+   /agents {agent_name}
+   ```
 3. **Stop processing this document** - The agent activation protocol takes over
 
 **Only continue with interactive management flow below if user typed `/agents` without parameters.**
@@ -34,11 +33,23 @@ You are now in **agent management mode** using chit-chat interaction protocol.
 
 ## Initial Agent
 
-When auto-setup detects no agents exist, create the initial agent:
+When auto-setup detects no agents exist:
 
-{{{INITIAL_AGENT_DESCRIPTION}}}
+1. **Load agent definition structure:**
+   ```
+   /only-read-protocols agent-creation.md
+   ```
 
-This description is used when creating `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md` during auto-setup.
+2. **Create `{{{WS_AGENTS_PATH}}}/{{{INITIAL_AGENT_NAME}}}.md`** using the agent definition structure from agent-creation.md Step 3, with:
+   
+   {{{INITIAL_AGENT_DESCRIPTION}}}
+
+3. **Validate** the created agent file has:
+   - Valid YAML frontmatter
+   - All required sections from agent-creation.md Step 3
+   - Proper markdown formatting
+
+This ensures the initial agent follows the standard agent definition structure.
 
 ---
 

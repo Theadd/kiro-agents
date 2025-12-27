@@ -16,6 +16,7 @@ Build agents for any domain: development, design, business, research, or anythin
 **Additional Features:**
 - 🔄 **Flexible Modes** - Switch between vibe (conversational) and spec (structured) workflows
 - 🎯 **Strict Mode** - Precision mode that blocks execution on ambiguous input
+- 🧠 **Reflection System** - Agents learn from experience with persistent memory across sessions
 
 ## Installation
 
@@ -84,6 +85,7 @@ Agents you create are saved as `.md` files in `.kiro/agents/`. Edit them like an
 - **[Getting Started](docs/GETTING_STARTED.md)** - Step-by-step onboarding guide
 - **[Architecture Overview](docs/ARCHITECTURE.md)** - System design and component relationships
 - **[Creating Powerful Agents](docs/user-guide/creating-powerful-agents.md)** - Layered architecture guide
+- **[Reflection System](docs/user-guide/reflection-system.md)** - Persistent memory for agents
 - **[Design Rationale](docs/design/)** - Protocol system, interaction patterns, neurodivergent accessibility
 - **[Contributing](CONTRIBUTING.md)** - Development workflow, build system, testing, versioning
 

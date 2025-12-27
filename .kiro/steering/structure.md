@@ -66,13 +66,16 @@ kiro-agents/
 ├── docs/                         # Documentation
 │   ├── ARCHITECTURE.md           # System design and component relationships
 │   ├── GETTING_STARTED.md        # Step-by-step onboarding guide
+│   ├── INSTALLED-ARCHITECTURE.md # Post-installation file structure
 │   ├── design/                   # Design rationale
 │   │   ├── README.md             # Design documentation index
 │   │   ├── protocol-system.md    # Why layered protocols work
 │   │   ├── interaction-patterns.md  # How patterns reduce cognitive load
-│   │   └── neurodivergent-accessibility.md  # ADHD-C design principles
+│   │   ├── neurodivergent-accessibility.md  # ADHD-C design principles
+│   │   └── reflection-architecture.md  # Reflection system technical design
 │   ├── user-guide/               # User-facing documentation
-│   │   └── creating-powerful-agents.md  # Layered architecture guide
+│   │   ├── creating-powerful-agents.md  # Layered architecture guide
+│   │   └── reflection-system.md  # Reflection system user guide
 │   ├── contributing/             # Contribution guides
 │   │   ├── DUAL_INSTALLATION.md
 │   │   ├── MANIFEST-SYSTEM.md
@@ -208,7 +211,11 @@ src/core/protocols/*.md → powers/kiro-protocols/steering/{name}.md
   ├── strict-mode.md      → powers/kiro-protocols/steering/strict-mode.md
   ├── agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
   ├── agent-management.md → powers/kiro-protocols/steering/agent-management.md
-  └── agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
+  ├── agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
+  ├── reflect-agent-insights.md → powers/kiro-protocols/steering/reflect-agent-insights.md
+  ├── reflect-review-workflow.md → powers/kiro-protocols/steering/reflect-review-workflow.md
+  ├── reflect-curator-checklist.md → powers/kiro-protocols/steering/reflect-curator-checklist.md
+  └── reflect-manager-workflow.md → powers/kiro-protocols/steering/reflect-manager-workflow.md
 
 # Kiro-specific protocols (includes mode definitions)
 src/kiro/steering/protocols/*.md → powers/kiro-protocols/steering/{name}.md
@@ -235,7 +242,11 @@ src/core/protocols/*.md → ~/.kiro/powers/kiro-protocols/steering/{name}.md
   ├── strict-mode.md      → ~/.kiro/powers/kiro-protocols/steering/strict-mode.md
   ├── agent-activation.md → ~/.kiro/powers/kiro-protocols/steering/agent-activation.md
   ├── agent-management.md → ~/.kiro/powers/kiro-protocols/steering/agent-management.md
-  └── agent-creation.md   → ~/.kiro/powers/kiro-protocols/steering/agent-creation.md
+  ├── agent-creation.md   → ~/.kiro/powers/kiro-protocols/steering/agent-creation.md
+  ├── reflect-agent-insights.md → ~/.kiro/powers/kiro-protocols/steering/reflect-agent-insights.md
+  ├── reflect-review-workflow.md → ~/.kiro/powers/kiro-protocols/steering/reflect-review-workflow.md
+  ├── reflect-curator-checklist.md → ~/.kiro/powers/kiro-protocols/steering/reflect-curator-checklist.md
+  └── reflect-manager-workflow.md → ~/.kiro/powers/kiro-protocols/steering/reflect-manager-workflow.md
 
 # Kiro-specific protocols (includes mode definitions) - auto-discovered via manifest
 src/kiro/steering/protocols/*.md → ~/.kiro/powers/kiro-protocols/steering/{name}.md
@@ -270,6 +281,10 @@ src/core/protocols/strict-mode.md  → build/npm/dist/protocols/strict-mode.md
 src/core/protocols/agent-activation.md → build/npm/dist/protocols/agent-activation.md
 src/core/protocols/agent-management.md → build/npm/dist/protocols/agent-management.md
 src/core/protocols/agent-creation.md   → build/npm/dist/protocols/agent-creation.md
+src/core/protocols/reflect-agent-insights.md → build/npm/dist/protocols/reflect-agent-insights.md
+src/core/protocols/reflect-review-workflow.md → build/npm/dist/protocols/reflect-review-workflow.md
+src/core/protocols/reflect-curator-checklist.md → build/npm/dist/protocols/reflect-curator-checklist.md
+src/core/protocols/reflect-manager-workflow.md → build/npm/dist/protocols/reflect-manager-workflow.md
 src/kiro/steering/protocols/mode-switching.md → build/npm/dist/protocols/mode-switching.md
 src/kiro/steering/protocols/mode-management.md → build/npm/dist/protocols/mode-management.md
 src/core/interactions/conversation-language.md → build/npm/dist/interactions/conversation-language.md
@@ -286,7 +301,7 @@ src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 - Core files in `src/core/` for cross-IDE compatibility
 - Kiro-specific files in `src/kiro/`
 - Configuration uses import + extend pattern
-- Interactive files (agents.md, modes.md, strict.md) in appropriate locations
+- Interactive files (agents.md, modes.md, strict.md, reflect.md) in appropriate locations
 - Protocol files (.md) as single source of truth, injected via substitutions
 
 **Build Process**:

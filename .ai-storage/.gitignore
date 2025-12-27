@@ -1,0 +1,15 @@
+# AI-Managed Storage Directory
+#
+# This directory contains AI-generated reflections, insights, and learnings.
+# It is managed by the reflection system and should be committed to version control.
+#
+# Structure:
+#   reflections/
+#   ├── drafts/        - Pending insights awaiting curator review
+#   └── approved/      - Approved insights organized by tier
+#
+# Files are created on-demand when agents record their first insight.
+# No initialization required - the system creates files as needed.
+
+# Don't ignore anything - commit all reflections
+!*

@@ -518,8 +518,8 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
  * 
  * Steering files include core system files that provide foundational kiro-agents
  * functionality including instruction aliases, agent management, mode switching,
- * strict mode control, and interaction patterns:
- * - Core system files (aliases.md, agents.md, modes.md, strict-mode.md, strict.md)
+ * strict mode control, reflection system, and interaction patterns:
+ * - Core system files (aliases.md, agents.md, modes.md, strict.md, reflect.md)
  * - Interaction patterns (chit-chat.md, interaction-styles.md)
  * - Mode definitions (kiro-spec-mode.md, kiro-vibe-mode.md)
  * 
