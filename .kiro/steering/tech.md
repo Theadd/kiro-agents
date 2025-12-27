@@ -33,8 +33,8 @@
 **Build Targets**:
 
 1. **npm** (`bun run build`)
-   - Generates CLI from template: `bin/cli.template.ts` → `bin/cli.ts` (with embedded file lists from manifest)
-   - Compiles CLI: `bin/cli.ts` → `build/npm/bin/cli.js`
+   - Generates CLI from template: `bin/cli.template.ts` → `bin/cli.generated.ts` (with embedded file lists from manifest)
+   - Compiles CLI: `bin/cli.generated.ts` → `build/npm/bin/cli.js`
    - Processes steering files via `STEERING_MAPPINGS` from manifest
    - Copies pre-built power files from `powers/kiro-protocols/`
    - Maps to `build/npm/dist/` and `build/npm/power/` using manifest

@@ -150,8 +150,9 @@ kiro-agents/
 - Maps files to target structure with guaranteed consistency
 - Dev mode runs both `dev:agents` and `dev:powers` in parallel
 
-**CLI Tool** (`bin/cli.ts`):
-- Generated from `bin/cli.template.ts` with embedded file lists from manifest
+**CLI Tool** (`bin/cli.template.ts`):
+- Template generates `bin/cli.generated.ts` with embedded file lists from manifest during build
+- Compiled to `build/npm/bin/cli.js` for distribution
 - Dual installation system for steering documents and kiro-protocols power
 - Uses `getSteeringFilesForCLI()` and `getPowerFilesForCLI()` from manifest
 - Installs core system files to `~/.kiro/steering/kiro-agents/`
@@ -309,7 +310,7 @@ src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 - **Glob Pattern Support**: Auto-discovers files with `*.md` patterns, no manual updates needed
 - **Manifest-Based Protocol Discovery**: `PROTOCOL_SOURCE_MAPPINGS` with glob patterns for automatic protocol inclusion
 - **Guaranteed Consistency**: Dev mode matches CLI installation exactly (no more mismatches)
-- **CLI Generation**: `bin/cli.ts` generated from template with embedded file lists from manifest
+- **CLI Generation**: `bin/cli.generated.ts` generated from template with embedded file lists from manifest
 - Deterministic builds (same input = same output)
 - Dynamic substitutions applied at build time
 - Three build modes: npm (clean), npm-no-clean (preserve), dev (parallel watch)
