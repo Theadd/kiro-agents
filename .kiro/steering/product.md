@@ -93,7 +93,28 @@ When working on this codebase, follow these principles:
 - Prevents assumption propagation
 - Works alongside agents and modes
 
-### 4. Debug Mode
+### 4. Reflection System
+
+**Purpose**: Persistent memory system for agents to capture and reuse knowledge across sessions
+
+**Implementation**:
+- Defined in `src/core/reflect.md` (steering document with commands)
+- Protocols in `src/core/protocols/reflect-*.md` (4 protocols)
+- Curator agent in `.kiro/agents/reflection-curator.md`
+- Storage in `.ai-storage/reflections/` (on-demand creation)
+
+**Key Behaviors**:
+- Agents capture insights during work (drafts)
+- Curator reviews and validates quality
+- Approved insights organized in 4 tiers (Universal, Category, Agent, Project)
+- File references in agent definitions auto-load insights
+- On-demand creation (no initialization required)
+
+**Workflow**:
+- Agent captures → Draft file → Curator reviews → User approves → Approved tier
+- Commands: `/reflect` (enable), `/reflect review` (review drafts)
+
+### 5. Debug Mode
 
 **Purpose**: Development mode that provides detailed tool execution information on errors
 
@@ -122,7 +143,7 @@ npx kiro-agents  # or bunx kiro-agents
 **Dual Installation Behavior**:
 - **Steering files** → `~/.kiro/steering/kiro-agents/`
   - Core system files (aliases.md, strict-mode.md)
-  - Interactive interfaces (agents.md, modes.md, strict.md)
+  - Interactive interfaces (agents.md, modes.md, strict.md, reflect.md)
   - Protocol files (agent-activation.md, agent-management.md, etc.)
   - Interaction patterns and mode definitions
 - **kiro-protocols power** → `~/.kiro/powers/kiro-protocols/`
@@ -230,10 +251,11 @@ npx kiro-agents  # or bunx kiro-agents
 1. **Centralized Manifest System**: All file mappings defined in `src/manifest.ts` (single source of truth)
 2. **Glob Pattern Support**: Auto-discovers files with `*.md` patterns, no manual updates needed
 3. **Manifest-Based Protocol Discovery**: `PROTOCOL_SOURCE_MAPPINGS` auto-discovers protocols via glob patterns
-4. **Two Build Targets**: npm, dev (powers built separately via `build:powers` using manifest)
+4. **Build Targets**: npm (with optional no-clean), dev (powers built separately via `build:powers` using manifest)
 5. **Deterministic Builds**: Same input = same output
 6. **Dynamic Substitutions**: Applied at build time via config functions
 7. **Guaranteed Consistency**: Dev mode matches CLI installation exactly (no more mismatches)
+8. **Manifest Validation**: `validate:manifest` ensures consistency across build system
 
 ### Powers Distribution Protection
 

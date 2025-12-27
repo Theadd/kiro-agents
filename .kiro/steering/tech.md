@@ -38,12 +38,14 @@
    - Processes steering files via `STEERING_MAPPINGS` from manifest
    - Copies pre-built power files from `powers/kiro-protocols/`
    - Maps to `build/npm/dist/` and `build/npm/power/` using manifest
-   - Cleans `build/npm/` after build
+   - Cleans `build/npm/` after build (default behavior)
+   - Use `npm-no-clean` mode to preserve artifacts for inspection/publish
 
 2. **dev** (`bun run dev`)
-   - Uses same manifest mappings as npm build for consistency
-   - Builds directly to `~/.kiro/steering/kiro-agents/`
-   - Watch mode for file changes
+   - Runs both `dev:agents` and `dev:powers` in parallel with color-coded output
+   - `dev:agents` - Builds steering files to `~/.kiro/steering/kiro-agents/`
+   - `dev:powers` - Builds protocols to `~/.kiro/powers/kiro-protocols/`
+   - Watch mode for file changes in both
    - No CLI compilation
    - Fast iteration cycle
 
@@ -87,17 +89,23 @@ bun run build:powers
 # Build npm package (compiles CLI, processes files, cleans after)
 bun run build
 
-# Dev mode (watch, builds steering to user directory)
+# Dev mode - parallel watch for both steering and powers
 bun run dev
 
-# Dev mode for powers (watch, builds to ~/.kiro/powers/kiro-protocols/)
+# Dev mode for steering files only (watch, builds to ~/.kiro/steering/kiro-agents/)
+bun run dev:agents
+
+# Dev mode for powers only (watch, builds to ~/.kiro/powers/kiro-protocols/)
 bun run dev:powers
 
-# Validate build
+# Validate build outputs
 bun run test
 
-# Validate powers
+# Validate powers structure
 bun run validate:powers
+
+# Validate manifest consistency
+bun run validate:manifest
 
 # Clean build artifacts
 bun run clean
@@ -123,6 +131,12 @@ bun run snapshot
 # Consolidate snapshots and create changeset (when feature complete)
 bun run finalize
 # or: /finalize (Kiro slash command)
+
+# Analyze snapshots without committing (review mode)
+bun run finalize:analyze
+
+# Commit analyzed changeset (after review)
+bun run finalize:commit
 
 # Publish release (maintainer only)
 bun run release
@@ -352,7 +366,20 @@ export const substitutions = {
 
 ## Dev Mode Benefits
 
-### dev (Steering Files)
+### dev (Parallel Watch Mode)
+
+**Fast Iteration**:
+- Runs both steering and powers builds simultaneously
+- Color-coded output: `[kiro-agents]` (yellow) and `[kiro-protocols]` (magenta)
+- Single command for complete development workflow
+- Immediate testing in Kiro IDE
+
+**Use Cases**:
+- Developing both steering files and protocols simultaneously
+- Full-stack kiro-agents development
+- Rapid prototyping across system layers
+
+### dev:agents (Steering Files Only)
 
 **Fast Iteration**:
 - No CLI compilation needed
@@ -366,7 +393,7 @@ export const substitutions = {
 - Debugging substitutions
 - Rapid prototyping
 
-### dev:powers (Protocol Files)
+### dev:powers (Protocol Files Only)
 
 **Fast Iteration**:
 - Uses manifest system for automatic protocol discovery

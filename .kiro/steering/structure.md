@@ -66,13 +66,16 @@ kiro-agents/
 ├── docs/                         # Documentation
 │   ├── ARCHITECTURE.md           # System design and component relationships
 │   ├── GETTING_STARTED.md        # Step-by-step onboarding guide
+│   ├── INSTALLED-ARCHITECTURE.md # Post-installation file structure
 │   ├── design/                   # Design rationale
 │   │   ├── README.md             # Design documentation index
 │   │   ├── protocol-system.md    # Why layered protocols work
 │   │   ├── interaction-patterns.md  # How patterns reduce cognitive load
-│   │   └── neurodivergent-accessibility.md  # ADHD-C design principles
+│   │   ├── neurodivergent-accessibility.md  # ADHD-C design principles
+│   │   └── reflection-architecture.md  # Reflection system technical design
 │   ├── user-guide/               # User-facing documentation
-│   │   └── creating-powerful-agents.md  # Layered architecture guide
+│   │   ├── creating-powerful-agents.md  # Layered architecture guide
+│   │   └── reflection-system.md  # Reflection system user guide
 │   ├── contributing/             # Contribution guides
 │   │   ├── DUAL_INSTALLATION.md
 │   │   ├── MANIFEST-SYSTEM.md
@@ -138,13 +141,14 @@ kiro-agents/
 - Uses same substitution system as production builds for consistency
 
 **npm Build Pipeline** (`scripts/build.ts`):
-- Two build targets: `npm`, `dev`
+- Three build modes: `npm` (clean after), `npm-no-clean` (preserve artifacts), `dev` (parallel watch)
 - Uses centralized manifest system (`src/manifest.ts`) for all file mappings
-- Compiles CLI to JavaScript (npm only)
+- Compiles CLI to JavaScript (npm modes only)
 - Loads configuration with substitutions
 - Processes markdown files via `STEERING_MAPPINGS` from manifest
 - Copies pre-built power files from `powers/kiro-protocols/`
 - Maps files to target structure with guaranteed consistency
+- Dev mode runs both `dev:agents` and `dev:powers` in parallel
 
 **CLI Tool** (`bin/cli.ts`):
 - Generated from `bin/cli.template.ts` with embedded file lists from manifest
@@ -175,14 +179,21 @@ kiro-agents/
 - Ready for npm inclusion (copied to `build/npm/power/`)
 
 **Dev Mode** (`~/.kiro/steering/kiro-agents/`):
-- Direct build to user directory
-- Watch mode for development
+- Parallel watch mode via `bun run dev`
+- Runs both `dev:agents` (steering) and `dev:powers` (protocols) simultaneously
+- Color-coded output for each process
 - No CLI compilation needed
 - Fast iteration cycle
 
+**Dev:Agents Mode** (`~/.kiro/steering/kiro-agents/`):
+- Direct build to user directory via `bun run dev:agents`
+- Watch mode for steering file development
+- No CLI compilation needed
+- Fast iteration for steering files only
+
 **Dev:Powers Mode** (`~/.kiro/powers/kiro-protocols/`):
 - Uses manifest system for automatic protocol discovery (same as production)
-- Direct build to user's power directory
+- Direct build to user's power directory via `bun run dev:powers`
 - Watch mode for protocol development
 - Handles readonly files automatically
 - Auto-discovers protocols via `PROTOCOL_SOURCE_MAPPINGS` glob patterns
@@ -200,7 +211,11 @@ src/core/protocols/*.md → powers/kiro-protocols/steering/{name}.md
   ├── strict-mode.md      → powers/kiro-protocols/steering/strict-mode.md
   ├── agent-activation.md → powers/kiro-protocols/steering/agent-activation.md
   ├── agent-management.md → powers/kiro-protocols/steering/agent-management.md
-  └── agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
+  ├── agent-creation.md   → powers/kiro-protocols/steering/agent-creation.md
+  ├── reflect-agent-insights.md → powers/kiro-protocols/steering/reflect-agent-insights.md
+  ├── reflect-review-workflow.md → powers/kiro-protocols/steering/reflect-review-workflow.md
+  ├── reflect-curator-checklist.md → powers/kiro-protocols/steering/reflect-curator-checklist.md
+  └── reflect-manager-workflow.md → powers/kiro-protocols/steering/reflect-manager-workflow.md
 
 # Kiro-specific protocols (includes mode definitions)
 src/kiro/steering/protocols/*.md → powers/kiro-protocols/steering/{name}.md
@@ -227,7 +242,11 @@ src/core/protocols/*.md → ~/.kiro/powers/kiro-protocols/steering/{name}.md
   ├── strict-mode.md      → ~/.kiro/powers/kiro-protocols/steering/strict-mode.md
   ├── agent-activation.md → ~/.kiro/powers/kiro-protocols/steering/agent-activation.md
   ├── agent-management.md → ~/.kiro/powers/kiro-protocols/steering/agent-management.md
-  └── agent-creation.md   → ~/.kiro/powers/kiro-protocols/steering/agent-creation.md
+  ├── agent-creation.md   → ~/.kiro/powers/kiro-protocols/steering/agent-creation.md
+  ├── reflect-agent-insights.md → ~/.kiro/powers/kiro-protocols/steering/reflect-agent-insights.md
+  ├── reflect-review-workflow.md → ~/.kiro/powers/kiro-protocols/steering/reflect-review-workflow.md
+  ├── reflect-curator-checklist.md → ~/.kiro/powers/kiro-protocols/steering/reflect-curator-checklist.md
+  └── reflect-manager-workflow.md → ~/.kiro/powers/kiro-protocols/steering/reflect-manager-workflow.md
 
 # Kiro-specific protocols (includes mode definitions) - auto-discovered via manifest
 src/kiro/steering/protocols/*.md → ~/.kiro/powers/kiro-protocols/steering/{name}.md
@@ -262,6 +281,10 @@ src/core/protocols/strict-mode.md  → build/npm/dist/protocols/strict-mode.md
 src/core/protocols/agent-activation.md → build/npm/dist/protocols/agent-activation.md
 src/core/protocols/agent-management.md → build/npm/dist/protocols/agent-management.md
 src/core/protocols/agent-creation.md   → build/npm/dist/protocols/agent-creation.md
+src/core/protocols/reflect-agent-insights.md → build/npm/dist/protocols/reflect-agent-insights.md
+src/core/protocols/reflect-review-workflow.md → build/npm/dist/protocols/reflect-review-workflow.md
+src/core/protocols/reflect-curator-checklist.md → build/npm/dist/protocols/reflect-curator-checklist.md
+src/core/protocols/reflect-manager-workflow.md → build/npm/dist/protocols/reflect-manager-workflow.md
 src/kiro/steering/protocols/mode-switching.md → build/npm/dist/protocols/mode-switching.md
 src/kiro/steering/protocols/mode-management.md → build/npm/dist/protocols/mode-management.md
 src/core/interactions/conversation-language.md → build/npm/dist/interactions/conversation-language.md
@@ -278,7 +301,7 @@ src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 - Core files in `src/core/` for cross-IDE compatibility
 - Kiro-specific files in `src/kiro/`
 - Configuration uses import + extend pattern
-- Interactive files (agents.md, modes.md, strict.md) in appropriate locations
+- Interactive files (agents.md, modes.md, strict.md, reflect.md) in appropriate locations
 - Protocol files (.md) as single source of truth, injected via substitutions
 
 **Build Process**:
@@ -289,10 +312,10 @@ src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 - **CLI Generation**: `bin/cli.ts` generated from template with embedded file lists from manifest
 - Deterministic builds (same input = same output)
 - Dynamic substitutions applied at build time
-- Two build targets: npm, dev
+- Three build modes: npm (clean), npm-no-clean (preserve), dev (parallel watch)
 - Powers built separately via `build:powers` script using manifest auto-discovery
-- npm build cleans after completion
-- Dev mode watches for changes
+- npm build cleans after completion by default
+- Dev mode runs both steering and powers watch processes
 
 **Distribution**:
 - npm: `build/npm/` included in package, then cleaned

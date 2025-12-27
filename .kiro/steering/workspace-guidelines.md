@@ -66,14 +66,19 @@ Protocol + steering changes:
 
 ```bash
 # Development (watch mode)
-bun run dev         # Steering → ~/.kiro/steering/kiro-agents/
-bun run dev:powers  # Protocols → ~/.kiro/powers/kiro-protocols/
+bun run dev         # Parallel: Steering + Protocols → ~/.kiro/
+bun run dev:agents  # Steering only → ~/.kiro/steering/kiro-agents/
+bun run dev:powers  # Protocols only → ~/.kiro/powers/kiro-protocols/
 
 # Distribution
 bun run build:powers  # Powers (manifest auto-discovery)
-bun run build         # npm package
+bun run build         # npm package (cleans after)
 bun run test          # Validate
 bun run clean         # Remove build/
+
+# Validation
+bun run validate:powers    # Power structure
+bun run validate:manifest  # Manifest consistency
 ```
 
 ### Protocol Auto-Discovery
@@ -94,8 +99,25 @@ git show --no-pager
 
 ## Markdown Formatting
 
-**Tables in conversation**: Wrap in 4-backtick `bash` blocks
-**Markdown in code blocks**: Use 4-backticks (prevents nesting issues)
+**CRITICAL - Nested Markdown Code Blocks**: When showing markdown content that contains code blocks, use **4-backticks for outer blocks** and **3-backticks for inner blocks**:
+
+````markdown
+## Example Section
+
+Here's some code:
+```javascript
+console.log("hello");
+```
+````
+
+**Key Rule**: Always reduce backtick count by 1 for each nesting level:
+- Outer block (your response): 4-backticks
+- Inner block (content you're showing): 3-backticks
+- If showing a file that has an example with 4-backticks, reduce it to 3-backticks
+
+**Why**: The parser needs different backtick counts to distinguish nesting levels. Using the same count causes premature block closure.
+
+**Common in this project**: Almost all `.md` files (steering documents, protocols, docs) contain code blocks, so default to 4-backticks for markdown content.
 
 ## Versioning Workflow
 
@@ -137,5 +159,12 @@ bun run validate:powers # Power structure
 
 ### Test Locally
 
-**Fast**: `bun run dev` or `bun run dev:powers` (watch mode → `~/.kiro/`)
-**Full**: `bun run build:powers && bun run build && bun link && kiro-agents`
+**Fast (Watch Mode)**:
+- `bun run dev` - Parallel watch for both steering and protocols
+- `bun run dev:agents` - Watch steering files only
+- `bun run dev:powers` - Watch protocol files only
+
+**Full Build Test**:
+```bash
+bun run build:powers && bun run build && bun link && kiro-agents
+```

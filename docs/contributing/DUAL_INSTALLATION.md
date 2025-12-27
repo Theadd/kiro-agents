@@ -7,7 +7,7 @@ kiro-agents uses a dual-distribution architecture that installs both steering fi
 **Steering files** → `~/.kiro/steering/kiro-agents/`
 - Core system files providing foundational kiro-agents functionality
 - Instruction aliases, agent management, mode switching, strict mode control
-- Interactive interfaces (agents.md, modes.md, strict.md)
+- Interactive interfaces (agents.md, modes.md, strict.md, reflect.md)
 - Interaction patterns and mode definitions
 
 **Power dependency** → `~/.kiro/powers/kiro-protocols/`

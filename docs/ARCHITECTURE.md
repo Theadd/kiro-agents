@@ -50,7 +50,7 @@ kiro-agents is a pure markdown steering document system that provides an agent f
 **Purpose:** AI instruction files that define system behavior
 
 **Types:**
-- **Interactive interfaces** - `agents.md`, `modes.md`, `strict.md`
+- **Interactive interfaces** - `agents.md`, `modes.md`, `strict.md`, `reflect.md`
 - **System configuration** - `aliases.md` (instruction alias definitions)
 - **Interaction patterns** - Available via kiro-protocols Power
 
@@ -241,9 +241,10 @@ npx kiro-agents  # or bunx kiro-agents
 **Installation Targets:**
 
 **1. Steering Files** → `~/.kiro/steering/kiro-agents/`
-- Core system files (aliases.md, strict-mode.md)
-- Interactive interfaces (agents.md, modes.md, strict.md)
-- Mode definitions (kiro-spec-mode.md, kiro-vibe-mode.md, etc.)
+- Core system files (aliases.md)
+- Interactive interfaces (agents.md, modes.md, strict.md, reflect.md)
+
+**Note:** Only 4 files in STEERING_MAPPINGS. Protocols (including mode definitions) are distributed exclusively via kiro-protocols Power, not as steering files.
 
 **2. kiro-protocols Power** → `~/.kiro/powers/kiro-protocols/`
 - Power metadata (POWER.md, mcp.json, icon.png)
@@ -590,12 +591,7 @@ User Installation:
 ├── aliases.md                # Includes protocol loading, mode system, conversation transfer
 ├── agents.md
 ├── modes.md
-├── strict.md
-└── modes/
-    ├── kiro-spec-mode.md
-    ├── kiro-vibe-mode.md
-    ├── kiro-as-spec-mode.md
-    └── kiro-as-vibe-mode.md
+└── strict.md
 
 ~/.kiro/powers/kiro-protocols/
 ├── POWER.md
@@ -627,9 +623,15 @@ Workspace-Specific:
 ```
 User: /agents
     ↓
-AI loads: src/core/agents.md (interactive interface)
+AI detects: Instruction alias in aliases.md (always loaded)
+    ↓
+AI loads: ~/.kiro/steering/kiro-agents/agents.md (manual inclusion)
     ↓
 AI detects: No parameter, interactive mode
+    ↓
+AI loads: chit-chat.md protocol (via kiroPowers)
+    ↓
+AI loads: agent-management.md protocol (via kiroPowers)
     ↓
 AI scans: .kiro/agents/ directory
     ↓
@@ -658,6 +660,8 @@ AI offers: Activate new agent?
 ```
 User: /agents {agent_name}
     ↓
+AI detects: Instruction alias in aliases.md (always loaded)
+    ↓
 AI detects: Parameter provided, activation mode
     ↓
 AI loads: .kiro/agents/{agent_name}.md
@@ -665,6 +669,10 @@ AI loads: .kiro/agents/{agent_name}.md
 AI loads: agent-activation.md protocol (via kiroPowers)
     ↓
 AI loads: strict-mode.md protocol (via kiroPowers)
+    ↓
+AI checks: Agent definition for chit-chat indicators
+    ↓
+AI loads: chit-chat.md protocol if needed (via kiroPowers)
     ↓
 AI assumes: Agent role completely
     ↓
@@ -675,6 +683,12 @@ AI begins: Interaction according to agent protocols
 
 ```
 User: /modes {mode_name}
+    ↓
+AI detects: Instruction alias in aliases.md (always loaded)
+    ↓
+AI checks: Is mode_name "spec" or "vibe"?
+    ├─ YES: Output literal "{mode_name}" (triggers Kiro native mode)
+    └─ NO: Continue with protocol loading
     ↓
 AI loads: kiro-{mode_name}-mode.md (via kiroPowers)
     ↓
@@ -694,7 +708,7 @@ AI begins: Mode-specific workflow
 ```
 User: /protocols {filename}
     ↓
-AI detects: Instruction alias
+AI detects: Instruction alias in aliases.md (always loaded)
     ↓
 AI extracts: Parameter value (filename)
     ↓
@@ -798,9 +812,9 @@ User Installation (npx kiro-agents)
 
 ### Context Overhead
 
-**Base Context:** ~0.9K tokens
+**Base Context:** ~1.35K tokens
 - Minimal initial footprint
-- Core system files only
+- Core system files only (aliases.md)
 - No protocols loaded initially
 
 **Lazy Loading:**
@@ -860,6 +874,7 @@ User Installation (npx kiro-agents)
 
 ## Related Documentation
 
+- **[Installed Product Architecture](INSTALLED-ARCHITECTURE.md)** - Runtime architecture from user perspective
 - **[Protocol System Design](design/protocol-system.md)** - Why layered protocols work
 - **[Interaction Patterns](design/interaction-patterns.md)** - How patterns reduce cognitive load
 - **[Neurodivergent Accessibility](design/neurodivergent-accessibility.md)** - ADHD-C design principles
@@ -870,6 +885,6 @@ User Installation (npx kiro-agents)
 
 ---
 
-**Document version:** 1.0.0  
-**Last updated:** December 20, 2025  
+**Document version:** 1.1.0  
+**Last updated:** December 26, 2025  
 **Maintained by:** kiro-agents project
