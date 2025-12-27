@@ -174,3 +174,6 @@ powers/*/icon-placeholder.svg
 # Test powers (created locally for testing, never committed)
 powers/*-test/
 powers/test-*/
+
+# Generated CLI (temporary build artifact)
+bin/cli.generated.ts

@@ -12,9 +12,9 @@ This eliminates the scattered file mapping constants that were previously duplic
 
 File mappings were hardcoded in 3 different places:
 
-1. **`scripts/build.ts`** - `NPM_FILE_MAPPINGS` (14 files) + `NPM_POWER_FILES` (9 files)
-2. **`bin/cli.ts`** - `STEERING_FILES` (9 files) + `POWER_FILES` (9 files)
-3. **`scripts/build.ts`** - `DEV_FILE_MAPPINGS` derived from `NPM_FILE_MAPPINGS`
+1. **`scripts/build.ts`** - Uses `STEERING_MAPPINGS` and `POWER_MAPPINGS` from manifest
+2. **`bin/cli.template.ts`** - Template with placeholders for file lists
+3. **Build generates** - `bin/cli.generated.ts` with embedded lists from manifest functions
 
 **Critical Issues:**
 - ❌ Dev mode installed **different files** than CLI (missing `protocols/` directory!)
@@ -244,10 +244,9 @@ Total checks: 5
 ### Files Removed
 
 - ❌ Hardcoded `NPM_FILE_MAPPINGS` constant
-- ❌ Hardcoded `NPM_POWER_FILES` constant
-- ❌ Hardcoded `DEV_FILE_MAPPINGS` constant
-- ❌ Hardcoded `STEERING_FILES` in `bin/cli.ts`
-- ❌ Hardcoded `POWER_FILES` in `bin/cli.ts`
+- ❌ Hardcoded file lists in multiple locations
+- ❌ Manual synchronization required between build script and CLI
+- ❌ Dev mode could install different files than CLI
 
 ### Dependencies Added
 

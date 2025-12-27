@@ -93,7 +93,7 @@ kiro-agents is a pure markdown steering document system that provides an agent f
 
 ### 4. CLI Tool
 
-**Location:** `bin/cli.ts`
+**Location:** `bin/cli.template.ts` (source), `bin/cli.generated.ts` (build artifact)
 
 **Purpose:** Dual installation system for steering documents and kiro-protocols Power
 
