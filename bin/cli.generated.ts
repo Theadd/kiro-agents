@@ -85,7 +85,8 @@ const STEERING_FILES = [
   "aliases.md",
   "agents.md",
   "modes.md",
-  "strict.md"
+  "strict.md",
+  "reflect.md"
 ] as const;
 
 /**
@@ -115,6 +116,7 @@ const POWER_FILES = [
   "steering/kiro-spec-mode.md",
   "steering/kiro-as-vibe-mode.md",
   "steering/kiro-as-spec-mode.md",
+  "steering/explainability-protocol.md",
   "steering/chit-chat.md",
   "steering/agent-management.md",
   "steering/agent-creation.md",
