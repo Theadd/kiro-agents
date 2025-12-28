@@ -11,5 +11,5 @@
 # Files are created on-demand when agents record their first insight.
 # No initialization required - the system creates files as needed.
 
-# Don't ignore anything - commit all reflections
-!*
+drafts/
+*-logs/
