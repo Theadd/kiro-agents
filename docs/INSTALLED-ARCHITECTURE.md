@@ -1033,13 +1033,14 @@ Step 5: Agents Use Approved Insights
 
 ### Commands
 
-**Enable Reflection (Session-Temporary):**
+**Enable Reflection (For This Session):**
 ```
 /reflect
 ```
-- Adds Reflections section to current agent for this session only
-- Removed when session ends or agent changes
-- Use case: Quick testing, one-off reflection capture
+- Adds Reflections section to agent file (permanent)
+- Loads capture protocol in context (this session only)
+- Next session: Agent reads insights but cannot capture (unless `/reflect` used again)
+- Use case: Enable reflection on any agent for testing or one-time capture
 
 **Review Draft Insights:**
 ```

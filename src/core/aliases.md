@@ -80,4 +80,24 @@ You are now activating the **{agent_name}** agent.
 
 This alias enables users to activate any agent with `/agents {name}` syntax.
 
+## Agent Management Alias (No Parameters)
+
+The agent management command (without parameters) enters interactive agent management mode:
+
+<alias>
+  <trigger>/agents</trigger>
+  <definition>
+## Agent Management Mode
+
+You are entering interactive agent management mode.
+
+**Execute agent management:**
+1. /only-read-protocols chit-chat.md
+2. /protocols agent-management.md
+3. Follow all steps from the "Agent Management Steps" section in agent-management.md protocol
+  </definition>
+</alias>
+
+This alias enables users to enter interactive agent management with `/agents` syntax (no parameters).
+
 {{{ADDITIONAL_ALIASES}}}
