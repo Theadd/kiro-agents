@@ -10,29 +10,32 @@ Commands for managing the AI reflection system that captures insights, patterns,
 
 ## Commands
 
-### /reflect - Enable Reflection (Session-Temporary)
+### /reflect - Enable Reflection for This Session
 
 **Usage:** `/reflect`
 
 **Behavior:**
 
-Enables reflection system for the currently active agent (session-temporary).
+Enables reflection system for the currently active agent for this session.
 
-**If agent already has Reflections section:**
-- Confirm it's already enabled
+**Step 1: Check if agent has Reflections section**
+
+Read the agent definition file: `{{{WS_AGENTS_PATH}}}/{agent-name}.md`
+
+**If agent already has `## Reflections` section:**
+- Load capture protocol: `/only-read-protocols reflect-agent-insights.md`
 - Show reflection status
-- Continue
+- Continue (agent can now capture insights)
 
-**If agent lacks Reflections section:**
-- Add Reflections section temporarily for this session
-- Include all 4 tiers (Universal, Category, Agent-Specific, Project)
-- Reflection active while using this agent
-- Removed when session ends or agent changes
-- Next session: agent returns to original state
+**If agent lacks `## Reflections` section:**
+- Go to Step 2
 
-**Reflections section added (temporary):**
+**Step 2: Add Reflections section to agent file**
+
+Use `fsAppend` to add the following section to `{{{WS_AGENTS_PATH}}}/{agent-name}.md`:
 
 ````markdown
+
 ## Reflections
 
 This agent records insights, patterns, and learnings in its dedicated reflection files.
@@ -54,15 +57,28 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 #[[file:.ai-storage/reflections/approved/project.md:insights]]
 ````
 
-**Note:** Replace `{agent-category}` and `{agent-name}` with actual values from agent definition.
+**Important:** Replace `{agent-category}` and `{agent-name}` with actual values from agent definition frontmatter.
 
-**After enabling:**
+**Step 3: Load capture protocol**
+
+Load the protocol that enables insight capture:
+
+```
+/only-read-protocols reflect-agent-insights.md
+```
+
+This protocol is loaded **only for this session**. Next session without `/reflect` will not have capture capability.
+
+**Step 4: Show confirmation**
 
 ```diff
-✅ REFLECTION ENABLED (Session-Temporary)
+✅ REFLECTION ENABLED FOR THIS SESSION
 
 Agent: {agent-name}
 Category: {agent-category}
+
+Reflections section: Added to agent file (permanent)
+Capture protocol: Loaded in context (this session only)
 
 Reflection files:
 - Universal: .ai-storage/reflections/approved/universal.md
@@ -73,10 +89,20 @@ Reflection files:
 Draft file:
 - .ai-storage/reflections/drafts/agents/{agent-name}.md
 
-You can now capture insights during work. Use /agents reflection-curator to review drafts.
+You can now capture insights during work. Use /reflect review to review drafts.
 ```
 
-**Use case:** Quick testing, one-off reflection capture, temporary enablement.
+**What "session-only" means:**
+
+- **Reflections section in agent file:** PERMANENT (stays in file)
+- **Capture protocol in context:** SESSION-ONLY (not loaded next time)
+
+**Next session behavior:**
+
+- **Without `/reflect`:** Agent reads existing insights but cannot capture new ones
+- **With `/reflect`:** Agent reads existing insights AND can capture new ones
+
+**Use case:** Enable reflection on any agent for testing or one-time capture.
 
 ---
 

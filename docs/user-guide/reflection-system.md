@@ -24,13 +24,22 @@ The reflection system enables AI agents to capture and reuse knowledge across co
 
 ## Quick Start
 
-### Enable Reflection (Session-Temporary)
+### Enable Reflection (For This Session)
 
 ```
 /reflect
 ```
 
 This enables reflection for your current agent for this session only. The agent will capture insights as it works.
+
+**What happens:**
+- Adds Reflections section to agent file (permanent)
+- Loads capture protocol in context (this session only)
+- Agent can now capture insights
+
+**Next session:**
+- Without `/reflect`: Agent reads existing insights but cannot capture new ones
+- With `/reflect`: Agent reads existing insights AND can capture new ones
 
 ### Review Draft Insights
 
@@ -224,17 +233,17 @@ Lessons from successes or failures
 
 ## Enablement Levels
 
-### Level 1: Session-Temporary
+### Level 1: Session-Only Capture
 
 **Command:** `/reflect`
 
 **Behavior:**
-- Adds Reflections section to current agent for this session only
-- Reflection active while using this agent
-- Removed when session ends or agent changes
-- Next session: agent returns to original state
+- Adds Reflections section to agent file (permanent)
+- Loads capture protocol in context (this session only)
+- Agent can capture insights during this session
+- Next session: Agent reads insights but cannot capture (unless `/reflect` used again)
 
-**Use case:** Quick testing, one-off reflection capture
+**Use case:** Enable reflection on any agent for testing or one-time capture
 
 ### Level 2: Permanent
 
