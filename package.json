@@ -55,7 +55,7 @@
     "bun"
   ],
   "author": "R. Beltran",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@changesets/cli": "2.27.9",
     "@types/bun": "latest",

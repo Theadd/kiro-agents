@@ -1,0 +1,191 @@
+# kiro-agents License
+
+Copyright (c) 2024-present R. Beltran
+
+**Note:** This project was previously published without a formal LICENSE file. 
+As of 2025-12-28, all versions (past and future) are licensed under the terms below.
+
+## Time-Delayed Triple Licensing
+
+This project uses a time-delayed licensing strategy to balance protection against parasitic forks with eventual open access.
+
+### For Recent Versions (Released within the last 16 months)
+
+You may choose between:
+
+**Option A: GNU Affero General Public License v3.0 (AGPL-3.0)**
+- Free to use, modify, and distribute
+- Must share modifications under AGPL-3.0
+- Network use triggers source disclosure
+- See full AGPL-3.0 terms below
+
+**Option B: Commercial License**
+- Use in proprietary/closed-source products
+- No obligation to share modifications
+- Priority support included
+- Contact: https://github.com/Theadd/kiro-agents#commercial-license
+
+### For Legacy Versions (Released more than 16 months ago)
+
+**MIT License**
+- Free to use, modify, and distribute
+- Use in proprietary products without restrictions
+- Minimal requirements (attribution only)
+- See full MIT terms below
+
+---
+
+## Version Release Timeline
+
+| Version | Release Date | AGPL Until      | MIT From        |
+|---------|--------------|-----------------|-----------------|
+| v1.14.0 | 2025-12-28   | 2027-04-28      | 2027-04-28      |
+
+*This table will be updated with each release*
+
+---
+
+## Which License Applies to Me?
+
+### Use AGPL-3.0 (Free) if:
+- You're building open source software
+- You're okay sharing your modifications
+- You want the latest features at no cost
+- Your project is also AGPL-compatible
+
+### Purchase Commercial License if:
+- You're building proprietary/closed-source software
+- You cannot share your modifications
+- You need the latest version immediately
+- You want priority support
+
+### Use MIT (Free, wait 16 months) if:
+- You can wait for the version to mature
+- You want maximum freedom with minimal restrictions
+- You don't need cutting-edge features
+- You prefer battle-tested stable code
+
+---
+
+## Why This Licensing Strategy?
+
+1. **Protects Against Parasitic Clones** - Prevents rebranding and selling without code sharing
+2. **Enables Sustainable Development** - Commercial licenses fund ongoing development
+3. **Rewards Patience** - Wait 16 months, get MIT freedom
+4. **Encourages Upstream Contribution** - Easier to contribute than maintain separate fork
+5. **Eventual Freedom** - All code becomes MIT eventually
+6. **Legitimate Forks Welcome** - Technical divergence is encouraged when needed
+
+---
+
+## GNU AFFERO GENERAL PUBLIC LICENSE Version 3.0
+
+Full AGPL-3.0 license text:
+https://www.gnu.org/licenses/agpl-3.0.txt
+
+
+### AGPL-3.0 Summary (Not Legal Advice)
+
+The AGPL-3.0 requires that:
+- You must share your source code if you distribute the software
+- You must share your source code if you run it as a network service (SaaS, web app, etc.)
+- Modifications must also be licensed under AGPL-3.0
+- You must preserve copyright and license notices
+- You must provide installation instructions
+
+For full legal terms, see: https://www.gnu.org/licenses/agpl-3.0.txt
+
+---
+
+## MIT License (Applies to versions > 16 months old)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Commercial License
+
+For commercial licensing inquiries, please visit:
+https://github.com/Theadd/kiro-agents#commercial-license
+
+Or contact: support@kiro-agents.dev
+
+Commercial licenses include:
+- Permission to use in proprietary software
+- No source code disclosure requirements
+- Priority support and bug fixes
+- Custom feature development (Enterprise tier)
+- Legal indemnification (Enterprise tier)
+
+---
+
+## Frequently Asked Questions
+
+### Can I use kiro-agents in my commercial product?
+
+Yes, under three options:
+1. Use under AGPL-3.0 (must share your source code)
+2. Purchase a Commercial License (no sharing required)
+3. Wait 16 months and use under MIT (no restrictions)
+
+### What happens if I violate the AGPL-3.0?
+
+Your license terminates automatically. You must:
+- Stop using the software immediately
+- Remove all copies from your systems
+- May face copyright infringement claims
+
+### Can I fork kiro-agents?
+
+Yes! Forks are encouraged when:
+- You need incompatible technical changes
+- Original project rejects your proposal after discussion
+- You want to take the project in a different direction
+
+Please:
+- Keep the AGPL-3.0 license (or wait for MIT)
+- Attribute the original project
+- Consider contributing upstream when possible
+
+### What if the project becomes unmaintained?
+
+See CONTRIBUTING.md for our succession plan. In summary:
+- Active forks can request ownership transfer
+- After extended inactivity, project may be relicensed to public domain
+- Community can continue development
+
+### Why 16 months instead of 12?
+
+This timeframe:
+- Gives recent versions strong protection
+- Allows sufficient time for commercial value
+- Ensures code is mature and stable before MIT release
+- Balances protection with eventual freedom
+
+---
+
+## Contact
+
+- Issues: https://github.com/Theadd/kiro-agents/issues
+- Discussions: https://github.com/Theadd/kiro-agents/discussions
+- Commercial: https://github.com/Theadd/kiro-agents#commercial-license
+
+---
+
+Last Updated: 2025-12-28

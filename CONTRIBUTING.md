@@ -71,6 +71,55 @@ git restore powers/*/steering/
 - Maintainers will regenerate powers after merging your PR
 - This ensures source and distribution stay synchronized
 
+## Fork Guidelines
+
+We welcome contributions! Please use GitHub forks for PRs (standard workflow).
+
+### GitHub Fork vs Project Fork
+
+**GitHub Fork (for contributions)** ✅ **Encouraged!**
+- Fork on GitHub → Clone locally → Make changes → Push → Open PR
+- Temporary fork with intention to merge upstream
+- Standard contribution workflow
+- **This is NOT what we're regulating below**
+
+**Project Fork (permanent divergence)** ⚠️ **Regulated**
+- Separate project with independent development
+- No intention to merge back upstream
+- Published as standalone product/package
+- **These guidelines apply to permanent forks**
+
+### When to Create a Permanent Fork (Legitimate Reasons)
+
+✅ **Fork when:**
+- **Technical divergence** - You need incompatible architectural changes
+- **Rejected proposal** - Maintainers reject your proposal after discussion
+- **Different vision** - You want to take the project in a fundamentally different direction
+
+❌ **Please DON'T fork for:**
+- **Cosmetic changes** - Themes, branding, UI tweaks (contribute upstream)
+- **Feature additions** - New features that could be merged (open PR instead)
+- **Bug fixes** - Always contribute fixes upstream first
+- **Rebranding** - Just changing names/logos without technical changes
+
+### If You Create a Permanent Fork
+
+Please follow these guidelines:
+
+1. **Discuss upstream first** - Open an issue to discuss your proposal
+2. **Keep AGPL-3.0 license** - Or wait 16 months for MIT (see LICENSE)
+3. **Attribute original project** - Link back to kiro-agents in your README
+4. **Consider merging back** - If projects converge, consider upstreaming changes
+5. **Respect time-delayed licensing** - Recent versions are AGPL, old versions become MIT
+
+### Why These Guidelines?
+
+**Goals:**
+- Prevent parasitic clones that fragment the community
+- Encourage upstream contributions over separate forks
+- Allow legitimate technical divergence
+- Keep community unified around single source of truth
+
 ## Build Commands
 
 ```bash
@@ -197,9 +246,34 @@ Tests validate:
 - Start a discussion for questions
 - Check existing issues before creating new ones
 
-## License
+## License and Contributor Agreement
 
-By contributing, you agree that your contributions will be licensed under the same license as the project.
+By contributing to this project, you agree that:
+
+1. **Your contributions are licensed under AGPL-3.0** (current project license)
+2. **You grant the project maintainer the right to relicense your contributions** under any license, including:
+   - MIT License (for time-delayed licensing after 16 months)
+   - Commercial License (for proprietary/closed-source products)
+   - Public domain (if project is abandoned)
+   - Any other license deemed necessary for project sustainability
+3. **This enables project succession and sustainability** if the project becomes unmaintained or needs commercial support
+
+### Why This Matters
+
+This Contributor License Agreement (CLA) ensures:
+- The project can transition to MIT after 16 months (time-delayed licensing)
+- The project can offer Commercial Licenses to fund development
+- The project can be relicensed to public domain if abandoned
+- Community can continue development without legal barriers
+- No need to track down every contributor for permission
+
+### Current Licensing Strategy
+
+kiro-agents uses **time-delayed triple licensing**:
+- **Recent versions (< 16 months)**: AGPL-3.0 or Commercial License
+- **Legacy versions (> 16 months)**: MIT License (automatic)
+
+See [LICENSE](LICENSE) for full details.
 
 ---
 

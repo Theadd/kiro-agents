@@ -98,7 +98,3 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - [npm Package](https://www.npmjs.com/package/kiro-agents)
 - [GitHub Repository](https://github.com/Theadd/kiro-agents)
 - [Kiro IDE](https://kiro.dev)
-
-## License
-
-MIT
