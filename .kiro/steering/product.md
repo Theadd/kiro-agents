@@ -106,7 +106,7 @@ When working on this codebase, follow these principles:
 **Key Behaviors**:
 - Agents capture insights during work (drafts)
 - Curator reviews and validates quality
-- Approved insights organized in 4 tiers (Universal, Category, Agent, Project)
+- Approved insights organized in 3 tiers (Universal, Agent, Project)
 - File references in agent definitions auto-load insights
 - On-demand creation (no initialization required)
 
