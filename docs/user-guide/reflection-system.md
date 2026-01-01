@@ -30,12 +30,18 @@ The reflection system enables AI agents to capture and reuse knowledge across co
 /reflect
 ```
 
-This enables reflection for your current agent for this session only. The agent will capture insights as it works.
+This enables reflection for your current agent for this session only. The agent will:
+
+1. **Add Reflections section** to agent file (permanent)
+2. **Load capture protocol** in context (this session only)
+3. **Capture previous insights** from earlier in the conversation automatically
+4. **Continue capturing** new insights as work progresses
 
 **What happens:**
-- Adds Reflections section to agent file (permanent)
-- Loads capture protocol in context (this session only)
-- Agent can now capture insights
+- Scans conversation history for insights discovered before `/reflect` was run
+- Writes all identified insights to draft file immediately
+- Shows count of captured insights by type
+- Agent can now capture new insights as they arise
 
 **Next session:**
 - Without `/reflect`: Agent reads existing insights but cannot capture new ones
@@ -120,18 +126,22 @@ The reflection system organizes insights into 3 tiers based on scope:
         └── agents/
             └── {agent-name}.md
 ```
-    │   └── agents/
-    │       └── {agent-name}.md
-    └── approved/            # Approved insights by tier
-        ├── universal.md
-        ├── project.md
-        ├── categories/
-        │   └── {category}.md
-        └── agents/
-            └── {agent-name}.md
-```
 
 **Note:** This directory is created automatically when the first insight is recorded. No initialization required!
+
+### Draft Insights Notification
+
+When you activate an agent with more than 5 pending draft insights, you'll see:
+
+### ⚠️ Draft Insights Pending Review
+
+You have **12** insights captured in previous sessions awaiting your review.
+
+```
+/reflect review
+```
+
+This reminds you to review insights captured in previous sessions.
 
 ## Insight Types
 
@@ -182,18 +192,51 @@ Lessons from successes or failures
 
 ### Phase 1: Agent Captures Insight
 
-**When:** Agent discovers something worth remembering during work
+**When:** Agent discovers something worth remembering during work, OR when reflection is enabled mid-conversation
 
 **What happens:**
-1. Agent determines appropriate tier (Universal, Category, Agent, Project)
+
+**If reflection just enabled (via `/reflect`):**
+1. Agent scans conversation history for previous insights
+2. **If insights found:**
+   - Extracts and formats each insight
+   - Writes all previous insights to draft file
+   - Shows count of captured insights
+3. **If no insights found:**
+   - Shows "No previous insights found" message
+   - Continues normally
+4. Agent continues working and captures new insights going forward
+
+**During ongoing work:**
+1. Agent determines appropriate tier (Universal, Agent, Project)
 2. Agent checks if draft file exists
-3. If first time: Creates draft file with all subsections
-4. If exists: Appends to appropriate subsection
+3. If first time: Creates draft file with header
+4. If exists: Appends to appropriate section
 5. Agent continues working
 
 **Result:** Insight saved to draft file, waiting for review
 
 **User sees:**
+
+After `/reflect` with insights found:
+```
+💡 INSIGHTS CAPTURED FROM CONVERSATION
+
+Total: 12 insights
+├─ Insights: 5
+├─ Patterns: 4
+├─ Decisions: 2
+└─ Learnings: 1
+```
+
+After `/reflect` with no insights:
+```
+No previous insights found in conversation.
+
+I'll capture insights as we continue working.
+```
+
+During ongoing work:
 ```
 💡 Insight captured in drafts (pending curator review)
 ```
@@ -395,9 +438,40 @@ Avoid:
 
 ## Best Practices
 
+### Enable Reflection Anytime
+
+**You can enable reflection at any point in the conversation:**
+
+✅ **At the start** - Captures insights throughout the session
+```
+/reflect
+(work with agent)
+```
+
+✅ **Mid-conversation** - Captures previous insights automatically
+```
+(work with agent for 30 minutes)
+/reflect
+(agent captures all previous insights + continues capturing new ones)
+```
+
+✅ **At the end** - Captures insights before context runs out
+```
+(work with agent)
+(context at 75-80%)
+/reflect
+(agent captures all insights from session)
+```
+
+**All approaches work!** The agent automatically captures insights from earlier in the conversation when you run `/reflect`.
+
 ### Capture Insights Immediately
 
-Don't wait until end of session. Capture insights as you discover them.
+**The agent captures insights automatically when you run `/reflect`**, including insights from earlier in the conversation. However, for ongoing work:
+
+- Enable reflection early if you want continuous capture
+- Or enable it anytime - previous insights are captured automatically
+- The agent will continue capturing new insights as work progresses
 
 ### Review Regularly
 
