@@ -8,6 +8,40 @@ This protocol guides agents on how to capture insights, patterns, decisions, and
 - Agent identifies a useful pattern
 - Agent makes an important decision
 - Agent learns from an error or success
+- **After `/reflect` command: Capture insights from earlier in conversation**
+
+## Capturing Previous Insights
+
+**When reflection is enabled mid-conversation** (via `/reflect` command), immediately scan the conversation history for insights discovered before the protocol was loaded.
+
+### Step 1: Review Conversation History
+
+Look for insights you identified or mentioned earlier:
+- Patterns you discovered
+- Decisions you made and explained
+- Learnings from successes or failures
+- User preferences you identified
+- Technical discoveries or solutions
+- Important context about the project
+
+### Step 2: Extract and Format Each Insight
+
+For each insight found:
+1. Determine type (INSIGHT, PATTERN, DECISION, LEARNING)
+2. Determine tier (Universal, Agent-Specific, Project)
+3. Format according to the Recording Process below
+4. Write to draft file
+
+### Step 3: Count and Report
+
+After capturing all previous insights:
+- Count total insights
+- Break down by type (Insights, Patterns, Decisions, Learnings)
+- Report in confirmation message
+
+**Then continue with normal insight capture during ongoing work.**
+
+---
 
 ## Insight Types
 

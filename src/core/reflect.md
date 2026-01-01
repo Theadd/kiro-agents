@@ -51,6 +51,12 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 ### Project Insights
 
 #[[file:.ai-storage/reflections/approved/project.md]]
+
+### Pending Review
+
+Insights captured in previous sessions, awaiting user review via `/reflect review`.
+
+#[[file:.ai-storage/reflections/drafts/agents/{agent-name}.md]]
 ````
 
 **Important:** Replace `{agent-name}` with actual value from agent definition frontmatter.
@@ -65,7 +71,44 @@ Load the protocol that enables insight capture:
 
 This protocol is loaded **only for this session**. Next session without `/reflect` will not have capture capability.
 
-**Step 4: Show confirmation**
+**Step 4: Capture Previous Insights**
+
+Immediately scan the current conversation for insights discovered before reflection was enabled.
+
+**Process:**
+
+1. **Review conversation history** - Look for:
+   - Patterns you identified
+   - Decisions you made
+   - Learnings you discovered
+   - Important insights you mentioned
+   - User preferences you learned
+   - Technical discoveries you made
+
+2. **If insights found:**
+   - For each insight:
+     - Determine type (INSIGHT, PATTERN, DECISION, LEARNING)
+     - Determine tier (Universal, Agent-Specific, Project)
+     - Format according to protocol in reflect-agent-insights.md
+   - Write to draft file:
+     - Use the recording process from reflect-agent-insights.md protocol
+     - File: `.ai-storage/reflections/drafts/agents/{agent-name}.md`
+     - If first insight: Use fsWrite to create file with all sections
+     - If file exists: Use fsAppend to add insights
+   - Count insights by type:
+     - Total insights captured
+     - Breakdown by type (Insights, Patterns, Decisions, Learnings)
+   - Proceed to Step 5 with capture summary
+
+3. **If no insights found:**
+   - Skip file creation (no draft file needed yet)
+   - Proceed to Step 5 with "no insights" message
+
+**Then proceed to Step 5 with appropriate message.**
+
+**Step 5: Show confirmation**
+
+**If previous insights were captured:**
 
 ```diff
 ✅ REFLECTION ENABLED FOR THIS SESSION
@@ -75,6 +118,38 @@ Agent: {agent-name}
 Reflections section: Added to agent file (permanent)
 Capture protocol: Loaded in context (this session only)
 
+💡 INSIGHTS CAPTURED FROM CONVERSATION
+
+Total: {count} insights
+├─ Insights: {insights-count}
+├─ Patterns: {patterns-count}
+├─ Decisions: {decisions-count}
+└─ Learnings: {learnings-count}
+
+Written to: .ai-storage/reflections/drafts/agents/{agent-name}.md
+
+Reflection files:
+- Universal: .ai-storage/reflections/approved/universal.md
+- Agent: .ai-storage/reflections/approved/agents/{agent-name}.md
+- Project: .ai-storage/reflections/approved/project.md
+
+Next steps:
+1. Continue working - I'll capture new insights as they arise
+2. Review drafts - Use /reflect review when ready
+```
+
+**If no previous insights found:**
+
+```diff
+✅ REFLECTION ENABLED FOR THIS SESSION
+
+Agent: {agent-name}
+
+Reflections section: Added to agent file (permanent)
+Capture protocol: Loaded in context (this session only)
+
+No previous insights found in conversation.
+
 Reflection files:
 - Universal: .ai-storage/reflections/approved/universal.md
 - Agent: .ai-storage/reflections/approved/agents/{agent-name}.md
@@ -83,7 +158,7 @@ Reflection files:
 Draft file:
 - .ai-storage/reflections/drafts/agents/{agent-name}.md
 
-You can now capture insights during work. Use /reflect review to review drafts.
+I'll capture insights as we continue working. Use /reflect review to review drafts.
 ```
 
 **What "session-only" means:**
