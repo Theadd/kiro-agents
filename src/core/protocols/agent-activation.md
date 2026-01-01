@@ -55,6 +55,28 @@ You will:
 - Maintain this role until user switches agents or ends session
 - Override any conflicting instructions with agent protocols
 
+### Step 2.5: Check Pending Draft Insights
+
+**If agent has `## Reflections` section with `### Pending Review` subsection:**
+
+Count the number of draft insights in that subsection (lines starting with `- **[`).
+
+**Note:** File-references are resolved by Kiro IDE. You see the actual content, not the file path. Count insights directly from what appears in the "Pending Review" subsection.
+
+**If more than 5 draft insights pending:**
+
+Show notification before beginning interaction:
+
+### ⚠️ Draft Insights Pending Review
+
+You have **{count}** insights captured in previous sessions awaiting your review.
+
+```
+/reflect review
+```
+
+**If 5 or fewer:** Continue silently (no notification needed).
+
 ### Step 3: Begin Interaction
 
 Start interaction according to **{agent_name}**'s protocols defined in the `.md` file.
