@@ -34,7 +34,7 @@
  */
 import { homedir } from "os";
 import { join } from "path";
-import { rmSync } from "fs";
+import { rmSync, existsSync, readdirSync, statSync, chmodSync, constants } from "fs";
 import { STEERING_MAPPINGS, POWER_MAPPINGS, expandMappings, getSteeringFilesForCLI, getPowerFilesForCLI } from "../src/manifest.ts";
 
 /**
@@ -465,6 +465,102 @@ async function buildNpm(config: Config): Promise<void> {
 
 
 /**
+ * Makes all files in a directory writable (removes readonly).
+ * 
+ * Recursively traverses directory and removes readonly flag from all files.
+ * Used before rebuilding to allow overwriting files that were set readonly
+ * after previous build or CLI installation.
+ * 
+ * **Usage:** Called by `buildDev` before processing files to handle CLI-installed
+ * readonly files. Paired with `makeReadonly` in try/finally pattern.
+ * 
+ * @param dirPath - Directory path to make writable
+ * 
+ * @example
+ * ```typescript
+ * makeWritable(userSteeringPath);
+ * try {
+ *   // Build files...
+ * } finally {
+ *   makeReadonly(userSteeringPath);
+ * }
+ * ```
+ * 
+ * @see makeReadonly - Companion function to restore readonly status
+ * @see buildDev - Uses this for readonly file handling
+ */
+function makeWritable(dirPath: string): void {
+  if (!existsSync(dirPath)) {
+    return;
+  }
+  
+  const entries = readdirSync(dirPath, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const fullPath = join(dirPath, entry.name);
+    
+    if (entry.isDirectory()) {
+      makeWritable(fullPath);
+    } else if (entry.isFile()) {
+      try {
+        const stats = statSync(fullPath);
+        if (!(stats.mode & constants.S_IWUSR)) {
+          chmodSync(fullPath, constants.S_IRUSR | constants.S_IWUSR | constants.S_IRGRP | constants.S_IROTH);
+        }
+      } catch {
+        // Ignore errors
+      }
+    }
+  }
+}
+
+/**
+ * Makes all files in a directory readonly.
+ * 
+ * Recursively traverses directory and sets readonly flag on all files.
+ * Used after build to protect generated files from accidental modification.
+ * 
+ * **Usage:** Called by `buildDev` after processing files to restore readonly
+ * status. Placed in finally block to ensure execution even if build fails.
+ * 
+ * @param dirPath - Directory path to make readonly
+ * 
+ * @example
+ * ```typescript
+ * makeWritable(userSteeringPath);
+ * try {
+ *   // Build files...
+ * } finally {
+ *   makeReadonly(userSteeringPath);
+ * }
+ * ```
+ * 
+ * @see makeWritable - Companion function to remove readonly status
+ * @see buildDev - Uses this for readonly file handling
+ */
+function makeReadonly(dirPath: string): void {
+  if (!existsSync(dirPath)) {
+    return;
+  }
+  
+  const entries = readdirSync(dirPath, { withFileTypes: true });
+  
+  for (const entry of entries) {
+    const fullPath = join(dirPath, entry.name);
+    
+    if (entry.isDirectory()) {
+      makeReadonly(fullPath);
+    } else if (entry.isFile()) {
+      try {
+        chmodSync(fullPath, constants.S_IRUSR | constants.S_IRGRP | constants.S_IROTH);
+      } catch {
+        // Ignore errors
+      }
+    }
+  }
+}
+
+/**
  * Builds directly to user's Kiro directory for development using manifest.
  * 
  * Processes steering files and writes to `~/.kiro/steering/kiro-agents/`
@@ -477,40 +573,61 @@ async function buildNpm(config: Config): Promise<void> {
  * Power (use `bun run dev:powers` for protocol development) and loaded on-demand via
  * kiroPowers tool.
  * 
+ * **Readonly File Handling:**
+ * CLI-installed files are set readonly to prevent accidental modification. This function
+ * temporarily makes files writable before building, then restores readonly status after.
+ * Uses try/finally to ensure readonly is restored even if build fails.
+ * 
  * **Build Steps:**
  * 1. Resolve user home directory
- * 2. Expand steering mappings (mix of explicit paths and glob patterns, excludes protocols)
- * 3. Process steering files with substitutions
- * 4. Write directly to `~/.kiro/steering/kiro-agents/`
+ * 2. Make existing files writable (handles CLI-installed readonly files)
+ * 3. Expand steering mappings (mix of explicit paths and glob patterns, excludes protocols)
+ * 4. Process steering files with substitutions
+ * 5. Write directly to `~/.kiro/steering/kiro-agents/`
+ * 6. Restore readonly status on all files
  * 
  * @param config - Configuration with substitution functions
  * 
  * @example Build to user directory
  * ```typescript
  * await buildDev(config);
+ * // Makes files writable → builds → restores readonly
  * // Writes files to ~/.kiro/steering/kiro-agents/
  * // Files match exactly what CLI installs (no protocols)
  * ```
+ * 
+ * @see makeWritable - Removes readonly flag from files
+ * @see makeReadonly - Sets readonly flag on files
  */
 async function buildDev(config: Config): Promise<void> {
   console.log("🔧 Building dev mode from manifest (user directory)...\n");
   
   const userSteeringPath = join(homedir(), ".kiro", "steering", "kiro-agents");
   
-  // Expand steering mappings - SAME as npm, ensures consistency!
-  const steeringFiles = await expandMappings(STEERING_MAPPINGS, "src", "dev");
+  // Make files writable temporarily (handles CLI-installed readonly files)
+  console.log("🔓 Making files writable...");
+  makeWritable(userSteeringPath);
   
-  console.log(`📋 Building ${steeringFiles.length} steering files...\n`);
-  
-  // Build all files to user directory
-  for (const mapping of steeringFiles) {
-    const srcPath = join("src", mapping.src);
-    const destPath = join(userSteeringPath, mapping.dest);
-    await buildFile(srcPath, destPath, config.substitutions, { target: "dev" });
+  try {
+    // Expand steering mappings - SAME as npm, ensures consistency!
+    const steeringFiles = await expandMappings(STEERING_MAPPINGS, "src", "dev");
+    
+    console.log(`📋 Building ${steeringFiles.length} steering files...\n`);
+    
+    // Build all files to user directory
+    for (const mapping of steeringFiles) {
+      const srcPath = join("src", mapping.src);
+      const destPath = join(userSteeringPath, mapping.dest);
+      await buildFile(srcPath, destPath, config.substitutions, { target: "dev" });
+    }
+    
+    console.log(`\n✅ Dev build completed in ${userSteeringPath}/`);
+    console.log(`✅ Files match CLI installation (no more dev mode mismatch!)`);
+  } finally {
+    // Restore readonly status
+    console.log("🔒 Restoring readonly status...");
+    makeReadonly(userSteeringPath);
   }
-  
-  console.log(`\n✅ Dev build completed in ${userSteeringPath}/`);
-  console.log(`✅ Files match CLI installation (no more dev mode mismatch!)`);
 }
 
 /**
