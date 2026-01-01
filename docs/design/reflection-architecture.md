@@ -35,9 +35,8 @@ Technical design documentation for the AI-managed reflection system in kiro-agen
 - User assigns insights to appropriate tier
 - Approved insights moved to tier-specific files
 
-**3. 4-Tier Hierarchy**
+**3. 3-Tier Hierarchy**
 - Universal (all agents)
-- Category (agent type)
 - Agent-Specific (one agent)
 - Project (project-wide)
 
@@ -60,15 +59,11 @@ Technical design documentation for the AI-managed reflection system in kiro-agen
     ├── drafts/              # Pending insights
     │   ├── universal.md
     │   ├── project.md
-    │   ├── categories/
-    │   │   └── {category}.md
     │   └── agents/
     │       └── {agent-name}.md
     └── approved/            # Approved insights
         ├── universal.md
         ├── project.md
-        ├── categories/
-        │   └── {category}.md
         └── agents/
             └── {agent-name}.md
 ```
@@ -77,22 +72,30 @@ Technical design documentation for the AI-managed reflection system in kiro-agen
 ```markdown
 # {Tier} Reflections
 
-## Insights
-- Insight 1
-- Insight 2
+- **[INSIGHT]** Insight 1 (approved: 2026-01-01)
 
-## Patterns
-- Pattern 1
-- Pattern 2
+- **[INSIGHT]** Insight 2 (approved: 2026-01-02)
 
-## Decisions
-- Decision 1 (rationale: why we chose this)
-- Decision 2
+- **[PATTERN]** Pattern 1 (approved: 2026-01-01)
 
-## Learnings
-- Learning 1 (what we discovered)
-- Learning 2
+- **[PATTERN]** Pattern 2 (approved: 2026-01-03)
+
+- **[DECISION]** Decision 1 (rationale: why we chose this) (approved: 2026-01-02)
+
+- **[DECISION]** Decision 2 (approved: 2026-01-04)
+
+- **[LEARNING]** Learning 1 (what we discovered) (approved: 2026-01-03)
+
+- **[LEARNING]** Learning 2 (approved: 2026-01-05)
 ```
+
+**Format features:**
+- Single header line
+- Each insight is a bullet point with type tag
+- Type tags: `[INSIGHT]`, `[PATTERN]`, `[DECISION]`, `[LEARNING]`
+- Blank line separator between insights
+- Approval date at end
+- No subsections (enables fsAppend for efficient updates)
 
 **Why This Structure:**
 - Separate drafts from approved (clear workflow)
@@ -111,19 +114,15 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 
 ### Universal Insights
 
-#[[file:.ai-storage/reflections/approved/universal.md:insights]]
-
-### Category Insights ({agent-category})
-
-#[[file:.ai-storage/reflections/approved/categories/{agent-category}.md:insights]]
+#[[file:.ai-storage/reflections/approved/universal.md]]
 
 ### Agent-Specific Insights
 
-#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md:insights]]
+#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md]]
 
 ### Project Insights
 
-#[[file:.ai-storage/reflections/approved/project.md:insights]]
+#[[file:.ai-storage/reflections/approved/project.md]]
 ```
 
 **File Reference Behavior:**
@@ -193,7 +192,7 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 ```
 1. Agent discovers insight during work
    ↓
-2. Agent determines tier (Universal, Category, Agent, Project)
+2. Agent determines tier (Universal, Agent, Project)
    ↓
 3. Agent checks if draft file exists
    ├─ If blank/missing → fsWrite (creates file + directories)
@@ -225,7 +224,7 @@ This agent records insights, patterns, and learnings in its dedicated reflection
    ├─ Suggest refinements if needed
    └─ Ask user which tier to approve to
    ↓
-5. User selects tier (Universal, Category, Agent, Project, Reject, Skip)
+5. User selects tier (Universal, Agent, Project, Reject, Skip)
    ↓
 6. Curator moves insight to approved tier
    ├─ Check if approved file exists
@@ -256,7 +255,6 @@ This agent records insights, patterns, and learnings in its dedicated reflection
    ↓
 4. Kiro IDE resolves file references
    ├─ Universal: .ai-storage/reflections/approved/universal.md
-   ├─ Category: .ai-storage/reflections/approved/categories/{category}.md
    ├─ Agent: .ai-storage/reflections/approved/agents/{agent-name}.md
    └─ Project: .ai-storage/reflections/approved/project.md
    ↓
@@ -295,7 +293,7 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 - Scales automatically (new tiers work immediately)
 - Self-documenting (structure emerges from usage)
 
-### Why 4-Tier Hierarchy?
+### Why 3-Tier Hierarchy?
 
 **Alternative Considered:** Flat structure (all insights in one file)
 
@@ -305,13 +303,14 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 - Difficult to maintain (hard to find specific insights)
 - No separation of concerns (personal vs team vs project)
 
-**Chosen Approach:** 4-tier hierarchy (Universal, Category, Agent, Project)
+**Chosen Approach:** 3-tier hierarchy (Universal, Agent, Project)
 
 **Benefits:**
 - Scalable (each tier stays manageable size)
 - Relevant (agents load only applicable insights)
 - Maintainable (easy to find and update insights)
 - Clear separation (personal, team, project scopes)
+- Simple (no complex categorization needed)
 
 ### Why Draft → Approved Workflow?
 
@@ -381,7 +380,6 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 
 **Thresholds:**
 - Universal: ~100 insights (most common)
-- Category: ~50 insights per category
 - Agent: ~30 insights per agent
 - Project: ~50 insights
 
@@ -402,10 +400,9 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 
 **Current Overhead:**
 - Universal: ~500-1000 tokens
-- Category: ~300-500 tokens
 - Agent: ~200-300 tokens
 - Project: ~300-500 tokens
-- **Total: ~1300-2300 tokens** (acceptable)
+- **Total: ~1000-1800 tokens** (acceptable)
 
 ### Team Collaboration
 

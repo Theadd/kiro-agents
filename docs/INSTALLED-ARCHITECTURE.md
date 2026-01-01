@@ -106,12 +106,10 @@ Both installations work together to provide the complete kiro-agents experience.
     ├── drafts/                             # Pending insights
     │   ├── universal.md
     │   ├── project.md
-    │   ├── categories/
     │   └── agents/
     └── approved/                           # Approved insights
         ├── universal.md
         ├── project.md
-        ├── categories/
         └── agents/
 ```
 
@@ -946,20 +944,12 @@ The reflection system enables agents to capture and reuse knowledge across sessi
     ├── drafts/              # Pending insights awaiting review
     │   ├── universal.md
     │   ├── project.md
-    │   ├── categories/
-    │   │   ├── architects.md
-    │   │   ├── developers.md
-    │   │   └── ...
     │   └── agents/
     │       ├── {agent-name}.md
     │       └── ...
     └── approved/            # Approved insights by tier
         ├── universal.md     # Used by ALL agents
         ├── project.md       # About this project
-        ├── categories/      # Used by agent type
-        │   ├── architects.md
-        │   ├── developers.md
-        │   └── ...
         └── agents/          # Used by specific agent
             ├── {agent-name}.md
             └── ...
@@ -977,15 +967,11 @@ The reflection system enables agents to capture and reuse knowledge across sessi
 - Used by ALL agents
 - Examples: Markdown preferences, approval protocols, team standards
 
-**2. Category Insights** (`.ai-storage/reflections/approved/categories/{category}.md`)
-- Used by agents of specific type (architects, developers, analysts)
-- Examples: Architecture patterns, testing conventions, code style
-
-**3. Agent-Specific Insights** (`.ai-storage/reflections/approved/agents/{agent-name}.md`)
+**2. Agent-Specific Insights** (`.ai-storage/reflections/approved/agents/{agent-name}.md`)
 - Used by one specific agent only
 - Examples: Agent-specific preferences, learned behaviors
 
-**4. Project Insights** (`.ai-storage/reflections/approved/project.md`)
+**3. Project Insights** (`.ai-storage/reflections/approved/project.md`)
 - About this specific project
 - Examples: Project structure, conventions, key files
 
@@ -1064,16 +1050,13 @@ Agents with Reflections section automatically load approved insights:
 ## Reflections
 
 ### Universal Insights
-#[[file:.ai-storage/reflections/approved/universal.md:insights]]
-
-### Category Insights ({agent-category})
-#[[file:.ai-storage/reflections/approved/categories/{agent-category}.md:insights]]
+#[[file:.ai-storage/reflections/approved/universal.md]]
 
 ### Agent-Specific Insights
-#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md:insights]]
+#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md]]
 
 ### Project Insights
-#[[file:.ai-storage/reflections/approved/project.md:insights]]
+#[[file:.ai-storage/reflections/approved/project.md]]
 ```
 
 **File Reference Behavior:**
@@ -1162,7 +1145,6 @@ Category: architect
 
 Reflection files:
 - Universal: .ai-storage/reflections/approved/universal.md
-- Category: .ai-storage/reflections/approved/categories/architect.md
 - Agent: .ai-storage/reflections/approved/agents/kiro-external-product-architect.md
 - Project: .ai-storage/reflections/approved/project.md
 

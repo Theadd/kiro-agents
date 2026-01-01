@@ -262,48 +262,40 @@ Check package.json version before publishing. Use semantic versioning: major.min
 **Criteria:**
 - Applies to ALL agents
 - No exceptions or special cases
-- Fundamental to system operation
+- Fundamental to system operation or widely applicable best practices
 
 **Examples:**
 - Markdown formatting rules
 - File operation patterns
 - Approval protocols
-- Team-wide standards
-
-### Category Tier
-
-**Criteria:**
-- Applies to specific agent type
-- Shared by multiple agents of same category
-- Category-specific best practices
-
-**Examples:**
-- Architecture patterns (for architect agents)
-- Testing conventions (for developer agents)
-- Analysis techniques (for analyst agents)
+- Error handling conventions
+- Documentation standards
 
 ### Agent-Specific Tier
 
 **Criteria:**
 - Applies to ONE agent only
-- Agent-specific preferences or behaviors
-- Unique to agent's role
+- Agent-specific workflows or behaviors
+- Unique to agent's specialized role
 
 **Examples:**
 - Agent-specific workflow preferences
 - Learned behaviors from past sessions
 - Agent-unique capabilities
+- Specialized techniques for specific tasks
 
 ### Project Tier
 
 **Criteria:**
 - About THIS project specifically
 - Project structure or conventions
+- User preferences for this workspace
 - Key files or patterns in this codebase
 
 **Examples:**
 - "This project uses Bun for package management"
 - "Build system uses centralized manifest in src/manifest.ts"
+- "User prefers integration tests over unit tests"
 - "Protocols are auto-discovered via glob patterns"
 
 ## Edge Cases

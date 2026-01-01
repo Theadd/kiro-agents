@@ -23,18 +23,24 @@ This protocol guides agents on how to capture insights, patterns, decisions, and
 **Where should this insight be recorded?**
 
 - **Universal** (`.ai-storage/reflections/drafts/universal.md`) - Useful for ALL agents
-  - Examples: Markdown preferences, approval protocols, team standards
-  
-- **Category** (`.ai-storage/reflections/drafts/categories/{category}.md`) - Useful for agent type
-  - Examples: Architecture patterns (architects), testing conventions (developers)
+  - Examples: Markdown preferences, approval protocols, error handling patterns, documentation standards
   
 - **Agent-Specific** (`.ai-storage/reflections/drafts/agents/{agent-name}.md`) - Only this agent
-  - Examples: Agent-specific preferences, learned behaviors
+  - Examples: Agent-specific workflows, learned behaviors, specialized techniques
   
 - **Project** (`.ai-storage/reflections/drafts/project.md`) - About this project
-  - Examples: Project structure, conventions, key files
+  - Examples: Project structure, user preferences, conventions, key files, team standards
 
-### Step 2: Check if Draft File Exists
+### Step 2: Determine Insight Type Tag
+
+**Choose the appropriate type tag:**
+
+- `[INSIGHT]` - General knowledge, preferences, standards
+- `[PATTERN]` - Reusable approaches, workflows, solutions
+- `[DECISION]` - Important choices made and their rationale
+- `[LEARNING]` - Lessons from successes or failures
+
+### Step 3: Check if Draft File Exists
 
 **Try to read the target draft file:**
 
@@ -43,53 +49,51 @@ Read: .ai-storage/reflections/drafts/{tier}/{file}.md
 ```
 
 **If file doesn't exist or is empty:**
-- Go to Step 3 (Create)
+- Go to Step 4 (Create)
 
 **If file exists with content:**
-- Go to Step 4 (Append)
+- Go to Step 5 (Append)
 
-### Step 3: Create Draft File (First Time)
+### Step 4: Create Draft File (First Time)
 
-Use `fsWrite` to create the draft file with all subsections:
+Use `fsWrite` to create the draft file with header and first insight:
 
 ```markdown
 # {Tier} Draft Reflections
 
-## Insights (Draft)
-
-{Your insight if type is Insights}
-
-## Patterns (Draft)
-
-{Your insight if type is Patterns}
-
-## Decisions (Draft)
-
-{Your insight if type is Decisions}
-
-## Learnings (Draft)
-
-{Your insight if type is Learnings}
+- **[TYPE]** {Your insight content} (captured: {YYYY-MM-DD})
 ```
+
+**Replace:**
+- `{Tier}` - Universal, Category Name, Agent Name, or Project
+- `[TYPE]` - INSIGHT, PATTERN, DECISION, or LEARNING
+- `{Your insight content}` - The actual insight text
+- `{YYYY-MM-DD}` - Current date (e.g., 2026-01-01)
 
 **Note:** fsWrite automatically creates all missing directories (`.ai-storage/reflections/drafts/`).
 
 **Important:** Agents ALWAYS write to drafts first, never directly to approved files. Only the reflection-curator agent moves insights from drafts to approved after review.
 
-**Then:** Skip to Step 5 (Done)
+**Then:** Skip to Step 6 (Done)
 
-### Step 4: Append to Existing Draft File
+### Step 5: Append to Existing Draft File
 
-Use `fsAppend` to add to the appropriate subsection:
+Use `fsAppend` to add the new insight:
 
 ```markdown
 
-- {Your insight content} (captured: {date})
+- **[TYPE]** {Your insight content} (captured: {YYYY-MM-DD})
 ```
 
-**Important:** Add to the correct subsection (Insights, Patterns, Decisions, or Learnings).
+**Format rules:**
+- Start with blank line (separator)
+- Use `- **[TYPE]**` prefix (TYPE in uppercase)
+- Include capture date in parentheses
+- Keep insight on single line if possible (use line breaks only if necessary)
 
-### Step 5: Notify User (Optional)
+**Important:** This format allows `fsAppend` to work without reading the file first.
+
+### Step 6: Notify User (Optional)
 
 Briefly mention the insight was captured:
 
@@ -118,26 +122,50 @@ Briefly mention the insight was captured:
 ### Good Insight (Universal)
 
 ```markdown
-- Markdown: Use 4 backticks for outer blocks, 3 for inner blocks when showing nested code examples. This prevents premature block closure in the parser.
+- **[INSIGHT]** Markdown: Use 4 backticks for outer blocks, 3 for inner blocks when showing nested code examples. This prevents premature block closure in the parser. (captured: 2026-01-01)
 ```
 
-### Good Pattern (Category: Architects)
+### Good Pattern (Agent-Specific)
 
 ```markdown
-- Workspace Detection Pattern: Always check for development files (src/manifest.ts, package.json, scripts/) before implementation. External workspaces require proposal-only mode.
+- **[PATTERN]** Workspace Detection: Always check for development files (src/manifest.ts, package.json, scripts/) before implementation. External workspaces require proposal-only mode. (captured: 2026-01-01)
 ```
 
 ### Good Decision (Agent-Specific)
 
 ```markdown
-- Protocol Organization: Decided to use 4-tier hierarchy (Universal, Category, Agent, Project) instead of flat structure. Rationale: Better scalability and clearer separation of concerns.
+- **[DECISION]** Protocol Organization: Decided to use 4-tier hierarchy (Universal, Category, Agent, Project) instead of flat structure. Rationale: Better scalability and clearer separation of concerns. (captured: 2026-01-01)
 ```
 
 ### Good Learning (Project)
 
 ```markdown
-- Build System: Learned that `bun run dev` with 5-second timeout is sufficient for validation. Full test suite not needed for quick iteration cycles.
+- **[LEARNING]** Build System: Learned that `bun run dev` with 5-second timeout is sufficient for validation. Full test suite not needed for quick iteration cycles. (captured: 2026-01-01)
 ```
+
+## File Format Example
+
+**Complete draft file structure:**
+
+```markdown
+# Universal Draft Reflections
+
+- **[INSIGHT]** Use 4 backticks for outer blocks, 3 for inner. Prevents premature block closure. (captured: 2026-01-01)
+
+- **[PATTERN]** Workspace Detection: Check for src/manifest.ts before implementation. External workspaces require proposal-only mode. (captured: 2026-01-01)
+
+- **[DECISION]** Protocol Organization: 4-tier hierarchy instead of flat. Rationale: Better scalability. (captured: 2026-01-02)
+
+- **[LEARNING]** Build System: `bun run dev` with 5s timeout sufficient for validation. (captured: 2026-01-02)
+```
+
+**Key features:**
+- Single header line
+- Each insight is a separate bullet point
+- Type tag in bold brackets
+- Blank line separator between insights
+- Capture date at end
+- No subsections (enables fsAppend)
 
 ## Integration with Agent Definition
 
@@ -147,16 +175,13 @@ Agents with Reflections section in their definition will have file references th
 ## Reflections
 
 ### Universal Insights
-#[[file:.ai-storage/reflections/approved/universal.md:insights]]
-
-### Category Insights
-#[[file:.ai-storage/reflections/approved/categories/{category}.md:insights]]
+#[[file:.ai-storage/reflections/approved/universal.md]]
 
 ### Agent-Specific Insights
-#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md:insights]]
+#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md]]
 
 ### Project Insights
-#[[file:.ai-storage/reflections/approved/project.md:insights]]
+#[[file:.ai-storage/reflections/approved/project.md]]
 ```
 
 **Note:** Agents write insights to drafts (`.ai-storage/reflections/drafts/`). The reflection-curator agent reviews drafts and moves approved insights to the appropriate approved tier (`.ai-storage/reflections/approved/`).
