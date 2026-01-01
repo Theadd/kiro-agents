@@ -30,11 +30,16 @@ This protocol guides the reflection-curator agent through reviewing draft insigh
 
 ### Step 2: Extract Draft Insights
 
-For each draft file, extract insights from all subsections:
-- Insights (Draft)
-- Patterns (Draft)
-- Decisions (Draft)
-- Learnings (Draft)
+For each draft file, extract insights by parsing the bullet list format:
+
+```markdown
+- **[TYPE]** Content (captured: date)
+```
+
+**Parse each line:**
+- Extract type tag: `[INSIGHT]`, `[PATTERN]`, `[DECISION]`, or `[LEARNING]`
+- Extract content: Text between type tag and capture date
+- Extract capture date: Date in parentheses at end
 
 **Create a review queue** with all pending items.
 
@@ -48,7 +53,8 @@ For each insight in the queue:
 📝 DRAFT INSIGHT #{number}
 
 Source: {file-path}
-Type: {Insights|Patterns|Decisions|Learnings}
+Type: [INSIGHT|PATTERN|DECISION|LEARNING]
+Captured: {date}
 
 Content:
 {insight-content}
@@ -74,11 +80,10 @@ Check against quality checklist (see reflect-curator-checklist.md):
 Where should this insight be approved to?
 
 1. **Universal** - All agents use this
-2. **Category: {category}** - All {category} agents use this
-3. **Agent-Specific: {agent-name}** - Only this agent uses this
-4. **Project** - Project-wide insight
-5. **Reject** - Not useful, discard
-6. **Skip** - Review later
+2. **Agent-Specific: {agent-name}** - Only this agent uses this
+3. **Project** - Project-wide insight
+4. **Reject** - Not useful, discard
+5. **Skip** - Review later
 ```
 
 #### 3d. Apply User Choice
@@ -87,31 +92,25 @@ Where should this insight be approved to?
 
 **Option 1 (Universal):**
 - Move to `.ai-storage/reflections/approved/universal.md`
-- Append to appropriate subsection (Insights, Patterns, Decisions, Learnings)
+- Use `fsAppend` to add: `\n- **[TYPE]** {content} (approved: {date})`
 - Remove from draft file
 
-**Option 2 (Category):**
-- Move to `.ai-storage/reflections/approved/categories/{category}.md`
-- Create category file if doesn't exist
-- Append to appropriate subsection
-- Remove from draft file
-
-**Option 3 (Agent-Specific):**
+**Option 2 (Agent-Specific):**
 - Move to `.ai-storage/reflections/approved/agents/{agent-name}.md`
-- Create agent file if doesn't exist
-- Append to appropriate subsection
+- Create agent file if doesn't exist (use `fsWrite` with header)
+- Use `fsAppend` to add: `\n- **[TYPE]** {content} (approved: {date})`
 - Remove from draft file
 
-**Option 4 (Project):**
+**Option 3 (Project):**
 - Move to `.ai-storage/reflections/approved/project.md`
-- Append to appropriate subsection
+- Use `fsAppend` to add: `\n- **[TYPE]** {content} (approved: {date})`
 - Remove from draft file
 
-**Option 5 (Reject):**
+**Option 4 (Reject):**
 - Remove from draft file
 - Log rejection reason (optional)
 
-**Option 6 (Skip):**
+**Option 5 (Skip):**
 - Leave in draft file
 - Continue to next insight
 
@@ -133,7 +132,6 @@ After processing all insights from a draft file:
 
 Processed: {total} insights
 ├─ Approved to Universal: {count}
-├─ Approved to Categories: {count}
 ├─ Approved to Agents: {count}
 ├─ Approved to Project: {count}
 ├─ Rejected: {count}
@@ -141,7 +139,6 @@ Processed: {total} insights
 
 Approved files updated:
 - .ai-storage/reflections/approved/universal.md
-- .ai-storage/reflections/approved/categories/{category}.md
 - .ai-storage/reflections/approved/agents/{agent-name}.md
 - .ai-storage/reflections/approved/project.md
 ```
@@ -155,7 +152,10 @@ Approved files updated:
 .ai-storage/reflections/drafts/agents/{agent-name}.md
 ```
 
-**Extract insight** from appropriate subsection.
+**Parse insights** from bullet list format:
+```markdown
+- **[TYPE]** Content (captured: date)
+```
 
 **Check if approved file exists:**
 ```
@@ -163,15 +163,23 @@ Approved files updated:
 ```
 
 **If approved file doesn't exist:**
-- Use `fsWrite` to create with all subsections
-- Add insight to appropriate subsection
+- Use `fsWrite` to create with header:
+  ```markdown
+  # {Tier} Reflections
+  
+  - **[TYPE]** {content} (approved: {date})
+  ```
 
 **If approved file exists:**
-- Use `fsAppend` to add insight to appropriate subsection
+- Use `fsAppend` to add insight:
+  ```markdown
+  
+  - **[TYPE]** {content} (approved: {date})
+  ```
 
 **Update draft file:**
-- Remove processed insight
-- If file becomes empty, delete it
+- Use `strReplace` to remove the processed insight line
+- If file becomes empty (only header remains), delete it
 
 ## Quality Refinement
 

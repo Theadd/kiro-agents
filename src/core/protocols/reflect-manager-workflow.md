@@ -26,21 +26,20 @@ This protocol enables batch enablement of reflection system across multiple agen
 **For each agent file:**
 1. Read agent definition
 2. Check if Reflections section exists
-3. Determine agent category (from frontmatter or content)
-4. Build agent list with status
+3. Build agent list with status
 
 **Display:**
 
 ```diff
 📋 AGENT REFLECTION STATUS
 
-# | Agent Name                    | Category    | Reflections
---|-------------------------------|-------------|------------
-1 | kiro-master                   | management  | ✅ Enabled
-2 | kiro-external-product-architect| architect   | ❌ Disabled
-3 | reflection-curator            | curator     | ✅ Enabled
-4 | custom-agent-1                | developer   | ❌ Disabled
-5 | custom-agent-2                | analyst     | ❌ Disabled
+# | Agent Name                    | Reflections
+--|-------------------------------|------------
+1 | kiro-master                   | ✅ Enabled
+2 | kiro-external-product-architect| ❌ Disabled
+3 | reflection-curator            | ✅ Enabled
+4 | custom-agent-1                | ❌ Disabled
+5 | custom-agent-2                | ❌ Disabled
 ...
 
 Total: {count} agents
@@ -57,10 +56,9 @@ Which agents should have reflection enabled?
 
 Options:
 1. **All disabled agents** - Enable all agents without Reflections
-2. **By category** - Enable all agents of specific type
-3. **By range** - Enable agents by number (e.g., "2-5, 10, 15-16")
-4. **By list** - Enable specific agents (e.g., "1, 4, 10")
-5. **Cancel** - Exit without changes
+2. **By range** - Enable agents by number (e.g., "2-5, 10, 15-16")
+3. **By list** - Enable specific agents (e.g., "1, 4, 10")
+4. **Cancel** - Exit without changes
 
 Enter your choice:
 ```
@@ -71,23 +69,18 @@ Enter your choice:
 - Select all agents with ❌ Disabled status
 - Proceed to Step 4
 
-**Option 2 (By category):**
-- Ask: "Which category? (architect, developer, analyst, etc.)"
-- Select all agents matching category
-- Proceed to Step 4
-
-**Option 3 (By range):**
+**Option 2 (By range):**
 - Parse range syntax: "2-5, 10, 15-16"
 - Expand ranges: 2, 3, 4, 5, 10, 15, 16
 - Select agents by numbers
 - Proceed to Step 4
 
-**Option 4 (By list):**
+**Option 3 (By list):**
 - Parse list syntax: "1, 4, 10"
 - Select agents by numbers
 - Proceed to Step 4
 
-**Option 5 (Cancel):**
+**Option 4 (Cancel):**
 - Exit workflow
 - No changes made
 
@@ -126,14 +119,7 @@ Read: {{{WS_AGENTS_PATH}}}/{agent-name}.md
 **If Reflections section doesn't exist:**
 - Proceed to 5c
 
-#### 5c. Determine Agent Category
-
-**Extract category from:**
-- Frontmatter: `type: {category}`
-- Content: Look for category mentions
-- Default: "general" if not found
-
-#### 5d. Add Reflections Section
+#### 5c. Add Reflections Section
 
 **For Permanent enablement:**
 
@@ -147,26 +133,22 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 
 ### Universal Insights
 
-#[[file:.ai-storage/reflections/approved/universal.md:insights]]
-
-### Category Insights ({category})
-
-#[[file:.ai-storage/reflections/approved/categories/{category}.md:insights]]
+#[[file:.ai-storage/reflections/approved/universal.md]]
 
 ### Agent-Specific Insights
 
-#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md:insights]]
+#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md]]
 
 ### Project Insights
 
-#[[file:.ai-storage/reflections/approved/project.md:insights]]
+#[[file:.ai-storage/reflections/approved/project.md]]
 ````
 
 **For Temporary enablement:**
 - Add to session context only (not to file)
 - Log: "Reflections enabled temporarily for {agent-name}"
 
-#### 5e. Log Result
+#### 5d. Log Result
 
 ```
 ✅ Enabled reflection for: {agent-name} ({enablement-type})
@@ -237,29 +219,12 @@ Result: Agents #1, #2, #3, #7, #10, #11, #12
 
 ## Category Detection
 
-### From Frontmatter
+**Note:** Category tier has been removed. Reflection system now uses 3 tiers:
+- Universal (all agents)
+- Agent-Specific (one agent)
+- Project (this project)
 
-```yaml
----
-name: my-agent
-type: architect
----
-```
-
-Extract: `architect`
-
-### From Content
-
-Look for patterns:
-- "Category: {category}"
-- "Type: {category}"
-- "Role: {category}"
-
-Extract first match.
-
-### Default
-
-If no category found: `general`
+This section is deprecated and kept for reference only.
 
 ## Enablement Types
 

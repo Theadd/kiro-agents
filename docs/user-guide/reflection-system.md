@@ -63,7 +63,7 @@ To permanently enable reflection on an agent:
 
 ## Insight Tiers
 
-The reflection system organizes insights into 4 tiers based on scope:
+The reflection system organizes insights into 3 tiers based on scope:
 
 ### 1. Universal Insights
 
@@ -78,44 +78,31 @@ The reflection system organizes insights into 4 tiers based on scope:
 
 **When to use:** Insight applies to every agent without exception
 
-### 2. Category Insights
-
-**Used by:** Agents of specific type (architects, developers, analysts, etc.)  
-**Files:** `.ai-storage/reflections/approved/categories/{category}.md`
-
-**Examples:**
-- Architecture patterns (for architect agents)
-- Testing conventions (for developer agents)
-- Analysis techniques (for analyst agents)
-- Code review standards (for reviewer agents)
-
-**When to use:** Insight applies to all agents of a specific type
-
-### 3. Agent-Specific Insights
+### 2. Agent-Specific Insights
 
 **Used by:** One specific agent only  
 **Files:** `.ai-storage/reflections/approved/agents/{agent-name}.md`
 
 **Examples:**
-- Agent-specific workflow preferences
-- Learned behaviors from past sessions
-- Agent-unique capabilities
-- Personal interaction patterns
+- Agent personality preferences
+- Specialized workflows for this agent
+- Agent-specific learned behaviors
+- Custom interaction patterns
 
-**When to use:** Insight only makes sense for one particular agent
+**When to use:** Insight only applies to this specific agent
 
-### 4. Project Insights
+### 3. Project Insights
 
-**Used by:** All agents working on this project  
+**Used by:** ALL agents in this project/workspace  
 **File:** `.ai-storage/reflections/approved/project.md`
 
 **Examples:**
-- "This project uses Bun for package management"
-- "Build system uses centralized manifest in src/manifest.ts"
-- "Authentication is in the auth/ directory"
-- "API endpoints are documented in docs/api.md"
+- Project-specific conventions
+- Codebase patterns and structure
+- Team preferences for this project
+- Project-specific tools and workflows
 
-**When to use:** Insight is about this specific project's structure or conventions
+**When to use:** Insight applies to this project but not others
 
 ## Storage Structure
 
@@ -125,8 +112,14 @@ The reflection system organizes insights into 4 tiers based on scope:
     ├── drafts/              # Pending insights awaiting review
     │   ├── universal.md
     │   ├── project.md
-    │   ├── categories/
-    │   │   └── {category}.md
+    │   └── agents/
+    │       └── {agent-name}.md
+    └── approved/            # Approved insights ready for use
+        ├── universal.md
+        ├── project.md
+        └── agents/
+            └── {agent-name}.md
+```
     │   └── agents/
     │       └── {agent-name}.md
     └── approved/            # Approved insights by tier
@@ -142,7 +135,7 @@ The reflection system organizes insights into 4 tiers based on scope:
 
 ## Insight Types
 
-Each reflection file has 4 subsections for different types of knowledge:
+Each reflection file uses a simple bullet list format with type tags:
 
 ### Insights
 
@@ -150,8 +143,8 @@ General knowledge, preferences, and standards
 
 **Example:**
 ```markdown
-- Markdown: Use 4 backticks for outer blocks, 3 for inner blocks when 
-  showing nested code examples. This prevents premature block closure.
+- **[INSIGHT]** Markdown: Use 4 backticks for outer blocks, 3 for inner blocks when 
+  showing nested code examples. This prevents premature block closure. (approved: 2026-01-01)
 ```
 
 ### Patterns
@@ -160,8 +153,8 @@ Reusable approaches, workflows, and solutions
 
 **Example:**
 ```markdown
-- Workspace Detection: Always check for development files (src/, package.json) 
-  before implementation. External workspaces require proposal-only mode.
+- **[PATTERN]** Workspace Detection: Always check for development files (src/, package.json) 
+  before implementation. External workspaces require proposal-only mode. (approved: 2026-01-01)
 ```
 
 ### Decisions
@@ -170,9 +163,9 @@ Important choices made and their rationale
 
 **Example:**
 ```markdown
-- Protocol Organization: Use 4-tier hierarchy (Universal, Category, Agent, 
+- **[DECISION]** Protocol Organization: Use 4-tier hierarchy (Universal, Category, Agent, 
   Project) instead of flat structure. Rationale: Better scalability and 
-  clearer separation of concerns.
+  clearer separation of concerns. (approved: 2026-01-02)
 ```
 
 ### Learnings
@@ -181,8 +174,8 @@ Lessons from successes or failures
 
 **Example:**
 ```markdown
-- Build Validation: `bun run dev` with 5-second timeout is sufficient for 
-  validation. Full test suite not needed for quick iteration cycles.
+- **[LEARNING]** Build Validation: `bun run dev` with 5-second timeout is sufficient for 
+  validation. Full test suite not needed for quick iteration cycles. (approved: 2026-01-02)
 ```
 
 ## Workflow Details

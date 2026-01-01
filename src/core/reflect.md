@@ -42,22 +42,18 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 
 ### Universal Insights
 
-#[[file:.ai-storage/reflections/approved/universal.md:insights]]
-
-### Category Insights ({agent-category})
-
-#[[file:.ai-storage/reflections/approved/categories/{agent-category}.md:insights]]
+#[[file:.ai-storage/reflections/approved/universal.md]]
 
 ### Agent-Specific Insights
 
-#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md:insights]]
+#[[file:.ai-storage/reflections/approved/agents/{agent-name}.md]]
 
 ### Project Insights
 
-#[[file:.ai-storage/reflections/approved/project.md:insights]]
+#[[file:.ai-storage/reflections/approved/project.md]]
 ````
 
-**Important:** Replace `{agent-category}` and `{agent-name}` with actual values from agent definition frontmatter.
+**Important:** Replace `{agent-name}` with actual value from agent definition frontmatter.
 
 **Step 3: Load capture protocol**
 
@@ -75,14 +71,12 @@ This protocol is loaded **only for this session**. Next session without `/reflec
 ✅ REFLECTION ENABLED FOR THIS SESSION
 
 Agent: {agent-name}
-Category: {agent-category}
 
 Reflections section: Added to agent file (permanent)
 Capture protocol: Loaded in context (this session only)
 
 Reflection files:
 - Universal: .ai-storage/reflections/approved/universal.md
-- Category: .ai-storage/reflections/approved/categories/{agent-category}.md
 - Agent: .ai-storage/reflections/approved/agents/{agent-name}.md
 - Project: .ai-storage/reflections/approved/project.md
 
@@ -146,7 +140,6 @@ Enable agents to capture and reuse knowledge across sessions:
 ### Insight Tiers
 
 **Universal** - Used by ALL agents  
-**Category** - Used by agent type (architects, developers, etc.)  
 **Agent-Specific** - Used by one agent only  
 **Project** - About this specific project
 
