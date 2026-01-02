@@ -1,5 +1,50 @@
 # Changelog
 
+## 1.15.0
+
+### Minor Changes
+
+- 66b747c: # Simplify reflection system to 3-tier hierarchy
+
+  Streamlined the AI reflection system from 4 tiers to 3 tiers by removing the category tier, and updated file references to remove anchors for better compatibility. This simplification reduces complexity while maintaining full functionality.
+
+  ## Changed
+
+  - Reflection system now uses 3-tier hierarchy (Universal, Agent, Project) instead of 4-tier
+  - File references no longer use anchors (e.g., `#[[file:path.md]]` instead of `#[[file:path.md:insights]]`)
+  - All reflection protocols updated to support simplified architecture
+  - Documentation updated throughout to reflect 3-tier structure
+
+  ## Removed
+
+  - Category tier from reflection hierarchy (Universal, ~~Category~~, Agent, Project)
+  - File reference anchors for better compatibility with flat file format
+
+- 97e0d7d: # Automatic capture of previous insights when enabling reflection mid-conversation
+
+  The `/reflect` command now automatically captures insights discovered earlier in the conversation, eliminating the need for manual capture. Additionally, agents with pending draft insights (>5) now show a prominent notification during activation, reminding users to review accumulated insights.
+
+  ## Added
+
+  - Automatic capture of previous insights when `/reflect` is executed mid-conversation (Step 4 in reflect.md)
+  - Draft insights notification during agent activation when >5 insights pending review (Step 2.5 in agent-activation.md)
+  - Pending Review subsection in Reflections template with file-reference to draft file
+  - Capturing Previous Insights section in reflect-agent-insights.md protocol
+  - Draft Insights Notification documentation in user guide
+  - Enable Reflection Anytime section in Best Practices showing valid approaches (start, mid, end)
+
+  ## Changed
+
+  - `/reflect` confirmation message now shows count of captured insights or "no insights found" message
+  - Agent activation protocol now checks for pending drafts and shows H3 notification with code block for visibility
+  - User guide Phase 1 documentation now distinguishes between just-enabled and ongoing-work scenarios
+  - Instructions reference subsection content directly (file-references resolved by Kiro IDE)
+
+  ## Fixed
+
+  - Insights discovered before `/reflect` was executed are no longer lost - they are captured automatically
+  - Duplicate Storage Structure content removed from user guide documentation
+
 ## 1.14.0
 
 ### Minor Changes
