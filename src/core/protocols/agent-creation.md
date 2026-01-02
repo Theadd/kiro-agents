@@ -141,53 +141,69 @@ Use the template's description to generate complete agent definition following t
 
 ---
 
-## Method 2: Project-Specific (AI Analysis)
+## Method 2: Project-Specific (Architectural Analysis)
 
-### Step 2.1: Analyze Workspace
-
-```diff
-  👉 Agent Creation - Project Analysis
-  ⏳ Analyzing your workspace...
-```
-
-**Analyzing project structure and technologies...**
-
-Execute analysis:
-1. Read `package.json`, `requirements.txt`, `Cargo.toml`, etc.
-2. Scan directory structure (src/, tests/, docs/, etc.)
-3. Identify frameworks and libraries
-4. Read README.md and documentation
-5. Check for CI/CD configs, Docker files, etc.
-
-### Step 2.2: Generate Recommendations
-
-Based on analysis, generate 5-8 relevant agent suggestions.
+### Step 2.1: Deep Project Analysis
 
 ```diff
   👉 Agent Creation - Project Analysis
-  ⏳ Recommendations
+  ⏳ Performing architectural analysis (1-2 minutes)...
 ```
 
-**Based on your project (React + TypeScript + Node.js + PostgreSQL):**
+**Execute comprehensive project understanding through two complementary lenses:**
 
-**Recommended agents:**
+**1. Structural Analysis (Architectural Synthesis)**
 
-1. ⭐ **React TypeScript Specialist**
-   "Expert in React with TypeScript, hooks, component patterns, and type-safe development."
+Invoke context-gatherer subagent (or perform direct analysis if unavailable) to achieve deep architectural understanding:
+- How systems and components connect
+- Architectural patterns and boundaries
+- Integration points and dependencies
+- Where complexity concentrates
+- Gaps in the architecture (missing layers, weak coverage areas)
 
-2. ⭐ **API Developer**
-   "Specialized in Node.js backend development, RESTful APIs, Express, and database integration."
+**2. Recent Activity Analysis**
 
-3. ⭐ **Database Expert**
-   "Expert in PostgreSQL schema design, query optimization, migrations, and ORMs."
+Identify what the user has been actively working on by analyzing recently modified files in the workspace.
 
-4. **Testing Engineer**
-   "Specialized in Jest, React Testing Library, and E2E testing with Playwright."
+**Objective:** Understand the user's current development focus by examining actual file contents.
 
-5. **DevOps Engineer**
-   "Expert in Docker, CI/CD, and deployment automation for Node.js applications."
+**Constraints:**
 
-**Type number to select, or 'back' to choose different method:**
+- **NO Heuristic Shortcuts:** Derive conclusions from PRIMARY SOURCES (actual file contents), not secondary signals (commit messages, filenames, git logs). Reading a file's content is required — listing filenames is not analysis.
+
+- **NO VCS Dependency:** Use filesystem modification timestamps, not version control history. Not all projects use git.
+
+- **NO Confabulation:** Only report patterns you actually observed in file contents. Do not invent or assume what files contain.
+
+**Target:** 20-30 most recently modified source files (by filesystem modification time), excluding generated directories (node_modules, dist, build, .git, etc.).
+
+**CRITICAL:** These are OBJECTIVES with CONSTRAINTS, not checklists. The AI determines the optimal approach for THIS specific project within these boundaries.
+
+**Notes:**
+- This method leverages Kiro subagents when available (Autopilot mode)
+- In Supervised mode, AI performs direct analysis with equivalent depth
+- For minimal/new projects, AI acknowledges limited context and offers alternatives
+
+### Step 2.2: Generate Contextual Recommendations
+
+Based on architectural synthesis and recent work analysis, generate agent recommendations.
+
+```diff
+  👉 Agent Creation - Project Analysis
+  ✅ Analysis complete
+```
+
+**Each recommendation must:**
+- Address discovered architectural gaps or complexity hotspots
+- Support the user's current development focus
+- Provide specialized expertise where the codebase needs it most
+- Explain WHY it's relevant to THIS project's specific structure and patterns
+
+**Present recommendations with clear reasoning tied to:**
+- Discovered architectural patterns and gaps
+- Component relationships and integration points
+- User's recent work and current focus
+- Specific areas where specialized assistance would help
 
 ### Step 2.3: Customize and Generate
 
