@@ -177,3 +177,4 @@ powers/test-*/
 
 # Generated CLI (temporary build artifact)
 bin/cli.generated.ts
+.ai-storage/knowledge-base
