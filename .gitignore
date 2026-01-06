@@ -152,7 +152,7 @@ __*
 .rooignore
 
 # workspace steering docs
-# .kiro/steering/
+.kiro/steering/commands/
 
 # workspace agents
 .kiro/agents/
@@ -177,4 +177,3 @@ powers/test-*/
 
 # Generated CLI (temporary build artifact)
 bin/cli.generated.ts
-.ai-storage/knowledge-base
