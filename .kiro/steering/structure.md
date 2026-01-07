@@ -328,5 +328,3 @@ src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 - Session snapshots in `.kiro/session-snapshots/` (gitignored)
 - Final changesets in `.changeset/*.md` (committed)
 - Kiro hooks in `.kiro/hooks/` for slash commands
-- Documentation in `docs/VERSIONING.md`
-- Kiro hooks in `.kiro/hooks/` for slash commands

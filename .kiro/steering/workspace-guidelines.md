@@ -53,6 +53,17 @@ All `src/*.md` files require:
 3. `{{{TRIPLE_BRACES}}}` for substitutions
 4. `<alias><trigger>` XML for commands
 
+## Command Types
+
+**Kiro SLASH COMMANDS** (UI dropdown, filename without extension):
+- Manual hooks: `/snapshot` → `snapshot.kiro.hook`
+- Manual steering: `/reflect` → `reflect.md`
+
+**INSTRUCTION ALIASES** (text processing, no UI):
+- XML patterns in any loaded context, e.g. `/protocols {filename}`
+
+**Both combined:** `/agents` uses both slash command + instruction alias, but discouraged - may cause erratic behavior.
+
 ## Build System
 
 ### Build Order
@@ -92,9 +103,9 @@ bun run validate:manifest  # Manifest consistency
 
 Always use `--no-pager`:
 ```bash
-git log --no-pager
-git diff --no-pager
-git show --no-pager
+git --no-pager log
+git --no-pager diff
+git --no-pager show
 ```
 
 ## Markdown Formatting
@@ -168,3 +179,9 @@ bun run validate:powers # Power structure
 ```bash
 bun run build:powers && bun run build && bun link && kiro-agents
 ```
+
+## GitHub Issue Creation
+
+**Draft:** Concise title + brief summary (no fluff)
+**Workflow:** Preview → "go" → execute
+**Command:** `gh issue create --repo Theadd/kiro-agents --title "..." --body "..."`
