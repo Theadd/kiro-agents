@@ -243,9 +243,7 @@ No initialization required! Files created automatically when:
 
 ## Learn More
 
-- **README:** `.ai-storage/README.md` - Complete system documentation
 - **Curator Agent:** `{{{WS_AGENTS_PATH}}}/reflection-curator.md`
-- **Proposal:** `proposals/ai-managed-storage-and-reflection-system-v2.md`
 
 ---
 
