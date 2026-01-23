@@ -272,28 +272,13 @@ src/core/aliases.md                → build/npm/dist/aliases.md
 src/core/agents.md                 → build/npm/dist/agents.md
 src/kiro/steering/modes.md         → build/npm/dist/modes.md
 src/core/strict.md                 → build/npm/dist/strict.md
+src/core/reflect.md                → build/npm/dist/reflect.md
 
 # Power files (copied from powers/)
 powers/kiro-protocols/POWER.md     → build/npm/power/POWER.md
 powers/kiro-protocols/mcp.json     → build/npm/power/mcp.json
 powers/kiro-protocols/icon.png     → build/npm/power/icon.png
 powers/kiro-protocols/steering/*   → build/npm/power/steering/*
-src/core/protocols/strict-mode.md  → build/npm/dist/protocols/strict-mode.md
-src/core/protocols/agent-activation.md → build/npm/dist/protocols/agent-activation.md
-src/core/protocols/agent-management.md → build/npm/dist/protocols/agent-management.md
-src/core/protocols/agent-creation.md   → build/npm/dist/protocols/agent-creation.md
-src/core/protocols/reflect-agent-insights.md → build/npm/dist/protocols/reflect-agent-insights.md
-src/core/protocols/reflect-review-workflow.md → build/npm/dist/protocols/reflect-review-workflow.md
-src/core/protocols/reflect-curator-checklist.md → build/npm/dist/protocols/reflect-curator-checklist.md
-src/core/protocols/reflect-manager-workflow.md → build/npm/dist/protocols/reflect-manager-workflow.md
-src/kiro/steering/protocols/mode-switching.md → build/npm/dist/protocols/mode-switching.md
-src/kiro/steering/protocols/mode-management.md → build/npm/dist/protocols/mode-management.md
-src/core/interactions/conversation-language.md → build/npm/dist/interactions/conversation-language.md
-src/core/interactions/interaction-styles.md → build/npm/dist/interactions/interaction-styles.md
-src/kiro/steering/protocols/kiro-spec-mode.md     → build/npm/dist/modes/kiro-spec-mode.md
-src/kiro/steering/protocols/kiro-vibe-mode.md     → build/npm/dist/modes/kiro-vibe-mode.md
-src/kiro/.../kiro-as-spec-mode.md  → build/npm/dist/modes/kiro-as-spec-mode.md
-src/kiro/.../kiro-as-vibe-mode.md  → build/npm/dist/modes/kiro-as-vibe-mode.md
 ```
 
 ## Conventions
