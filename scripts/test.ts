@@ -127,6 +127,7 @@ async function testNpmBuild() {
     "build/npm/dist/agents.md",
     "build/npm/dist/modes.md",
     "build/npm/dist/strict.md",
+    "build/npm/dist/reflect.md",
   ];
   
   let missingFiles = 0;
@@ -176,19 +177,25 @@ async function testNpmBuild() {
  * **Validation Steps:**
  * 1. Check POWER.md exists and has valid frontmatter
  * 2. Verify mcp.json is valid JSON
- * 3. Validate protocol files present
+ * 3. Validate protocol files present (16 total protocols)
  * 4. Check for unprocessed substitutions
  * 5. Verify frontmatter in protocol files
  * 
  * **Expected Structure:**
  * - `build/npm/power/POWER.md` - Power metadata with frontmatter
  * - `build/npm/power/mcp.json` - Valid JSON structure
- * - `build/npm/power/steering/*.md` - Protocol files with frontmatter
+ * - `build/npm/power/steering/*.md` - Protocol files with frontmatter (16 protocols)
+ * 
+ * **Protocol Categories:**
+ * - Core protocols: strict-mode, chit-chat, agent-activation, agent-creation, agent-management
+ * - Mode protocols: mode-switching, mode-management, kiro-vibe-mode, kiro-spec-mode, kiro-as-vibe-mode, kiro-as-spec-mode
+ * - Reflection protocols: explainability-protocol, reflect-agent-insights, reflect-review-workflow, reflect-curator-checklist, reflect-manager-workflow
  * 
  * @example
  * ```typescript
  * await testPowerBuild();
  * // Validates build/npm/power/ directory structure and content
+ * // Checks all 16 protocol files are present
  * ```
  */
 async function testPowerBuild() {
@@ -221,7 +228,7 @@ async function testPowerBuild() {
     mcpValid ? "mcp.json is valid JSON" : "mcp.json invalid or missing"
   );
   
-  // Check protocol files exist (power contains protocols from kiro-protocols power)
+  // Check protocol files exist (16 total: 5 core + 6 mode + 5 reflection protocols from kiro-protocols power)
   const protocolFiles = [
     "build/npm/power/steering/strict-mode.md",
     "build/npm/power/steering/chit-chat.md",
@@ -234,6 +241,11 @@ async function testPowerBuild() {
     "build/npm/power/steering/kiro-spec-mode.md",
     "build/npm/power/steering/kiro-as-vibe-mode.md",
     "build/npm/power/steering/kiro-as-spec-mode.md",
+    "build/npm/power/steering/explainability-protocol.md",
+    "build/npm/power/steering/reflect-agent-insights.md",
+    "build/npm/power/steering/reflect-review-workflow.md",
+    "build/npm/power/steering/reflect-curator-checklist.md",
+    "build/npm/power/steering/reflect-manager-workflow.md",
   ];
   
   let missingFiles = 0;

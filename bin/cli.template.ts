@@ -283,6 +283,41 @@ async function extractPowerMetadata(powerMdPath: string): Promise<PowerMetadata>
 }
 
 /**
+ * Recursively copies a file or directory.
+ * 
+ * Used as fallback when symbolic links cannot be created (e.g., Windows without admin).
+ * Preserves directory structure and copies all files recursively.
+ * 
+ * @param src - Source path (file or directory)
+ * @param dest - Destination path
+ * 
+ * @example
+ * ```typescript
+ * await copyRecursive('/source/dir', '/dest/dir');
+ * // Copies all files and subdirectories
+ * ```
+ */
+async function copyRecursive(src: string, dest: string): Promise<void> {
+  const { stat, readdir, mkdir, copyFile } = await import("fs/promises");
+  
+  const stats = await stat(src);
+  
+  if (stats.isDirectory()) {
+    // Create destination directory
+    await mkdir(dest, { recursive: true });
+    
+    // Copy all entries recursively
+    const entries = await readdir(src);
+    for (const entry of entries) {
+      await copyRecursive(join(src, entry), join(dest, entry));
+    }
+  } else {
+    // Copy file
+    await copyFile(src, dest);
+  }
+}
+
+/**
  * Creates symbolic links in installed/ directory pointing to power files.
  * 
  * Kiro IDE expects installed powers to be in ~/.kiro/powers/installed/{power-name}/
@@ -292,26 +327,31 @@ async function extractPowerMetadata(powerMdPath: string): Promise<PowerMetadata>
  * 1. Removes existing installed directory if present
  * 2. Creates new installed directory
  * 3. Creates symbolic links for each file and directory in power directory
+ * 4. Falls back to copying files if symlink creation fails (Windows without admin)
  * 
  * Platform-specific behavior:
- * - Windows: Uses junction for directories, symlink for files
+ * - Windows: Uses junction for directories, symlink for files (requires admin)
+ * - Windows fallback: Copies files if symlink fails (no admin required)
  * - Unix: Uses symbolic links for both files and directories
  * 
- * @throws {Error} If symbolic link creation fails
+ * @returns Number of warnings encountered (0 = success, >0 = partial success)
  * 
  * @example
  * ```typescript
- * await createSymbolicLinks();
+ * const warnings = await createSymbolicLinks();
  * // Creates ~/.kiro/powers/installed/kiro-protocols/ with symlinks to:
  * // - POWER.md -> ../../kiro-protocols/POWER.md
  * // - mcp.json -> ../../kiro-protocols/mcp.json
  * // - icon.png -> ../../kiro-protocols/icon.png
  * // - steering/ -> ../../kiro-protocols/steering/
+ * // Or copies files if symlink fails
  * ```
  */
-async function createSymbolicLinks(): Promise<void> {
+async function createSymbolicLinks(): Promise<number> {
   const { readdir, mkdir, symlink, rm, stat } = await import("fs/promises");
   const { platform } = await import("os");
+  
+  let warningCount = 0;
   
   // Remove existing installed directory
   if (existsSync(POWER_INSTALLED_DIR)) {
@@ -345,9 +385,18 @@ async function createSymbolicLinks(): Promise<void> {
       
       console.log(`✅ Linked: ${entry}`);
     } catch (error) {
-      console.warn(`⚠️  Could not link ${entry}:`, error instanceof Error ? error.message : error);
+      // Fallback to copying if symlink fails (Windows without admin)
+      try {
+        await copyRecursive(sourcePath, targetPath);
+        console.log(`📋 Copied: ${entry} (symlink not available)`);
+      } catch (copyError) {
+        console.warn(`⚠️  Could not link or copy ${entry}:`, error instanceof Error ? error.message : error);
+        warningCount++;
+      }
     }
   }
+  
+  return warningCount;
 }
 
 /**
@@ -371,16 +420,16 @@ async function createSymbolicLinks(): Promise<void> {
  * - Repo source uses stable ID "local-kiro-protocols" (no timestamp)
  * - Source type is "repo" (not "local") for proper UI integration
  * 
- * @throws {Error} If POWER.md is missing or has invalid frontmatter
+ * @returns True if successful, false if failed
  * 
  * @example
  * ```typescript
- * await registerPowerInRegistry();
+ * const success = await registerPowerInRegistry();
  * // Power registered in registry.json
  * // Appears as installed in Kiro Powers UI
  * ```
  */
-async function registerPowerInRegistry(): Promise<void> {
+async function registerPowerInRegistry(): Promise<boolean> {
   const { readFile, writeFile, mkdir } = await import("fs/promises");
   
   // Ensure registry directory exists
@@ -445,6 +494,7 @@ async function registerPowerInRegistry(): Promise<void> {
   await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2), "utf-8");
   
   console.log("✅ Power registered in Kiro registry");
+  return true;
 }
 
 /**
@@ -524,6 +574,8 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
  * - sourcePath points to actual power directory
  * - Power appears as "installed" in Powers UI
  * 
+ * Tracks errors and warnings to provide accurate installation status.
+ * 
  * @throws {Error} If installation fails (caught by main execution handler)
  * 
  * @example
@@ -535,6 +587,9 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
  */
 async function install(): Promise<void> {
   console.log("🚀 Installing kiro-agents system...\n");
+  
+  let hasErrors = false;
+  let hasWarnings = false;
   
   // Install steering files
   console.log("📄 Installing steering files to ~/.kiro/steering/kiro-agents/");
@@ -563,24 +618,41 @@ async function install(): Promise<void> {
   // Create symbolic links in installed/ directory
   console.log("\n🔗 Creating symbolic links in installed/ directory...");
   try {
-    await createSymbolicLinks();
+    const symlinkWarnings = await createSymbolicLinks();
+    if (symlinkWarnings > 0) {
+      hasWarnings = true;
+    }
   } catch (error) {
     console.warn("⚠️  Warning: Could not create symbolic links:", error instanceof Error ? error.message : error);
     console.warn("   Power may not appear correctly in Kiro Powers UI.");
+    hasWarnings = true;
   }
   
   // Register power in Kiro registry
   console.log("\n📝 Registering power in Kiro registry...");
   try {
-    await registerPowerInRegistry();
+    const registrySuccess = await registerPowerInRegistry();
+    if (!registrySuccess) {
+      hasWarnings = true;
+    }
   } catch (error) {
     console.warn("⚠️  Warning: Could not register power in registry:", error instanceof Error ? error.message : error);
     console.warn("   The power files are installed but may not appear in Kiro Powers UI.");
     console.warn("   You can manually add the power via: Powers panel → Add Repository → Local Directory");
     console.warn(`   Path: ${POWER_INSTALL_DIR}`);
+    hasWarnings = true;
   }
   
-  console.log("\n✨ Installation completed successfully!");
+  // Final status message
+  if (hasErrors) {
+    console.log("\n❌ Installation completed with errors!");
+  } else if (hasWarnings) {
+    console.log("\n⚠️  Installation completed with warnings!");
+    console.log("   Core files installed successfully, but some optional features may not work.");
+  } else {
+    console.log("\n✨ Installation completed successfully!");
+  }
+  
   console.log(`\n📁 Steering files: ${STEERING_INSTALL_DIR}`);
   console.log(`📁 Power files: ${POWER_INSTALL_DIR}`);
   console.log(`📁 Installed links: ${POWER_INSTALLED_DIR}`);
