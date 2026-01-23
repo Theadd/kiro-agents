@@ -367,6 +367,44 @@ async function buildCLI(): Promise<void> {
 
 
 /**
+ * Builds powers from source protocols during npm build.
+ * 
+ * Executes `build-powers.ts` to generate all protocol files from `src/` before
+ * copying to npm distribution. Ensures npm package includes complete protocol
+ * library without committing generated files to git.
+ * 
+ * **Strategy benefits:**
+ * - Single source of truth: `src/core/protocols/` and `src/kiro/steering/protocols/`
+ * - Clean git history: No generated file diffs in commits
+ * - Protection maintained: gitignore + CI validation prevent manual edits
+ * - Complete package: All 16 protocols included in npm distribution
+ * 
+ * @throws Error if power build fails (non-zero exit code)
+ * 
+ * @example Build powers during npm build
+ * ```typescript
+ * await buildPowersFromSource();
+ * // Generates all 16 protocols to powers/kiro-protocols/steering/
+ * // Ready for copyPowerFiles() to include in npm package
+ * ```
+ * 
+ * @see scripts/build-powers.ts - Protocol generation script with manifest auto-discovery
+ * @see copyPowerFiles - Copies generated protocols to build/npm/power/
+ */
+async function buildPowersFromSource(): Promise<void> {
+  const { spawnSync } = await import("child_process");
+  
+  const result = spawnSync("bun", ["run", "scripts/build-powers.ts"], {
+    stdio: "inherit",
+    shell: true,
+  });
+  
+  if (result.status !== 0) {
+    throw new Error("Power build failed");
+  }
+}
+
+/**
  * Copies power files to npm distribution using manifest.
  * 
  * Copies pre-built power files from `powers/kiro-protocols/` directory to `build/npm/power/`
@@ -414,28 +452,30 @@ async function copyPowerFiles(): Promise<void> {
  * Builds npm package distribution using manifest.
  * 
  * Compiles CLI tool with embedded file lists and processes all steering files with substitutions.
+ * Builds powers from source to generate fresh protocols, then copies to npm distribution.
  * Output goes to `build/npm/` which is included in npm package then cleaned.
  * The CLI handles power installation and `registry.json` registration during user installation.
  * 
  * Uses `STEERING_MAPPINGS` from manifest to discover files (mix of explicit paths and glob patterns).
  * This ensures consistency with dev mode and CLI installation.
  * 
- * **Note:** Protocol files are NOT in steering mappings. They are distributed exclusively
- * through the kiro-protocols Power (copied from `powers/kiro-protocols/`) and loaded
- * on-demand via kiroPowers tool.
+ * **Note:** Protocol files are NOT in steering mappings. They are generated fresh during build
+ * via `buildPowersFromSource()`, then copied from `powers/kiro-protocols/` to npm distribution.
+ * This maintains protection strategy (gitignore + CI validation) while ensuring complete distribution.
  * 
  * **Build Steps:**
  * 1. Compile CLI with embedded file lists from manifest
  * 2. Expand steering mappings with glob resolution (excludes protocols)
  * 3. Process steering files with substitutions
- * 4. Copy power files from `powers/kiro-protocols/` to `build/npm/power/`
+ * 4. Build powers from source (generates all 16 protocols)
+ * 5. Copy power files from `powers/kiro-protocols/` to `build/npm/power/`
  * 
  * @param config - Configuration with substitution functions
  * 
  * @example Build npm distribution
  * ```typescript
  * await buildNpm(config);
- * // Creates build/npm/bin/cli.js, build/npm/dist/*.md, and build/npm/power/*
+ * // Creates build/npm/bin/cli.js, build/npm/dist/*.md, and build/npm/power/* (with all 16 protocols)
  * ```
  */
 async function buildNpm(config: Config): Promise<void> {
@@ -456,7 +496,11 @@ async function buildNpm(config: Config): Promise<void> {
     await buildFile(srcPath, destPath, config.substitutions, { target: "npm" });
   }
   
-  // Copy power files
+  // Build powers from source before copying (Option B: generate fresh protocols)
+  console.log("\n🔨 Building powers from source...\n");
+  await buildPowersFromSource();
+  
+  // Copy power files (now includes all 16 protocols)
   await copyPowerFiles();
   
   console.log("\n✅ npm distribution built in build/npm/");
