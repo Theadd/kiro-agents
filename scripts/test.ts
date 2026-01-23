@@ -4,22 +4,22 @@
  * 
  * Validates npm and Power distributions by checking file existence, substitution
  * processing, frontmatter validity, and structural integrity. Automatically builds
- * npm distribution in no-clean mode to preserve artifacts for inspection.
+ * npm distribution in npm-no-clean mode to preserve artifacts for inspection.
  * 
  * **Test Coverage:**
  * - npm build: CLI compilation, file mappings, substitution processing
  * - Power build: POWER.md structure, mcp.json validity, steering frontmatter
  * - Dev mode: Optional check for user directory installation
  * 
- * **Usage:**
+ * **Exit Codes:**
+ * - 0: All tests passed
+ * - 1: Build failed or tests failed
+ * 
+ * @example Run test suite
  * ```bash
  * bun run test
  * # Builds npm distribution, validates both npm and Power builds
  * ```
- * 
- * **Exit Codes:**
- * - 0: All tests passed
- * - 1: Build failed or tests failed
  * 
  * @see scripts/build.ts - Build system that creates artifacts tested here
  */
@@ -72,7 +72,7 @@ function test(name: string, passed: boolean, message: string) {
 /**
  * Validates npm distribution build artifacts.
  * 
- * Automatically builds npm distribution in no-clean mode (preserves artifacts),
+ * Automatically builds npm distribution in npm-no-clean mode (preserves artifacts),
  * then validates CLI compilation, file mappings, and substitution processing.
  * Skips validation if build fails.
  * 
@@ -88,7 +88,7 @@ function test(name: string, passed: boolean, message: string) {
  * 
  * **Note:** Mode definitions (kiro-spec-mode.md, kiro-vibe-mode.md, etc.) are
  * distributed via kiro-protocols Power, not npm dist. They're validated in
- * testPowerBuild() instead.
+ * `testPowerBuild()` instead.
  * 
  * @example
  * ```typescript
@@ -102,7 +102,7 @@ async function testNpmBuild() {
   console.log("\n📦 Testing npm build...\n");
   
   // Build with npm-no-clean to preserve artifacts for testing
-  console.log("🔨 Building npm distribution (no-clean mode)...\n");
+  console.log("🔨 Building npm distribution (npm-no-clean mode)...\n");
   const buildResult = spawnSync(["bun", "run", "scripts/build.ts", "npm-no-clean"]);
   
   if (buildResult.exitCode !== 0) {

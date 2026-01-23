@@ -3,7 +3,7 @@
  * Automated release workflow for publishing to npm and GitHub.
  * 
  * Consumes changesets, bumps version, updates CHANGELOG, publishes to npm,
- * and pushes tags to GitHub. Must be run from main branch by maintainers.
+ * and pushes tags to GitHub. Must be run from main branch by maintainers only.
  * 
  * **Prerequisites:**
  * - On main/master branch
@@ -14,28 +14,32 @@
  * **Workflow:**
  * 1. Validates branch and changesets
  * 2. Consumes changesets and bumps version
- * 3. Builds package (npm mode without cleanup)
+ * 3. Builds package (npm-no-clean mode preserves artifacts for publish)
  * 4. Commits version bump
  * 5. Publishes to npm
  * 6. Pushes to GitHub with tags
  * 
- * @example
+ * **Critical Distinction:** Maintainers only. Contributors use `/finalize` to
+ * create changesets, maintainers use `/release` to publish.
+ * 
+ * @example Via npm script
  * ```bash
- * # Via npm script
  * bun run release
+ * ```
  * 
- * # Via Kiro hook
+ * @example Via Kiro hook
+ * ```bash
  * /release
+ * ```
  * 
- * # Direct execution
+ * @example Direct execution
+ * ```bash
  * bun run scripts/release.ts
  * ```
  * 
- * **Critical Distinction:** This is for maintainers only. Contributors use
- * `/finalize` to create changesets, maintainers use `/release` to publish.
- * 
  * @see scripts/finalize.ts - For creating changesets from feature branches
- * @see docs/VERSIONING.md - Complete versioning workflow documentation
+ * @see scripts/build.ts - Build system with npm-no-clean target for releases
+ * @see docs/contributing/VERSIONING.md - Complete versioning workflow documentation
  */
 import { execSync } from "child_process";
 import { readFileSync } from "fs";
@@ -96,7 +100,7 @@ async function main() {
   const newVersion = newPkg.version;
   console.log(`\n✅ Version bumped: ${currentVersion} → ${newVersion}\n`);
   
-  // Step 2: Build (without cleanup for npm publish)
+  // Step 2: Build (npm-no-clean preserves artifacts for npm publish)
   console.log("🔨 Step 2: Building package...");
   try {
     // Build npm package with npm-no-clean mode (preserves artifacts for npm publish)

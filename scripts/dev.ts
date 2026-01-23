@@ -23,8 +23,8 @@
  * # Press Ctrl-C to stop both
  * ```
  * 
- * @see scripts/build.ts - Steering files build system with dev mode
- * @see scripts/dev-powers.ts - Powers build system with dev mode
+ * @see scripts/build.ts - Steering files build system with dev:agents mode
+ * @see scripts/dev-powers.ts - Powers build system with dev:powers mode
  */
 
 /**

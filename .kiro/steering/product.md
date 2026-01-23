@@ -268,15 +268,15 @@ npx kiro-agents  # or bunx kiro-agents
 
 **Workflow**:
 - **Contributors**: Modify `src/core/protocols/` or `src/kiro/steering/protocols/` only
-- **Build System**: Run `bun run build:powers` to regenerate `powers/*/steering/` using manifest auto-discovery
-- **Maintainers**: Commit regenerated steering files after validating changes
-- **Release**: `bun run release` publishes npm package with pre-built power files
+- **npm Build**: Automatically runs `bun run build:powers` to generate fresh protocols during build
+- **Distribution**: npm package includes all 16 protocols (generated during build, not committed)
+- **Local Dev**: Run `bun run dev:powers` to test protocol changes
 
 **Benefits**:
 - Single source of truth for protocol content
 - Prevents manual edits to generated files
-- Clear separation between source and distribution
-- Maintainers control when powers are regenerated
+- Clean git history (no generated file diffs)
+- npm package always complete (all protocols generated fresh)
 
 ### Versioning Rules
 

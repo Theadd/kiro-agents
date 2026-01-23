@@ -53,6 +53,8 @@ All `src/*.md` files require:
 3. `{{{TRIPLE_BRACES}}}` for substitutions
 4. `<alias><trigger>` XML for commands
 
+**Lists with ranges:** Use unordered bullets with key in backticks (e.g., - `1-8.` Text). Numbered ranges break markdown rendering. Maintain standard numbering for strictly sequential lists.
+
 ## Command Types
 
 **Kiro SLASH COMMANDS** (UI dropdown, filename without extension):
