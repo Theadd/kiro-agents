@@ -177,7 +177,7 @@ kiro-agents/
 ✅ **Required:**
 - Use substitutions: `{{{WS_AGENTS_PATH}}}`, `{{{INITIAL_AGENT_NAME}}}`
 - Generic terminology: "IDE" instead of "Kiro IDE"
-- Generic paths: `.ai-agents/agents` (base) → `.kiro/agents` (Kiro override)
+- Generic paths: `.ai-agents/agents` (base) → `.kiro/kiro-agents` (Kiro override)
 
 ## Versioning System
 

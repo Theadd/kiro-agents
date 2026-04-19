@@ -127,7 +127,7 @@ You can create as many agents as you need:
 3. Choose your preferred creation method
 4. Repeat for each agent
 
-All agents are saved in `.kiro/agents/` and available across sessions.
+All agents are saved in `.kiro/kiro-agents/` and available across sessions.
 
 ### Refining Agents
 
@@ -225,7 +225,7 @@ Use strict mode for:
 **Agent not activating?**
 - Check the agent name: `/agents {exact-name}`
 - Use `/agents` to see available agents
-- Verify agent file exists in `.kiro/agents/`
+- Verify agent file exists in `.kiro/kiro-agents/`
 
 **Want to start over?**
 - Type `/agents`

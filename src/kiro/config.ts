@@ -38,13 +38,17 @@ function getVersion(): string {
 }
 
 /**
- * Scans `.kiro/agents/` for agent definitions (fallback message if directory missing).
+ * Scans `.kiro/kiro-agents/` for agent definitions (fallback message if directory missing).
  * 
- * @returns Markdown bullet list of agent names without .md extension
+ * Reads workspace-level agent `.md` files from `.kiro/kiro-agents/` and formats them
+ * as a markdown bullet list for injection into steering documents via `{{{AGENT_LIST}}}`.
+ * 
+ * @returns Markdown bullet list of agent names (without `.md` extension), or default
+ *   fallback `"- kiro-master (auto-created on first use)"` if directory is absent or empty
  */
 function getAgentList(): string {
   try {
-    const agentsDir = ".kiro/agents";
+    const agentsDir = ".kiro/kiro-agents";
     const files = readdirSync(agentsDir);
     const agents = files
       .filter(f => f.endsWith(".md"))
@@ -121,7 +125,7 @@ const getSteeringsPath = (target: string) => {
  * **Agent system overrides:**
  * - Can override `WS_AGENTS_PATH`, `INITIAL_AGENT_NAME`, `INITIAL_AGENT_DESCRIPTION` if Kiro needs different values
  * - Base config provides cross-IDE defaults (`.ai-agents/agents`, `project-master`)
- * - Kiro typically uses `.kiro/agents/` and `kiro-master` instead
+ * - Kiro typically uses `.kiro/kiro-agents/` and `kiro-master` instead
  * 
  * @see src/config.ts - Base substitutions with all required keys
  * @see scripts/build.ts - Multi-pass substitution processor
@@ -145,7 +149,9 @@ export const substitutions = {
   '{{{PROTOCOLS_PATH}}}': ({ target }: any) => getSteeringsPath(target) + '/protocols',
   '{{{KIRO_PROTOCOLS_PATH}}}': ({ target }: any) => getSteeringsPath(target) + '/protocols',
   /** Override workspace agents path for Kiro */
-  '{{{WS_AGENTS_PATH}}}': () => '.kiro/agents',
+  '{{{WS_AGENTS_PATH}}}': () => '.kiro/kiro-agents',
+  /** Global (user-level) agents path for Kiro */
+  '{{{GLOBAL_AGENTS_PATH}}}': () => '~/.kiro/kiro-agents',
   /** Override initial agent name for Kiro */
   '{{{INITIAL_AGENT_NAME}}}': () => 'kiro-master',
   /** Override initial agent description for Kiro */

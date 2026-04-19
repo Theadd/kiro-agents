@@ -156,6 +156,10 @@ __*
 
 # workspace agents
 .kiro/agents/
+.kiro/kiro-agents/
+
+# workspace settings
+.kiro/settings/mcp.json
 
 # Changeset snapshots (temporary session data)
 .kiro/session-snapshots/

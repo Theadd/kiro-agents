@@ -66,8 +66,8 @@
 - Executable via `npx` and `bunx`
 - Dual installation: steering files + kiro-protocols power
 - Installs to: `~/.kiro/steering/kiro-agents/` and `~/.kiro/powers/kiro-protocols/`
-- Creates symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
-- Automatic power registration in `~/.kiro/powers/registry.json`
+- Copies power files physically to `~/.kiro/powers/installed/kiro-protocols/`
+- Automatic power registration in `~/.kiro/powers/installed.json` and `registries/user-added.json`
 - Power appears immediately as "installed" in Kiro Powers UI
 - Cross-platform CLI tool
 - Removes old installation before installing new

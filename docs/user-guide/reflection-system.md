@@ -518,7 +518,7 @@ Create custom agent categories in agent definitions to organize category-tier in
 
 ## Learn More
 
-- **Curator Agent:** `.kiro/agents/reflection-curator.md` - Full agent definition
+- **Curator Agent:** `.kiro/kiro-agents/reflection-curator.md` - Full agent definition
 - **Protocols:** `~/.kiro/powers/kiro-protocols/steering/reflect-*.md` - Detailed workflows
 - **Proposal:** `proposals/ai-managed-storage-and-reflection-system-v2.md` - Design rationale
 

@@ -4,17 +4,23 @@ kiro-agents uses a dual-distribution architecture that installs both steering fi
 
 ## Installation Targets
 
-**Steering files** → `~/.kiro/steering/kiro-agents/`
+**Steering files** → `~/.kiro/steering/kiro-agents/` (read-only)
 - Core system files providing foundational kiro-agents functionality
 - Instruction aliases, agent management, mode switching, strict mode control
 - Interactive interfaces (agents.md, modes.md, strict.md, reflect.md)
 - Interaction patterns and mode definitions
 
-**Power dependency** → `~/.kiro/powers/kiro-protocols/`
+**Power source** → `~/.kiro/powers/kiro-protocols/` (writable)
 - POWER.md (power metadata)
 - mcp.json (empty MCP config)
 - icon.png (power icon)
 - steering/ (reusable protocols)
+- Kept writable so Kiro IDE can read it as a source directory
+
+**Power installed** → `~/.kiro/powers/installed/kiro-protocols/` (read-only)
+- Physical copy of power files (no symlinks)
+- Where Kiro IDE reads the power from at runtime
+- Does not include icon.png (Kiro IDE skips it during install)
 
 ## Why This Architecture?
 
@@ -25,6 +31,10 @@ The kiro-protocols power contains reusable protocol files referenced by steering
 - Independent updates
 - Reusability across projects
 - Automatic registration in Kiro's power system
+
+The two-directory approach (`kiro-protocols/` + `installed/kiro-protocols/`) mirrors exactly what Kiro IDE does when a user installs a power via "Add Custom Power" UI:
+- `kiro-protocols/` acts as the registered source (equivalent to the local path the user provides in the UI)
+- `installed/kiro-protocols/` is the physical copy Kiro IDE creates and reads from at runtime
 
 ## Build Process
 
@@ -55,64 +65,64 @@ bun run build
 When user runs `npx kiro-agents`:
 
 1. **Remove old installations** (if present)
-2. **Install steering files** to `~/.kiro/steering/kiro-agents/`
-3. **Install power files** to `~/.kiro/powers/kiro-protocols/`
-4. **Create symbolic links** in `~/.kiro/powers/installed/kiro-protocols/`
-5. **Register power** in `~/.kiro/powers/registry.json`
+2. **Install steering files** to `~/.kiro/steering/kiro-agents/` (read-only)
+3. **Install power source files** to `~/.kiro/powers/kiro-protocols/` (writable)
+4. **Copy power files** to `~/.kiro/powers/installed/kiro-protocols/` (read-only physical copy)
+5. **Register power** in `~/.kiro/powers/installed.json` and `~/.kiro/powers/registries/user-added.json`
 6. **Show success message**
 
 ## Automatic Power Registration
 
-The CLI automatically registers kiro-protocols in Kiro's registry following the exact pattern used by Kiro IDE:
+The CLI registers kiro-protocols by writing to the two files Kiro IDE uses to track installed custom powers:
 
+**`~/.kiro/powers/installed.json`**
 ```json
 {
-  "powers": {
-    "kiro-protocols": {
-      "installed": true,
-      "installedAt": "2025-12-16T...",
-      "installPath": "~/.kiro/powers/installed/kiro-protocols",
-      "source": {
-        "type": "repo",
-        "repoId": "local-kiro-protocols",
-        "repoName": "~/.kiro/powers/kiro-protocols"
-      },
-      "sourcePath": "~/.kiro/powers/kiro-protocols"
-    }
-  },
-  "repoSources": {
-    "local-kiro-protocols": {
-      "name": "~/.kiro/powers/kiro-protocols",
-      "type": "local",
-      "enabled": true,
-      "path": "~/.kiro/powers/kiro-protocols",
-      "powerCount": 1
-    }
-  }
+  "version": "1.0.0",
+  "installedPowers": [
+    { "name": "kiro-protocols", "registryId": "user-added" }
+  ],
+  "dismissedAutoInstalls": []
 }
 ```
 
-**Key features:**
-- Uses stable repo ID `"local-kiro-protocols"` (no timestamp conflicts)
-- `installPath` points to `installed/` directory with symlinks
-- `sourcePath` points to actual power directory
-- Power appears immediately as "installed" in Kiro Powers UI
+**`~/.kiro/powers/registries/user-added.json`**
+```json
+{
+  "powers": [
+    {
+      "name": "kiro-protocols",
+      "description": "Custom power from ~/.kiro/powers/kiro-protocols",
+      "source": {
+        "type": "local",
+        "path": "~/.kiro/powers/kiro-protocols"
+      }
+    }
+  ]
+}
+```
+
+**Key points:**
+- Both files are merged with existing content (other installed powers are preserved)
+- `registry.json` is NOT modified — that file is the marketplace catalog managed by Kiro IDE
+- The `source.path` points to `kiro-protocols/` (writable source), not `installed/kiro-protocols/`
 
 ### Implementation Details
 
-**Symbolic Links** (`createSymbolicLinks()`)
-- Creates `installed/kiro-protocols/` directory
-- Links each file and directory from power
-- Platform-specific: Windows uses junction for directories, symlink for files
+**Physical file copy** (`installPowerFiles()`)
+- Removes existing `installed/kiro-protocols/` for clean install
+- Copies all files from `kiro-protocols/` to `installed/kiro-protocols/`
+- Excludes `icon.png` (Kiro IDE does not copy it)
+- Sets all copied files to read-only
 
-**Registry Registration** (`registerPowerInRegistry()`)
-- Extracts metadata from POWER.md frontmatter
-- Creates/updates registry entries
-- Graceful error handling (non-blocking)
+**Registry registration** (`registerPower()`)
+- Reads and merges `installed.json` and `registries/user-added.json`
+- Extracts power name/description from POWER.md frontmatter
+- Graceful error handling (non-blocking — warns but continues)
 
 **Error Handling:**
-- Registry registration errors logged as warnings
-- Installation continues even if registration fails
+- Copy/registration errors logged as warnings
+- Installation continues even if these steps fail
 - User gets manual activation instructions as fallback
 
 ## Testing
@@ -129,9 +139,11 @@ kiro-agents
 # Verify installations
 ls ~/.kiro/steering/kiro-agents/
 ls ~/.kiro/powers/kiro-protocols/
+ls ~/.kiro/powers/installed/kiro-protocols/
 
 # Verify registry
-cat ~/.kiro/powers/registry.json | grep -A 10 "kiro-protocols"
+cat ~/.kiro/powers/installed.json
+cat ~/.kiro/powers/registries/user-added.json
 
 # Check Kiro Powers UI
 # Should see "kiro-protocols" with "Installed" badge

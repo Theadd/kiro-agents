@@ -45,7 +45,8 @@ ls ~/.kiro/steering/kiro-agents/
 ls ~/.kiro/powers/kiro-protocols/
 
 # Check registry
-cat ~/.kiro/powers/registry.json | grep "kiro-protocols"
+cat ~/.kiro/powers/installed.json
+cat ~/.kiro/powers/registries/user-added.json
 ```
 
 ### Testing Power in Kiro IDE
@@ -122,5 +123,5 @@ Test on:
 Verify:
 - File permissions set correctly
 - Paths resolve properly
-- Symbolic links created
-- Registry registration works
+- Physical file copy to installed/ works
+- Registry registration works (installed.json + user-added.json)

@@ -528,7 +528,7 @@ async function analyzePhase() {
  * files, attempted features that were reverted).
  * 
  * **How It Works:**
- * 1. Extracts all path-like patterns from changeset (e.g., `docs/__internal/`, `.kiro/agents/`)
+ * 1. Extracts all path-like patterns from changeset (e.g., `docs/__internal/`, `.kiro/kiro-agents/`)
  * 2. Gets actual changed files from git diff
  * 3. Cross-references each path against actual files
  * 4. Reports any paths that don't exist in the commit
@@ -558,7 +558,7 @@ function validateChangesetAgainstDiff(changesetFile: string): { valid: boolean; 
   const errors: string[] = [];
 
   // Extract all file/directory references from changeset
-  // Look for common patterns: `path/to/file`, docs/__internal/, .kiro/agents/, etc.
+  // Look for common patterns: `path/to/file`, docs/__internal/, .kiro/kiro-agents/, etc.
   const pathPattern = /`([^`]+\/[^`]+)`|([a-zA-Z0-9_-]+\/[a-zA-Z0-9_\/-]+)/g;
   const matches = content.matchAll(pathPattern);
 
