@@ -3,7 +3,7 @@
  * kiro-agents CLI installer
  * 
  * Dual-installation system that installs both steering documents and kiro-protocols power
- * to user's home directory. Automatically registers power in Kiro's registry for immediate use.
+ * to user's home directory. Automatically registers power for immediate use in Kiro IDE.
  * Removes old installations before installing new versions.
  * 
  * **File Lists Generated from Manifest:**
@@ -11,13 +11,14 @@
  * to ensure consistency across all build targets (npm, dev, cli).
  * 
  * Installation targets:
- * - Steering: ~/.kiro/steering/kiro-agents/ (core system files)
- * - Power: ~/.kiro/powers/kiro-protocols/ (protocol library power)
- * - Symlinks: ~/.kiro/powers/installed/kiro-protocols/ (points to power files)
- * - Registry: ~/.kiro/powers/registry.json (automatic registration)
+ * - Steering: ~/.kiro/steering/kiro-agents/ (core system files, read-only)
+ * - Power source: ~/.kiro/powers/kiro-protocols/ (protocol library, writable — used as source by Kiro IDE)
+ * - Power installed: ~/.kiro/powers/installed/kiro-protocols/ (physical copy — used by Kiro IDE at runtime)
+ * - Registry: ~/.kiro/powers/installed.json + ~/.kiro/powers/registries/user-added.json
  * 
- * The CLI installs power files and registers them in registry.json following Kiro's
- * exact pattern for local power installations. Power appears as "installed" in Powers UI.
+ * The CLI replicates exactly what Kiro IDE does when a user installs a power via
+ * "Add Custom Power" in the Powers UI. Power appears as "installed" in Powers UI
+ * immediately after running npx kiro-agents.
  * 
  * @example
  * ```bash
@@ -42,23 +43,48 @@ const __dirname = dirname(__filename);
 /** Installation directory for steering documents (e.g., '~/.kiro/steering/kiro-agents') */
 const STEERING_INSTALL_DIR = join(homedir(), ".kiro", "steering", "kiro-agents");
 
-/** Installation directory for kiro-protocols power (e.g., '~/.kiro/powers/kiro-protocols') */
+/**
+ * Source directory for kiro-protocols power files (e.g., '~/.kiro/powers/kiro-protocols').
+ * 
+ * Files here are kept writable so Kiro IDE can read them as a source when needed.
+ * Registered as `source.path` in `registries/user-added.json`.
+ * 
+ * @see registerPower - Registers this path as source in user-added registry
+ */
 const POWER_INSTALL_DIR = join(homedir(), ".kiro", "powers", "kiro-protocols");
 
 /**
- * Installation directory for Kiro's installed power symlinks (e.g., '~/.kiro/powers/installed/kiro-protocols').
+ * Runtime directory for kiro-protocols power files (e.g., '~/.kiro/powers/installed/kiro-protocols').
  * 
- * Kiro IDE expects installed powers to have symlinks in this directory pointing to the actual
- * power files in POWER_INSTALL_DIR. The CLI creates these symlinks during installation to match
- * Kiro's pattern for local power installations.
+ * Contains a physical copy of the power files (no symlinks). This is where Kiro IDE
+ * reads the power from at runtime. Populated by installPowerFiles() during installation,
+ * replicating what Kiro IDE does when a user installs via "Add Custom Power" UI.
  * 
- * @see createSymbolicLinks - Creates symlinks in this directory
- * @see registerPowerInRegistry - Registers this path as installPath in registry
+ * Files here are set to read-only after copying, matching Kiro IDE's behavior.
+ * 
+ * @see installPowerFiles - Copies files from POWER_INSTALL_DIR to this directory
  */
 const POWER_INSTALLED_DIR = join(homedir(), ".kiro", "powers", "installed", "kiro-protocols");
 
-/** Kiro powers registry file path (e.g., '~/.kiro/powers/registry.json') */
-const REGISTRY_PATH = join(homedir(), ".kiro", "powers", "registry.json");
+/**
+ * Path to Kiro's installed powers manifest (e.g., '~/.kiro/powers/installed.json').
+ * 
+ * Tracks which powers are installed and which registry they belong to.
+ * The CLI adds kiro-protocols with registryId "user-added" to this file.
+ * 
+ * @see registerPower - Writes to this file during installation
+ */
+const INSTALLED_JSON_PATH = join(homedir(), ".kiro", "powers", "installed.json");
+
+/**
+ * Path to Kiro's user-added powers registry (e.g., '~/.kiro/powers/registries/user-added.json').
+ * 
+ * Tracks custom powers added by the user, including their source paths.
+ * The CLI adds kiro-protocols with source.type "local" pointing to POWER_INSTALL_DIR.
+ * 
+ * @see registerPower - Writes to this file during installation
+ */
+const USER_ADDED_JSON_PATH = join(homedir(), ".kiro", "powers", "registries", "user-added.json");
 
 /**
  * Steering files to install from dist/ directory in package.
@@ -102,7 +128,7 @@ const STEERING_FILES = /* STEERING_FILES_PLACEHOLDER */ as const;
 const POWER_FILES = /* POWER_FILES_PLACEHOLDER */ as const;
 
 /**
- * Power metadata extracted from POWER.md frontmatter for registry registration.
+ * Power metadata extracted from POWER.md frontmatter.
  * 
  * @property name - Power identifier (e.g., 'kiro-protocols')
  * @property displayName - Human-readable name shown in Powers UI (e.g., 'Kiro Protocols')
@@ -119,75 +145,38 @@ interface PowerMetadata {
 }
 
 /**
- * Kiro registry structure for tracking installed powers.
+ * Structure of ~/.kiro/powers/installed.json.
  * 
- * Located at `~/.kiro/powers/registry.json`, maintains state of all powers
- * installed in Kiro IDE for Powers UI integration.
+ * Tracks which powers are installed and which registry entry describes them.
+ * Kiro IDE reads this file on startup to determine installed powers.
  * 
- * @property version - Registry format version (e.g., '1.0.0')
- * @property powers - Map of power name to power entry
- * @property repoSources - Map of repo ID to repository source
- * @property lastUpdated - ISO timestamp of last registry modification
+ * @property version - File format version
+ * @property installedPowers - List of installed power entries
+ * @property dismissedAutoInstalls - Powers the user has dismissed from auto-install prompts
  */
-interface KiroRegistry {
+interface InstalledPowers {
   version: string;
-  powers: Record<string, PowerEntry>;
-  repoSources: Record<string, RepoSource>;
-  lastUpdated: string;
+  installedPowers: Array<{ name: string; registryId: string }>;
+  dismissedAutoInstalls: string[];
 }
 
 /**
- * Power entry in the registry representing an installed or available power.
+ * Structure of ~/.kiro/powers/registries/user-added.json.
  * 
- * @property name - Power identifier
- * @property displayName - Human-readable name
- * @property description - Power capabilities description
- * @property mcpServers - MCP server names provided by power (empty for kiro-protocols)
- * @property author - Power author/maintainer
- * @property keywords - Search terms for discovery
- * @property installed - Whether power is currently installed
- * @property installedAt - ISO timestamp of installation (if installed)
- * @property installPath - Path to symlink directory in installed/ (if installed)
- * @property source - Repository source information
- * @property sourcePath - Path to actual power directory (if installed)
- */
-interface PowerEntry {
-  name: string;
-  displayName: string;
-  description: string;
-  mcpServers: string[];
-  author: string;
-  keywords: string[];
-  installed: boolean;
-  installedAt?: string;
-  installPath?: string;
-  source: {
-    type: string;
-    repoId: string;
-    repoName: string;
-  };
-  sourcePath?: string;
-}
-
-/**
- * Repository source entry tracking power source locations.
+ * Registry of custom powers added by the user via "Add Custom Power" UI or CLI.
+ * Kiro IDE reads this to find the source path for each user-added power.
  * 
- * @property name - Repository display name (full path for local repos)
- * @property type - Source type ('local' for filesystem, 'git' for remote)
- * @property enabled - Whether source is active for power discovery
- * @property addedAt - ISO timestamp when source was added
- * @property path - Filesystem path to repository
- * @property lastSync - ISO timestamp of last synchronization
- * @property powerCount - Number of powers available from this source
+ * @property powers - List of user-added power entries with source information
  */
-interface RepoSource {
-  name: string;
-  type: string;
-  enabled: boolean;
-  addedAt: string;
-  path: string;
-  lastSync: string;
-  powerCount: number;
+interface UserAddedRegistry {
+  powers: Array<{
+    name: string;
+    description: string;
+    source: {
+      type: string;
+      path: string;
+    };
+  }>;
 }
 
 /**
@@ -245,7 +234,7 @@ async function setReadOnly(filePath: string): Promise<void> {
  * @example
  * ```typescript
  * const metadata = await extractPowerMetadata('/path/to/POWER.md');
- * // { name: 'kiro-protocols', displayName: 'Kiro Protocols', 
+ * // { name: 'kiro-protocols', displayName: 'Kiro Protocols',
  * //   description: '...', keywords: [...], author: '...' }
  * ```
  */
@@ -283,18 +272,17 @@ async function extractPowerMetadata(powerMdPath: string): Promise<PowerMetadata>
 }
 
 /**
- * Recursively copies a file or directory.
+ * Recursively copies a file or directory, preserving directory structure.
  * 
- * Used as fallback when symbolic links cannot be created (e.g., Windows without admin).
- * Preserves directory structure and copies all files recursively.
+ * Used internally by `installPowerFiles` to copy subdirectories (e.g., `steering/`).
  * 
  * @param src - Source path (file or directory)
  * @param dest - Destination path
  * 
  * @example
  * ```typescript
- * await copyRecursive('/source/dir', '/dest/dir');
- * // Copies all files and subdirectories
+ * await copyRecursive('/source/steering', '/dest/steering');
+ * // Copies all .md files preserving subdirectory layout
  * ```
  */
 async function copyRecursive(src: string, dest: string): Promise<void> {
@@ -303,195 +291,161 @@ async function copyRecursive(src: string, dest: string): Promise<void> {
   const stats = await stat(src);
   
   if (stats.isDirectory()) {
-    // Create destination directory
     await mkdir(dest, { recursive: true });
-    
-    // Copy all entries recursively
     const entries = await readdir(src);
     for (const entry of entries) {
       await copyRecursive(join(src, entry), join(dest, entry));
     }
   } else {
-    // Copy file
     await copyFile(src, dest);
   }
 }
 
 /**
- * Creates symbolic links in installed/ directory pointing to power files.
+ * Copies power files from POWER_INSTALL_DIR to POWER_INSTALLED_DIR as physical files.
  * 
- * Kiro IDE expects installed powers to be in ~/.kiro/powers/installed/{power-name}/
- * with symbolic links pointing to the actual files in ~/.kiro/powers/{power-name}/.
+ * Replicates what Kiro IDE does when a user installs a power via "Add Custom Power" UI:
+ * copies all files (except `icon.png`, which Kiro IDE skips) from the source directory
+ * to the `installed/` directory as real files, then sets them read-only.
+ * 
+ * This is NOT a symlink operation. Kiro IDE reads from `installed/` directly at runtime
+ * and does not auto-repair this directory if it is missing or corrupted.
  * 
  * Process:
- * 1. Removes existing installed directory if present
- * 2. Creates new installed directory
- * 3. Creates symbolic links for each file and directory in power directory
- * 4. Falls back to copying files if symlink creation fails (Windows without admin)
+ * 1. Removes existing installed directory if present (clean install)
+ * 2. Copies all entries from POWER_INSTALL_DIR except `icon.png`
+ * 3. For files: copies and sets read-only immediately
+ * 4. For directories (e.g., `steering/`): copies recursively, then sets top-level entries read-only
  * 
- * Platform-specific behavior:
- * - Windows: Uses junction for directories, symlink for files (requires admin)
- * - Windows fallback: Copies files if symlink fails (no admin required)
- * - Unix: Uses symbolic links for both files and directories
- * 
- * @returns Number of warnings encountered (0 = success, >0 = partial success)
+ * **Note:** Read-only is applied to direct children of subdirectories only (one level deep).
+ * Deeply nested files are copied but not explicitly chmod'd.
  * 
  * @example
  * ```typescript
- * const warnings = await createSymbolicLinks();
- * // Creates ~/.kiro/powers/installed/kiro-protocols/ with symlinks to:
- * // - POWER.md -> ../../kiro-protocols/POWER.md
- * // - mcp.json -> ../../kiro-protocols/mcp.json
- * // - icon.png -> ../../kiro-protocols/icon.png
- * // - steering/ -> ../../kiro-protocols/steering/
- * // Or copies files if symlink fails
+ * await installPowerFiles();
+ * // Creates ~/.kiro/powers/installed/kiro-protocols/ with:
+ * // - POWER.md (read-only)
+ * // - mcp.json (read-only)
+ * // - steering/*.md (read-only)
+ * // icon.png is intentionally excluded (Kiro IDE does not copy it)
  * ```
  */
-async function createSymbolicLinks(): Promise<number> {
-  const { readdir, mkdir, symlink, rm, stat } = await import("fs/promises");
-  const { platform } = await import("os");
+async function installPowerFiles(): Promise<void> {
+  const { readdir, mkdir, rm, stat, copyFile } = await import("fs/promises");
   
-  let warningCount = 0;
-  
-  // Remove existing installed directory
+  // Remove existing installed directory for clean install
   if (existsSync(POWER_INSTALLED_DIR)) {
     await rm(POWER_INSTALLED_DIR, { recursive: true, force: true });
   }
-  
-  // Create installed directory
   await mkdir(POWER_INSTALLED_DIR, { recursive: true });
   
-  // Get all files and directories in power directory
+  // Copy all entries from source except icon.png (Kiro IDE does not copy it)
   const entries = await readdir(POWER_INSTALL_DIR);
-  
-  // Create symbolic links for each entry
   for (const entry of entries) {
-    const sourcePath = join(POWER_INSTALL_DIR, entry);
-    const targetPath = join(POWER_INSTALLED_DIR, entry);
+    if (entry === "icon.png") continue;
     
-    try {
-      // Check if entry is directory
-      const stats = await stat(sourcePath);
-      const isDirectory = stats.isDirectory();
-      
-      // Windows requires different link types
-      if (platform() === "win32") {
-        // Use junction for directories, symlink for files
-        await symlink(sourcePath, targetPath, isDirectory ? "junction" : "file");
-      } else {
-        // Unix uses symlink for both
-        await symlink(sourcePath, targetPath);
+    const srcPath = join(POWER_INSTALL_DIR, entry);
+    const destPath = join(POWER_INSTALLED_DIR, entry);
+    const stats = await stat(srcPath);
+    
+    if (stats.isDirectory()) {
+      // Recursively copy subdirectory (e.g., steering/)
+      await copyRecursive(srcPath, destPath);
+      // Set all files in subdirectory to read-only
+      const subEntries = await readdir(destPath);
+      for (const subEntry of subEntries) {
+        await setReadOnly(join(destPath, subEntry));
       }
-      
-      console.log(`✅ Linked: ${entry}`);
-    } catch (error) {
-      // Fallback to copying if symlink fails (Windows without admin)
-      try {
-        await copyRecursive(sourcePath, targetPath);
-        console.log(`📋 Copied: ${entry} (symlink not available)`);
-      } catch (copyError) {
-        console.warn(`⚠️  Could not link or copy ${entry}:`, error instanceof Error ? error.message : error);
-        warningCount++;
-      }
+    } else {
+      await copyFile(srcPath, destPath);
+      await setReadOnly(destPath);
     }
+    
+    console.log(`✅ Installed: ${entry}`);
   }
-  
-  return warningCount;
 }
 
 /**
- * Registers the kiro-protocols power in Kiro's registry.json.
+ * Registers kiro-protocols in Kiro's power registry files.
  * 
- * Follows the exact pattern used by Kiro IDE for local power installations.
- * The power is registered with a stable repoId and proper paths to ensure
- * it appears as "installed" in Kiro's Powers UI.
+ * Replicates exactly what Kiro IDE does when a user installs a power via
+ * "Add Custom Power" UI. Writes to two files:
  * 
- * Process:
- * 1. Ensures registry directory exists (~/.kiro/powers/)
- * 2. Reads existing registry or creates new one
- * 3. Extracts power metadata from POWER.md frontmatter
- * 4. Creates/updates power entry with installation info
- * 5. Creates/updates local repo source entry
- * 6. Saves updated registry with timestamp
+ * 1. `~/.kiro/powers/installed.json` — marks kiro-protocols as installed
+ *    with registryId "user-added". Merges with existing entries (idempotent).
  * 
- * Registry structure follows Kiro's pattern:
- * - Power entry uses installPath pointing to installed/ directory
- * - Power entry uses sourcePath pointing to actual power directory
- * - Repo source uses stable ID "local-kiro-protocols" (no timestamp)
- * - Source type is "repo" (not "local") for proper UI integration
+ * 2. `~/.kiro/powers/registries/user-added.json` — records the source path
+ *    (`POWER_INSTALL_DIR`) so Kiro IDE knows where the power came from.
+ *    Updates existing entry if present, otherwise appends.
+ * 
+ * Does NOT modify `~/.kiro/powers/registry.json` — that file is the marketplace
+ * catalog managed exclusively by Kiro IDE.
  * 
  * @returns True if successful, false if failed
  * 
- * @example
+ * @example Register on fresh install
  * ```typescript
- * const success = await registerPowerInRegistry();
- * // Power registered in registry.json
- * // Appears as installed in Kiro Powers UI
+ * const success = await registerPower();
+ * // Writes to installed.json and registries/user-added.json
+ * // Power appears as installed in Kiro Powers UI
+ * ```
+ * 
+ * @example Re-running is safe (idempotent)
+ * ```typescript
+ * await registerPower(); // first install
+ * await registerPower(); // update — merges, no duplicates
  * ```
  */
-async function registerPowerInRegistry(): Promise<boolean> {
+async function registerPower(): Promise<boolean> {
   const { readFile, writeFile, mkdir } = await import("fs/promises");
   
-  // Ensure registry directory exists
-  const registryDir = dirname(REGISTRY_PATH);
-  await mkdir(registryDir, { recursive: true });
+  // Ensure registries directory exists
+  await mkdir(dirname(USER_ADDED_JSON_PATH), { recursive: true });
   
-  // Read existing registry or create new one
-  let registry: KiroRegistry;
-  if (existsSync(REGISTRY_PATH)) {
-    const content = await readFile(REGISTRY_PATH, "utf-8");
-    registry = JSON.parse(content);
+  // --- installed.json ---
+  let installed: InstalledPowers;
+  if (existsSync(INSTALLED_JSON_PATH)) {
+    const content = await readFile(INSTALLED_JSON_PATH, "utf-8");
+    installed = JSON.parse(content);
   } else {
-    registry = {
-      version: "1.0.0",
-      powers: {},
-      repoSources: {},
-      lastUpdated: new Date().toISOString(),
-    };
+    installed = { version: "1.0.0", installedPowers: [], dismissedAutoInstalls: [] };
   }
   
-  // Extract metadata from POWER.md
-  const powerMdPath = join(POWER_INSTALL_DIR, "POWER.md");
-  const metadata = await extractPowerMetadata(powerMdPath);
+  // Add kiro-protocols entry if not already present
+  const alreadyInstalled = installed.installedPowers.some(p => p.name === "kiro-protocols");
+  if (!alreadyInstalled) {
+    installed.installedPowers.push({ name: "kiro-protocols", registryId: "user-added" });
+  }
+  await writeFile(INSTALLED_JSON_PATH, JSON.stringify(installed, null, 2), "utf-8");
   
-  // Use stable repo ID (matches Kiro's pattern for local powers)
-  const repoId = "local-kiro-protocols";
+  // --- registries/user-added.json ---
+  let userAdded: UserAddedRegistry;
+  if (existsSync(USER_ADDED_JSON_PATH)) {
+    const content = await readFile(USER_ADDED_JSON_PATH, "utf-8");
+    userAdded = JSON.parse(content);
+  } else {
+    userAdded = { powers: [] };
+  }
   
-  // Create/update power entry (following Kiro's exact pattern)
-  registry.powers[metadata.name] = {
-    name: metadata.name,
-    displayName: metadata.displayName,
-    description: metadata.description,
-    mcpServers: [], // kiro-protocols has no MCP servers
-    author: metadata.author,
-    keywords: metadata.keywords,
-    installed: true,
-    installedAt: new Date().toISOString(),
-    installPath: POWER_INSTALLED_DIR, // Points to installed/ directory with symlinks
+  // Extract description from POWER.md for the registry entry (currently unused — description is derived from path)
+  // const metadata = await extractPowerMetadata(powerMdPath); // reserved for future use
+  
+  // Update or add kiro-protocols entry
+  const existingIdx = userAdded.powers.findIndex(p => p.name === "kiro-protocols");
+  const entry = {
+    name: "kiro-protocols",
+    description: `Custom power from ${POWER_INSTALL_DIR}`,
     source: {
-      type: "repo", // Changed from "local" to match Kiro's pattern
-      repoId: repoId,
-      repoName: POWER_INSTALL_DIR, // Full path to actual power directory
+      type: "local",
+      path: POWER_INSTALL_DIR,
     },
-    sourcePath: POWER_INSTALL_DIR, // Points to actual power directory
   };
-  
-  // Create/update repo source entry (following Kiro's exact pattern)
-  registry.repoSources[repoId] = {
-    name: POWER_INSTALL_DIR, // Full path as name
-    type: "local",
-    enabled: true,
-    addedAt: new Date().toISOString(),
-    path: POWER_INSTALL_DIR,
-    lastSync: new Date().toISOString(),
-    powerCount: 1,
-  };
-  
-  // Update lastUpdated timestamp
-  registry.lastUpdated = new Date().toISOString();
-  
-  // Save registry
-  await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2), "utf-8");
+  if (existingIdx >= 0) {
+    userAdded.powers[existingIdx] = entry;
+  } else {
+    userAdded.powers.push(entry);
+  }
+  await writeFile(USER_ADDED_JSON_PATH, JSON.stringify(userAdded, null, 2), "utf-8");
   
   console.log("✅ Power registered in Kiro registry");
   return true;
@@ -501,29 +455,30 @@ async function registerPowerInRegistry(): Promise<boolean> {
  * Installs a single file from package to target directory.
  * 
  * Process:
- * 1. Restores write permissions if file exists
+ * 1. Restores write permissions if file exists (for updates)
  * 2. Reads source file from package
  * 3. Creates destination directory if needed
  * 4. Writes file to destination
- * 5. Sets file to read-only
+ * 5. Sets file to read-only (steering files only — power source files stay writable)
  * 
  * @param relativePath - Path relative to source directory (e.g., 'agents.md', 'steering/agent-activation.md')
  * @param installDir - Absolute installation directory (e.g., '~/.kiro/steering/kiro-agents')
  * @param sourceDir - Source directory in package (e.g., 'dist', 'power')
+ * @param readOnly - Whether to set the file read-only after install (default: true)
  * 
  * @example
  * ```typescript
- * // Install steering file
+ * // Install steering file (read-only)
  * await installFile('agents.md', STEERING_INSTALL_DIR, 'dist');
  * 
- * // Install power file
- * await installFile('steering/agent-activation.md', POWER_INSTALL_DIR, 'power');
+ * // Install power source file (writable — Kiro IDE needs to read it as source)
+ * await installFile('steering/agent-activation.md', POWER_INSTALL_DIR, 'power', false);
  * ```
  */
-async function installFile(relativePath: string, installDir: string, sourceDir: string): Promise<void> {
+async function installFile(relativePath: string, installDir: string, sourceDir: string, readOnly = true): Promise<void> {
   const destPath = join(installDir, relativePath);
   
-  // Restore write permissions if file exists
+  // Restore write permissions if file exists (needed for updates)
   if (existsSync(destPath)) {
     await setWritable(destPath);
   }
@@ -531,7 +486,6 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
   // Get source file from package
   const srcPath = join(__dirname, "..", sourceDir, relativePath);
   
-  // Read file using fs for Node.js compatibility
   const { readFile, writeFile, mkdir } = await import("fs/promises");
   const content = await readFile(srcPath);
   
@@ -539,11 +493,11 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
   const destDir = dirname(destPath);
   await mkdir(destDir, { recursive: true });
   
-  // Write file
   await writeFile(destPath, content);
   
-  // Set read-only
-  await setReadOnly(destPath);
+  if (readOnly) {
+    await setReadOnly(destPath);
+  }
   
   console.log(`✅ Installed: ${relativePath}`);
 }
@@ -553,28 +507,14 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
  * 
  * Installation process:
  * 1. Removes existing steering installation if present
- * 2. Installs steering files to ~/.kiro/steering/kiro-agents/
- * 3. Removes existing power installation if present
- * 4. Installs power files to ~/.kiro/powers/kiro-protocols/
- * 5. Creates symbolic links in ~/.kiro/powers/installed/kiro-protocols/
- * 6. Registers kiro-protocols in ~/.kiro/powers/registry.json
- * 7. Sets all files to read-only
+ * 2. Installs steering files to ~/.kiro/steering/kiro-agents/ (read-only)
+ * 3. Removes existing power source installation if present
+ * 4. Installs power files to ~/.kiro/powers/kiro-protocols/ (writable — source directory)
+ * 5. Copies power files to ~/.kiro/powers/installed/kiro-protocols/ (read-only — runtime directory)
+ * 6. Registers kiro-protocols in installed.json and registries/user-added.json
  * 
- * Steering files include core system files that provide foundational kiro-agents
- * functionality including instruction aliases, agent management, mode switching,
- * strict mode control, and interaction patterns.
- * 
- * Power files include:
- * - Power metadata (POWER.md, mcp.json, icon.png)
- * - Protocol files (agent-activation.md, agent-creation.md, etc.)
- * 
- * Registry registration follows Kiro's exact pattern:
- * - Stable repoId: "local-kiro-protocols"
- * - installPath points to symlink directory
- * - sourcePath points to actual power directory
- * - Power appears as "installed" in Powers UI
- * 
- * Tracks errors and warnings to provide accurate installation status.
+ * This replicates exactly what Kiro IDE does when a user installs a power via
+ * "Add Custom Power" UI, ensuring compatibility with current and future Kiro versions.
  * 
  * @throws {Error} If installation fails (caught by main execution handler)
  * 
@@ -588,76 +528,64 @@ async function installFile(relativePath: string, installDir: string, sourceDir: 
 async function install(): Promise<void> {
   console.log("🚀 Installing kiro-agents system...\n");
   
-  let hasErrors = false;
   let hasWarnings = false;
   
-  // Install steering files
+  // --- Steering files ---
   console.log("📄 Installing steering files to ~/.kiro/steering/kiro-agents/");
   if (existsSync(STEERING_INSTALL_DIR)) {
     console.log("🗑️  Removing existing steering installation...");
     const { rmSync } = await import("fs");
     rmSync(STEERING_INSTALL_DIR, { recursive: true, force: true });
   }
-  
   for (const file of STEERING_FILES) {
     await installFile(file, STEERING_INSTALL_DIR, "dist");
   }
   
-  // Install power files
-  console.log("\n⚡ Installing kiro-protocols power to ~/.kiro/powers/kiro-protocols/");
+  // --- Power source files (writable) ---
+  console.log("\n⚡ Installing kiro-protocols source to ~/.kiro/powers/kiro-protocols/");
   if (existsSync(POWER_INSTALL_DIR)) {
-    console.log("🗑️  Removing existing power installation...");
+    console.log("🗑️  Removing existing power source...");
     const { rmSync } = await import("fs");
     rmSync(POWER_INSTALL_DIR, { recursive: true, force: true });
   }
-  
   for (const file of POWER_FILES) {
-    await installFile(file, POWER_INSTALL_DIR, "power");
+    await installFile(file, POWER_INSTALL_DIR, "power", false);
   }
   
-  // Create symbolic links in installed/ directory
-  console.log("\n🔗 Creating symbolic links in installed/ directory...");
+  // --- Power installed files (physical copy, read-only) ---
+  console.log("\n📋 Copying power files to ~/.kiro/powers/installed/kiro-protocols/");
   try {
-    const symlinkWarnings = await createSymbolicLinks();
-    if (symlinkWarnings > 0) {
-      hasWarnings = true;
-    }
+    await installPowerFiles();
   } catch (error) {
-    console.warn("⚠️  Warning: Could not create symbolic links:", error instanceof Error ? error.message : error);
+    console.warn("⚠️  Warning: Could not copy power files to installed/:", error instanceof Error ? error.message : error);
     console.warn("   Power may not appear correctly in Kiro Powers UI.");
     hasWarnings = true;
   }
   
-  // Register power in Kiro registry
+  // --- Registry registration ---
   console.log("\n📝 Registering power in Kiro registry...");
   try {
-    const registrySuccess = await registerPowerInRegistry();
-    if (!registrySuccess) {
-      hasWarnings = true;
-    }
+    await registerPower();
   } catch (error) {
-    console.warn("⚠️  Warning: Could not register power in registry:", error instanceof Error ? error.message : error);
+    console.warn("⚠️  Warning: Could not register power:", error instanceof Error ? error.message : error);
     console.warn("   The power files are installed but may not appear in Kiro Powers UI.");
-    console.warn("   You can manually add the power via: Powers panel → Add Repository → Local Directory");
+    console.warn("   You can manually add the power via: Powers panel → Add Custom Power → Local Directory");
     console.warn(`   Path: ${POWER_INSTALL_DIR}`);
     hasWarnings = true;
   }
   
-  // Final status message
-  if (hasErrors) {
-    console.log("\n❌ Installation completed with errors!");
-  } else if (hasWarnings) {
+  // Final status
+  if (hasWarnings) {
     console.log("\n⚠️  Installation completed with warnings!");
     console.log("   Core files installed successfully, but some optional features may not work.");
   } else {
     console.log("\n✨ Installation completed successfully!");
   }
   
-  console.log(`\n📁 Steering files: ${STEERING_INSTALL_DIR}`);
-  console.log(`📁 Power files: ${POWER_INSTALL_DIR}`);
-  console.log(`📁 Installed links: ${POWER_INSTALLED_DIR}`);
+  console.log(`\n📁 Steering files:  ${STEERING_INSTALL_DIR}`);
+  console.log(`📁 Power source:    ${POWER_INSTALL_DIR}`);
+  console.log(`📁 Power installed: ${POWER_INSTALLED_DIR}`);
   console.log("\n💡 The kiro-protocols power should now appear as installed in Kiro Powers UI.");
-  console.log("💡 Files are set to read-only. To modify them, change permissions first.");
   console.log("\n🔄 To update, simply run 'npx kiro-agents' again.");
 }
 

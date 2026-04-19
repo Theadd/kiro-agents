@@ -142,7 +142,7 @@ ACTIVE_AGENT: none | {agent-name}
 
 **Agent activation:**
 - Triggered by `/agents {agent-name}` command
-- Loads `.kiro/agents/{agent-name}.md` into context
+- Loads `{{{WS_AGENTS_PATH}}}/{agent-name}.md` into context
 - Executes agent-activation protocol
 - Sets ACTIVE_AGENT = {agent-name}
 

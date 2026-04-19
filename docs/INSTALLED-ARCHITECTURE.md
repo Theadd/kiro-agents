@@ -46,7 +46,7 @@ Both installations work together to provide the complete kiro-agents experience.
 
 **Agents:**
 - User-created specialized AI roles
-- Stored in workspace `.kiro/agents/` directory
+- Stored in workspace `.kiro/kiro-agents/` directory
 - Activated via `/agents {name}` command
 - Load protocols and steering documents as needed
 
@@ -66,7 +66,7 @@ Both installations work together to provide the complete kiro-agents experience.
 │   ├── strict.md                           # Strict mode control (inclusion: manual)
 │   └── reflect.md                          # Reflection system commands (inclusion: always)
 │
-├── powers/kiro-protocols/                  # Protocol library (actual files)
+├── powers/kiro-protocols/                  # Protocol library source (writable)
 │   ├── POWER.md                            # Power metadata
 │   ├── mcp.json                            # MCP configuration (empty)
 │   ├── icon.png                            # Power icon (512x512)
@@ -87,13 +87,17 @@ Both installations work together to provide the complete kiro-agents experience.
 │       ├── reflect-curator-checklist.md
 │       └── reflect-manager-workflow.md
 │
-├── powers/installed/kiro-protocols/        # Symbolic links (Kiro UI integration)
-│   ├── POWER.md -> ../../kiro-protocols/POWER.md
-│   ├── mcp.json -> ../../kiro-protocols/mcp.json
-│   ├── icon.png -> ../../kiro-protocols/icon.png
-│   └── steering/ -> ../../kiro-protocols/steering/
+├── powers/installed/kiro-protocols/        # Protocol library runtime copy (read-only)
+│   ├── POWER.md                            # Physical copy (no symlinks)
+│   ├── mcp.json                            # Physical copy
+│   └── steering/                           # Physical copy of all protocol files
+│       └── *.md
 │
-└── powers/registry.json                    # Power registry (automatic registration)
+├── powers/installed.json                   # Installed powers manifest
+├── powers/registries/
+│   └── user-added.json                     # User-added powers registry
+│
+└── powers/registry.json                    # Marketplace catalog (managed by Kiro IDE)
 
 {workspace}/.kiro/                          # Workspace-specific directory
 └── agents/                                 # User-created agents
@@ -115,21 +119,17 @@ Both installations work together to provide the complete kiro-agents experience.
 
 ### Why Two Power Directories?
 
-**`~/.kiro/powers/kiro-protocols/`** (Actual Files)
-- Contains the real power files
-- Where CLI installs the power
-- Source of truth for power content
+**`~/.kiro/powers/kiro-protocols/`** (Source — writable)
+- Contains the power files installed from the npm package
+- Kept writable so Kiro IDE can read it as a source directory
+- Registered as `source.path` in `registries/user-added.json`
+- Equivalent to the local path a user provides when adding a custom power via UI
 
-**`~/.kiro/powers/installed/kiro-protocols/`** (Symbolic Links)
-- Contains symlinks pointing to actual files
-- Used by Kiro IDE Powers UI
-- Follows Kiro's pattern for local power installations
-- Enables proper "installed" status in UI
-
-**Why this pattern?**
-- Kiro IDE expects installed powers in `installed/` directory
-- Allows separation between power source and UI integration
-- Enables proper registry tracking and UI display
+**`~/.kiro/powers/installed/kiro-protocols/`** (Runtime — read-only)
+- Physical copy of the power files (no symlinks, no icon.png)
+- Where Kiro IDE reads the power from at runtime
+- Created by the CLI replicating what Kiro IDE does during UI installation
+- Does NOT auto-repair if deleted — must be recreated by running `npx kiro-agents` again
 
 ---
 
@@ -182,11 +182,11 @@ Both installations work together to provide the complete kiro-agents experience.
 - Minimize base context overhead
 - Can be loaded multiple times if needed
 
-### Agent Files (`.kiro/agents/`)
+### Agent Files (`.kiro/kiro-agents/`)
 
 **Purpose:** User-created specialized AI agents
 
-**Location:** Workspace-specific (`.kiro/agents/` in each project)
+**Location:** Workspace-specific (`.kiro/kiro-agents/` in each project)
 
 **Structure:**
 ```markdown
@@ -211,7 +211,7 @@ version: 1.0.0
 
 **Lifecycle:**
 1. Created via `/agents` command (agent-creation.md protocol)
-2. Stored in workspace `.kiro/agents/` directory
+2. Stored in workspace `.kiro/kiro-agents/` directory
 3. Activated via `/agents {name}` command
 4. Modified via agent management interface
 
@@ -345,7 +345,7 @@ Step 5: Load Management Protocol
 └─ Agent management protocol now in context
 
 Step 6: Scan Workspace
-├─ AI scans .kiro/agents/ directory
+├─ AI scans .kiro/kiro-agents/ directory
 ├─ Finds existing agents (e.g., kiro-master.md)
 └─ Builds list of available agents
 
@@ -383,8 +383,8 @@ Step 1: Alias Detection
 
 Step 2: Alias Execution
 ├─ Alias definition:
-│   "Read .kiro/agents/{agent_name}.md into context"
-├─ AI reads: .kiro/agents/kiro-master.md
+│   "Read .kiro/kiro-agents/{agent_name}.md into context"
+├─ AI reads: .kiro/kiro-agents/kiro-master.md
 └─ Agent definition now in context
 
 Step 3: Load Activation Protocol
@@ -436,7 +436,7 @@ Step 8: Begin Interaction
 
 **Files in Context (in order):**
 1. `aliases.md` (always loaded)
-2. `.kiro/agents/kiro-master.md` (loaded by alias)
+2. `.kiro/kiro-agents/kiro-master.md` (loaded by alias)
 3. `agent-activation.md` (loaded by alias)
 4. `strict-mode.md` (loaded by activation protocol)
 5. `chit-chat.md` (loaded if agent uses it)
@@ -660,22 +660,22 @@ User installs: npx kiro-agents
 
 Step 1: Installation
 ├─ CLI installs steering files to ~/.kiro/steering/kiro-agents/
-├─ CLI installs kiro-protocols power to ~/.kiro/powers/kiro-protocols/
-├─ CLI creates symbolic links in ~/.kiro/powers/installed/kiro-protocols/
-├─ CLI registers power in ~/.kiro/powers/registry.json
+├─ CLI installs kiro-protocols source to ~/.kiro/powers/kiro-protocols/
+├─ CLI copies power files to ~/.kiro/powers/installed/kiro-protocols/
+├─ CLI registers power in installed.json + registries/user-added.json
 └─ Installation complete
 
 Step 2: First Command
 ├─ User opens Kiro IDE in a project
 ├─ User types: /agents
-└─ AI detects no agents exist in .kiro/agents/
+└─ AI detects no agents exist in .kiro/kiro-agents/
 
 Step 3: Auto-Setup
-├─ agents.md detects empty .kiro/agents/ directory
+├─ agents.md detects empty .kiro/kiro-agents/ directory
 ├─ AI automatically creates kiro-master agent:
 │   ├─ Name: kiro-master
 │   ├─ Description: "Interactive Kiro feature management..."
-│   └─ File: .kiro/agents/kiro-master.md
+│   └─ File: .kiro/kiro-agents/kiro-master.md
 └─ AI shows agent management menu with kiro-master listed
 
 Step 4: User Interaction
@@ -778,7 +778,7 @@ AI: [Shows customization options]
 User: 1 (Use as-is)
 
 AI: [Generates agent definition]
-    [Writes to .kiro/agents/technical-writer.md]
+    [Writes to .kiro/kiro-agents/technical-writer.md]
     [Shows summary]
     
     Agent created: technical-writer
@@ -1077,7 +1077,7 @@ Agents with Reflections section automatically load approved insights:
 
 ### Reflection Curator Agent
 
-**File:** `.kiro/agents/reflection-curator.md`
+**File:** `.kiro/kiro-agents/reflection-curator.md`
 
 **Responsibilities:**
 - Review draft insights from all agents
@@ -1203,80 +1203,56 @@ Where should this insight be approved to?
 
 ## Registry Integration
 
-### Registry File Location
+### Registry Files
 
-**Path:** `~/.kiro/powers/registry.json`
+The CLI writes to two files that Kiro IDE uses to track installed custom powers:
 
-**Purpose:** Track installed powers for Kiro IDE Powers UI
-
-### Registry Structure
+**`~/.kiro/powers/installed.json`** — installed powers manifest
 
 ```json
 {
   "version": "1.0.0",
-  "powers": {
-    "kiro-protocols": {
-      "name": "kiro-protocols",
-      "displayName": "Kiro Protocols",
-      "description": "Reusable protocol library for AI agents...",
-      "mcpServers": [],
-      "author": "R. Beltran",
-      "keywords": ["protocols", "workflows", "agents", "modes"],
-      "installed": true,
-      "installedAt": "2024-12-26T10:30:00.000Z",
-      "installPath": "~/.kiro/powers/installed/kiro-protocols",
-      "source": {
-        "type": "repo",
-        "repoId": "local-kiro-protocols",
-        "repoName": "~/.kiro/powers/kiro-protocols"
-      },
-      "sourcePath": "~/.kiro/powers/kiro-protocols"
-    }
-  },
-  "repoSources": {
-    "local-kiro-protocols": {
-      "name": "~/.kiro/powers/kiro-protocols",
-      "type": "local",
-      "enabled": true,
-      "addedAt": "2024-12-26T10:30:00.000Z",
-      "path": "~/.kiro/powers/kiro-protocols",
-      "lastSync": "2024-12-26T10:30:00.000Z",
-      "powerCount": 1
-    }
-  },
-  "lastUpdated": "2024-12-26T10:30:00.000Z"
+  "installedPowers": [
+    { "name": "kiro-protocols", "registryId": "user-added" }
+  ],
+  "dismissedAutoInstalls": []
 }
 ```
 
-### Registry Fields Explained
+**`~/.kiro/powers/registries/user-added.json`** — user-added powers registry
 
-**Power Entry:**
-- `installed: true` - Power is installed and ready to use
-- `installPath` - Points to symlink directory (for UI)
-- `sourcePath` - Points to actual power files
-- `source.type: "repo"` - Treated as repository source (not "local")
-- `source.repoId` - Stable identifier (no timestamp)
+```json
+{
+  "powers": [
+    {
+      "name": "kiro-protocols",
+      "description": "Custom power from ~/.kiro/powers/kiro-protocols",
+      "source": {
+        "type": "local",
+        "path": "~/.kiro/powers/kiro-protocols"
+      }
+    }
+  ]
+}
+```
 
-**Repo Source Entry:**
-- `type: "local"` - Local filesystem source
-- `path` - Full path to power directory
-- `powerCount: 1` - Number of powers in this source
+### How Kiro IDE Uses These Files
 
-### Why This Structure?
+On startup, Kiro IDE:
+1. Reads `installed.json` to determine which powers are installed
+2. For each installed power, looks up its `registryId` (`"user-added"`)
+3. Reads `registries/user-added.json` to find the power's `source.path`
+4. Reads the power files from `installed/kiro-protocols/` at runtime
 
-**Stable repoId:**
-- Uses `"local-kiro-protocols"` (no timestamp)
-- Prevents duplicate entries on reinstall
-- Matches Kiro's pattern for local powers
+The `source.path` in `user-added.json` is used as a reference to the origin of the power (equivalent to the local path a user provides in the "Add Custom Power" UI). Kiro IDE does not re-copy from this path on startup — the `installed/` directory is the runtime source of truth.
 
-**Two Paths:**
-- `installPath` - Where Kiro UI looks (symlinks)
-- `sourcePath` - Where actual files are (source of truth)
+### What the CLI Does NOT Modify
 
-**source.type: "repo":**
-- Ensures proper UI integration
-- Power appears as "installed" in Powers panel
-- Enables proper power management
+**`~/.kiro/powers/registry.json`** — this is the marketplace catalog managed exclusively by Kiro IDE. The CLI does not touch it.
+
+### Merge Behavior
+
+Both registry files are merged with existing content during installation. Other installed powers are preserved.
 
 ---
 
@@ -1284,20 +1260,22 @@ Where should this insight be approved to?
 
 ### After Installation
 
-**All installed files are read-only:**
-
-```bash
-# Steering files
+**Steering files — read-only:**
+```
 ~/.kiro/steering/kiro-agents/*.md  # r--r--r-- (444)
-
-# Power files
-~/.kiro/powers/kiro-protocols/**/*  # r--r--r-- (444)
 ```
 
-**Why read-only?**
-- Prevents accidental modification
-- Ensures consistency across installations
-- Users can't break system by editing files
+**Power source — writable:**
+```
+~/.kiro/powers/kiro-protocols/**/*  # rw-r--r-- (644)
+```
+Kept writable so Kiro IDE can read it as a source directory without permission errors.
+
+**Power installed — read-only:**
+```
+~/.kiro/powers/installed/kiro-protocols/**/*  # r--r--r-- (444)
+```
+Matches what Kiro IDE sets when it installs a power via UI.
 
 ### Modifying Files
 
@@ -1361,7 +1339,7 @@ Error loading protocol: agent-creation.md not found
 
 **Symptom:**
 ```
-Agent 'my-agent' not found in .kiro/agents/
+Agent 'my-agent' not found in .kiro/kiro-agents/
 ```
 
 **Causes:**
@@ -1372,12 +1350,12 @@ Agent 'my-agent' not found in .kiro/agents/
 **Solutions:**
 1. **Check agent directory:**
    ```bash
-   ls .kiro/agents/
+   ls .kiro/kiro-agents/
    ```
 
 2. **Verify workspace:**
    - Ensure you're in correct project directory
-   - Check if `.kiro/agents/` exists
+   - Check if `.kiro/kiro-agents/` exists
 
 3. **Create agent:**
    ```
@@ -1457,18 +1435,19 @@ Power not showing as installed in Kiro Powers UI
    ```bash
    npx kiro-agents
    ```
-   - Automatically updates registry
-   - Recreates symbolic links
+   - Automatically updates registry files
+   - Recreates installed/ copy
 
-2. **Check registry file:**
+2. **Check registry files:**
    ```bash
-   cat ~/.kiro/powers/registry.json
+   cat ~/.kiro/powers/installed.json
+   cat ~/.kiro/powers/registries/user-added.json
    ```
-   - Look for "kiro-protocols" entry
-   - Verify `installed: true`
+   - Look for "kiro-protocols" entry in installedPowers
+   - Verify source.path points to ~/.kiro/powers/kiro-protocols
 
-3. **Manual registry fix (advanced):**
-   - Delete registry.json
+3. **Manual fix (advanced):**
+   - Delete ~/.kiro/powers/installed/kiro-protocols/
    - Reinstall kiro-agents
    - Registry recreated automatically
 

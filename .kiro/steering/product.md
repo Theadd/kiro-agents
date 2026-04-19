@@ -44,7 +44,7 @@ When working on this codebase, follow these principles:
 **Purpose**: Specialized AI agents with defined capabilities and workflows
 
 **Implementation**:
-- Agents defined in `.kiro/agents/{name}.md` files
+- Agents defined in `.kiro/kiro-agents/{name}.md` files
 - Activated via `/agents {name}` command (instruction alias pattern)
 - Interactive management via `/agents` command
 - Each agent loads its definition and assumes that role completely
@@ -100,7 +100,7 @@ When working on this codebase, follow these principles:
 **Implementation**:
 - Defined in `src/core/reflect.md` (steering document with commands)
 - Protocols in `src/core/protocols/reflect-*.md` (4 protocols)
-- Curator agent in `.kiro/agents/reflection-curator.md`
+- Curator agent in `.kiro/kiro-agents/reflection-curator.md`
 - Storage in `.ai-storage/reflections/` (on-demand creation)
 
 **Key Behaviors**:
@@ -149,15 +149,15 @@ npx kiro-agents  # or bunx kiro-agents
 - **kiro-protocols power** → `~/.kiro/powers/kiro-protocols/`
   - Power metadata (POWER.md, mcp.json, icon.png)
   - Protocol files in steering/ subdirectory
-  - Symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
-  - Automatic registration in `~/.kiro/powers/registry.json`
+  - Physical copy in `~/.kiro/powers/installed/kiro-protocols/`
+  - Automatic registration in `~/.kiro/powers/installed.json` and `registries/user-added.json`
   - Appears immediately as "installed" in Kiro Powers UI
 
 **Build Process**:
 1. Build powers: `bun run build:powers` (uses manifest to auto-discover and process protocols to `powers/kiro-protocols/`)
 2. Build npm: `bun run build` (compiles CLI, processes steering via manifest, copies power files from `powers/`)
 3. CLI installs both steering and power during `npx kiro-agents`
-4. CLI creates symbolic links and registers power automatically
+4. CLI copies power files physically and registers power automatically
 
 **Why Dual Installation**:
 - Protocols discoverable in Kiro Powers UI
@@ -183,7 +183,7 @@ npx kiro-agents  # or bunx kiro-agents
 2. Interactive wizard activates (chit-chat protocol)
 3. User chooses "Create new agent"
 4. Wizard guides through agent creation
-5. Agent file created in `.kiro/agents/{name}.md`
+5. Agent file created in `.kiro/kiro-agents/{name}.md`
 6. User can activate with `/agents {name}`
 
 ### Switching Modes
@@ -237,7 +237,7 @@ npx kiro-agents  # or bunx kiro-agents
 **Required patterns**:
 - ✅ Use substitutions for IDE-specific values: `{{{WS_AGENTS_PATH}}}`, `{{{INITIAL_AGENT_NAME}}}`
 - ✅ Generic terminology: "IDE" instead of "Kiro IDE"
-- ✅ Generic paths: `.ai-agents/agents` (base) → `.kiro/agents` (Kiro override)
+- ✅ Generic paths: `.ai-agents/agents` (base) → `.kiro/kiro-agents` (Kiro override)
 - ✅ Generic names: `project-master` (base) → `kiro-master` (Kiro override)
 
 **Build system architecture**:

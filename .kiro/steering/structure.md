@@ -157,8 +157,8 @@ kiro-agents/
 - Uses `getSteeringFilesForCLI()` and `getPowerFilesForCLI()` from manifest
 - Installs core system files to `~/.kiro/steering/kiro-agents/`
 - Installs protocol library to `~/.kiro/powers/kiro-protocols/`
-- Creates symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
-- Automatic power registration in `~/.kiro/powers/registry.json`
+- Copies power files physically to `~/.kiro/powers/installed/kiro-protocols/`
+- Automatic power registration in `~/.kiro/powers/installed.json` and `registries/user-added.json`
 - Removes old installations before installing new
 - Manages file permissions
 - Cross-platform compatible

@@ -170,7 +170,7 @@ This agent records insights, patterns, and learnings in its dedicated reflection
 
 ### 5. Curator Agent
 
-**File:** `.kiro/agents/reflection-curator.md`
+**File:** `.kiro/kiro-agents/reflection-curator.md`
 
 **Responsibilities:**
 - Review draft insights

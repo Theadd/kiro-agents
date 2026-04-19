@@ -124,6 +124,8 @@ export const substitutions = {
   '{{{KIRO_MODE_ALIASES}}}': () => '',
   /** Workspace agents directory path (e.g., '.ai-agents/agents' for cross-IDE compatibility) */
   '{{{WS_AGENTS_PATH}}}': () => '.ai-agents/agents',
+  /** Global (user-level) agents directory path */
+  '{{{GLOBAL_AGENTS_PATH}}}': () => '~/.ai-agents/agents',
   /** Initial agent name created during auto-setup (e.g., 'project-master') */
   '{{{INITIAL_AGENT_NAME}}}': () => 'project-master',
   /** 

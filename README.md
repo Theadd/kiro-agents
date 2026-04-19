@@ -78,7 +78,7 @@ Automatically installed alongside kiro-agents, this Power provides protocols (ag
 Protocols load only when needed, keeping your context clean. Base system uses just 1.35K tokens.
 
 **Your Agents, Your Files**
-Agents you create are saved as `.md` files in `.kiro/agents/`. Edit them like any document, version control them with git, reuse them across projects.
+Agents you create are saved as `.md` files in `.kiro/kiro-agents/`. Edit them like any document, version control them with git, reuse them across projects.
 
 ## Documentation
 

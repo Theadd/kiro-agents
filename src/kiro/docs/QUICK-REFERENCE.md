@@ -133,7 +133,7 @@ inclusion: manual
 
 ## Available Agents
 
-Check `.kiro/agents/` directory or use `/agents` command
+Check `.kiro/kiro-agents/` directory or use `/agents` command
 
 ## Tips
 

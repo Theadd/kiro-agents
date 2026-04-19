@@ -249,8 +249,8 @@ npx kiro-agents  # or bunx kiro-agents
 **2. kiro-protocols Power** → `~/.kiro/powers/kiro-protocols/`
 - Power metadata (POWER.md, mcp.json, icon.png)
 - Protocol files in steering/ subdirectory
-- Symbolic links in `~/.kiro/powers/installed/kiro-protocols/`
-- Automatic registration in `~/.kiro/powers/registry.json`
+- Physical copy in `~/.kiro/powers/installed/kiro-protocols/`
+- Automatic registration in `~/.kiro/powers/installed.json` and `registries/user-added.json`
 
 **Why Dual Installation:**
 - Protocols discoverable in Kiro Powers UI
@@ -290,7 +290,7 @@ User Installation
 
 ### Architecture
 
-**Agent Definition Files:** `.kiro/agents/{name}.md`
+**Agent Definition Files:** `.kiro/kiro-agents/{name}.md`
 
 **Components:**
 1. **Frontmatter** - Metadata (name, type, description, version)
@@ -308,7 +308,7 @@ User Installation
 - Agent management protocol loads
 - User selects creation method (Quick Start, Project-Specific, etc.)
 - AI generates agent definition based on user input
-- Agent file saved to `.kiro/agents/{name}.md`
+- Agent file saved to `.kiro/kiro-agents/{name}.md`
 
 **2. Activation**
 - User invokes `/agents {name}`
@@ -336,7 +336,7 @@ User Installation
 <alias>
   <trigger>/agents {agent_name}</trigger>
   <definition>
-1. Read `.kiro/agents/{agent_name}.md` into context
+1. Read `.kiro/kiro-agents/{agent_name}.md` into context
 2. /only-read-protocols agent-activation.md
 3. Follow agent activation steps
   </definition>
@@ -610,7 +610,7 @@ User Installation:
 
 Workspace-Specific:
 
-{workspace}/.kiro/agents/
+{workspace}/.kiro/kiro-agents/
 └── {user-created-agents}.md
 ```
 
@@ -633,7 +633,7 @@ AI loads: chit-chat.md protocol (via kiroPowers)
     ↓
 AI loads: agent-management.md protocol (via kiroPowers)
     ↓
-AI scans: .kiro/agents/ directory
+AI scans: .kiro/kiro-agents/ directory
     ↓
 AI presents: Numbered choices (create, activate, manage, etc.)
     ↓
@@ -650,7 +650,7 @@ AI executes: Open-ended generation
     ├── Generates optimal agent architecture
     └── Creates agent definition
     ↓
-AI writes: .kiro/agents/{name}.md
+AI writes: .kiro/kiro-agents/{name}.md
     ↓
 AI offers: Activate new agent?
 ```
@@ -664,7 +664,7 @@ AI detects: Instruction alias in aliases.md (always loaded)
     ↓
 AI detects: Parameter provided, activation mode
     ↓
-AI loads: .kiro/agents/{agent_name}.md
+AI loads: .kiro/kiro-agents/{agent_name}.md
     ↓
 AI loads: agent-activation.md protocol (via kiroPowers)
     ↓
@@ -770,7 +770,7 @@ User Installation (npx kiro-agents)
 ✅ **Required:**
 - Use substitutions: `{{{WS_AGENTS_PATH}}}`, `{{{INITIAL_AGENT_NAME}}}`
 - Generic terminology: "IDE" instead of "Kiro IDE"
-- Generic paths: `.ai-agents/agents` (base) → `.kiro/agents` (Kiro override)
+- Generic paths: `.ai-agents/agents` (base) → `.kiro/kiro-agents` (Kiro override)
 - Generic names: `project-master` (base) → `kiro-master` (Kiro override)
 
 ### Build System Architecture
@@ -853,7 +853,7 @@ User Installation (npx kiro-agents)
 ### Adding New Agents
 
 1. User creates agent via `/agents` command
-2. Agent file saved to `.kiro/agents/{name}.md`
+2. Agent file saved to `.kiro/kiro-agents/{name}.md`
 3. Immediately available for activation
 4. No system changes needed
 
