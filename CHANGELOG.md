@@ -1,5 +1,48 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- 8b6b833: # Migrate agent definitions directory to avoid conflict with Kiro Subagents
+
+  Kiro IDE's official Subagents feature uses the same directory as kiro-agents for custom agent definitions, causing Kiro models to fail when listing or reading Subagents due to incompatible file formats. The agent storage path has been updated across the build system, protocols, and all documentation to resolve this conflict. **Existing users must manually move their agent files from `.kiro/agents/` to `.kiro/kiro-agents/`.**
+
+  ## Added
+
+  - New `{{{GLOBAL_AGENTS_PATH}}}` substitution key in `src/config.ts` and `src/kiro/config.ts` for global user-level agent path
+
+  ## Changed
+
+  - `src/kiro/config.ts`: updated `{{{WS_AGENTS_PATH}}}` substitution and `getAgentList()` to use new agent directory
+  - `src/core/protocols/strict-mode.md`: replaced hardcoded agent path with `{{{WS_AGENTS_PATH}}}` substitution
+  - Documentation updated across `README.md`, `CONTRIBUTING.md`, `docs/ARCHITECTURE.md`, `docs/GETTING_STARTED.md`, `docs/INSTALLED-ARCHITECTURE.md`, `docs/design/reflection-architecture.md`, `docs/user-guide/reflection-system.md`
+
+  ## Fixed
+
+  - Conflict with Kiro IDE's official Subagents feature that caused model failures when scanning for custom subagents
+
+- 8b6b833: # Fix kiro-protocols power installation to be compatible with current Kiro IDE versions
+
+  The previous CLI installer used symlinks and wrote to `registry.json`, which Kiro IDE no longer uses to determine installed custom powers. The installer now replicates exactly what Kiro IDE does when a user installs a power via "Add Custom Power" UI: physical file copy and registration in the correct manifest files. **Existing installations are broken and require running `npx kiro-agents` again to reinstall.**
+
+  ## Changed
+
+  - `bin/cli.template.ts`: rewritten power installation — physical file copy replaces symlinks, correct Kiro IDE registry files are now written
+  - `docs/contributing/DUAL_INSTALLATION.md`: updated to document new two-directory power installation architecture and correct registry file locations
+  - `docs/INSTALLED-ARCHITECTURE.md`: updated directory structure, registry integration, and file permissions sections
+  - `docs/contributing/TESTING.md`: updated verification commands to reflect new registry files
+
+  ## Fixed
+
+  - `bin/cli.template.ts`: power no longer silently fails to appear in Kiro Powers UI after running `npx kiro-agents`
+  - `bin/cli.template.ts`: EPERM error on Windows caused by read-only source files during Kiro IDE's internal copy operation
+
+  ## Removed
+
+  - `bin/cli.template.ts`: symlink-based installation removed — `createSymbolicLinks()` function deleted
+  - `bin/cli.template.ts`: `registry.json` registration removed — `registerPowerInRegistry()` function deleted
+
 ## 1.15.4
 
 ### Patch Changes
